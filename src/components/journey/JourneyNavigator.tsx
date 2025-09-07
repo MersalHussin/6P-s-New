@@ -6,12 +6,12 @@ import type { PassionData } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, Zap, FileCheck, AlertTriangle, Goal, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
@@ -22,8 +22,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { content } from "@/lib/content";
-
-const P_STATIONS_CONTENT = content.ar.stations; // Assuming 'ar' for now, will adapt to language context
 
 const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: number }) => {
   const { control } = useFormContext();
@@ -39,60 +37,69 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
   
   const c = content[language].journey;
 
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {fields.map((item, index) => (
-        <div key={item.id} className="flex flex-col sm:flex-row items-start gap-3 p-4 border rounded-lg bg-background">
-          <div className="flex-grow w-full">
-            <FormLabel className="font-semibold">{c.fieldLabel} {index + 1}</FormLabel>
+        <div key={item.id} className="flex items-start gap-3 p-4 border rounded-lg bg-background/50 relative">
+          <div className="flex-grow w-full space-y-4">
             <FormField
               control={control}
               name={`passions.${passionIndex}.${fieldName}.${index}.text`}
               render={({ field }) => (
-                <FormItem className="mt-1">
+                <FormItem>
+                  <FormLabel className="font-semibold">{c.fieldLabel} {index + 1}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={2} className="text-base" placeholder={c.fieldPlaceholder}/>
+                    <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            
+            {station.id === 'purpose' && (
+              <FormField
+                  control={control}
+                  name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
+                  render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">{c.weightLabel}</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                          <SelectTrigger>
+                          <SelectValue placeholder={c.weightPlaceholder} />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          <SelectItem value="high">{c.weights.high}</SelectItem>
+                          <SelectItem value="medium">{c.weights.medium}</SelectItem>
+                          <SelectItem value="low">{c.weights.low}</SelectItem>
+                      </SelectContent>
+                      </Select>
+                      <FormMessage />
+                  </FormItem>
+                  )}
+              />
+            )}
           </div>
-          <div className="w-full sm:w-48">
-            <FormLabel className="font-semibold">{c.weightLabel}</FormLabel>
-            <FormField
-                control={control}
-                name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
-                render={({ field }) => (
-                <FormItem className="mt-1">
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                        <SelectTrigger>
-                        <SelectValue placeholder={c.weightPlaceholder} />
-                        </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                        <SelectItem value="high">{c.weights.high}</SelectItem>
-                        <SelectItem value="medium">{c.weights.medium}</SelectItem>
-                        <SelectItem value="low">{c.weights.low}</SelectItem>
-                    </SelectContent>
-                    </Select>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-           </div>
           {fields.length > 1 && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="mt-6 text-destructive hover:bg-destructive/10"
-              onClick={() => remove(index)}
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="mt-1 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{c.removeButton}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       ))}
@@ -121,10 +128,10 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
 
 
     const handleSuggestSolutions = async () => {
-        const problems = getValues(`passions.${passionIndex}.problems`);
-        const problemsText = problems.map((p: {text: string}) => p.text).filter(Boolean).join('\n');
+        const problemsData = getValues(`passions.${passionIndex}.problems`);
+        const problemsText = problemsData.map((p: {text: string}) => p.text).filter(Boolean);
         
-        if (!problemsText || problemsText.trim() === "") {
+        if (problemsText.length === 0) {
             toast({
               title: toastContent.noProblems.title,
               description: toastContent.noProblems.description,
@@ -134,7 +141,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
         }
         setLoading(true);
         try {
-          const result = await suggestSolutionsForProblems({ problems: [problemsText] });
+          const result = await suggestSolutionsForProblems({ problems: problemsText });
           setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
           toast({
             title: toastContent.suggestionsSuccess.title,
@@ -153,8 +160,8 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
 
     return (
         <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-            {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-            <Sparkles className="ml-2 h-4 w-4"/>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Sparkles className="mr-2 h-4 w-4"/>
             {c.suggestSolutionsButton}
         </Button>
     )
@@ -277,9 +284,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                           <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <span className="cursor-help text-accent">
+                                    <button type="button" className="cursor-help text-accent">
                                         <Lightbulb className="h-6 w-6" />
-                                    </span>
+                                    </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>{station.hint}</p>
@@ -327,3 +334,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
+    

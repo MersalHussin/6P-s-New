@@ -47,6 +47,7 @@ export const content = {
                 low: "ضعيفة"
             },
             addMoreButton: "إضافة بند آخر",
+            removeButton: "إزالة البند",
             suggestSolutionsButton: "اقترح لي حلولاً",
             aiSolutions: {
                 title: "حلول مقترحة من الذكاء الاصطناعي",
@@ -127,6 +128,7 @@ export const content = {
                 low: "Low"
             },
             addMoreButton: "Add Another Item",
+            removeButton: "Remove Item",
             suggestSolutionsButton: "Suggest Solutions",
             aiSolutions: {
                 title: "AI Suggested Solutions",
@@ -162,3 +164,5 @@ export const content = {
         }
     }
 }
+
+    
