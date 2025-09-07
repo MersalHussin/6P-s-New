@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import jsPDF from "jspdf";
+import 'jspdf-autotable';
+
 
 interface ResultsDisplayProps {
   passions: PassionData[];
@@ -114,7 +116,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     }
     setIsDownloading(true);
 
-    // 1. Generate and download text report
     try {
         const reportPassions = passions.map(p => ({
           ...p,
@@ -128,15 +129,43 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
-        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'Passion_Path_Report.txt';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const doc = new jsPDF();
+        
+        // This is a workaround to load a font that supports Arabic
+        // The font is a standard one, so it should be available.
+        try {
+            doc.addFont('Arial', 'Arial', 'normal');
+            doc.setFont('Arial');
+        } catch (e) {
+            console.warn("Arial font could not be set, using default.", e)
+        }
+        
+        // We use autotable to handle the complex text layout
+        (doc as any).autoTable({
+            body: [[report]],
+            startY: 10,
+            styles: {
+                font: 'Arial', // Ensure the font is set for the table
+                halign: language === 'ar' ? 'right' : 'left',
+            },
+            didDrawPage: (data: any) => {
+                if (language === 'ar') {
+                     // This is a hack to force RTL rendering in the body
+                    const text = doc.splitTextToSize(report, 180);
+                    doc.text(text, 200, 20, { align: 'right' });
+                } else {
+                    const text = doc.splitTextToSize(report, 180);
+                    doc.text(text, 10, 20);
+                }
+            },
+            // We hide the header and body of the table itself, 
+            // as we are manually drawing the text in didDrawPage
+            // This is a hack to get jsPDF to handle RTL text flow.
+            willDrawCell: () => false,
+        });
+
+        doc.save('Passion_Path_Report.pdf');
+
     } catch (e) {
       console.error(e);
       alert(dc.reportError);
@@ -144,7 +173,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
 
     // 2. Generate and download PDF certificate
     try {
-        const doc = new jsPDF({
+        const certDoc = new jsPDF({
             orientation: 'landscape',
             unit: 'px',
             format: 'a4'
@@ -155,16 +184,16 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         img.src = "https://i.suar.me/j5GBz/l";
         
         img.onload = () => {
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
+            const pageWidth = certDoc.internal.pageSize.getWidth();
+            const pageHeight = certDoc.internal.pageSize.getHeight();
+            certDoc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
 
-            doc.setFontSize(30);
-            doc.setTextColor('#000000');
-            doc.setFont('helvetica', 'bold');
-            doc.text(userName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
+            certDoc.setFontSize(30);
+            certDoc.setTextColor('#000000');
+            certDoc.setFont('helvetica', 'bold');
+            certDoc.text(userName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
 
-            doc.save('Passion_Path_Certificate.pdf');
+            certDoc.save('Passion_Path_Certificate.pdf');
             setIsDownloading(false);
             setShowDownloadDialog(false);
         };
@@ -275,3 +304,5 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     </div>
   );
 }
+
+    

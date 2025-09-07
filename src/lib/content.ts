@@ -126,7 +126,7 @@ export const content = {
         results: {
             title: "نتائج رحلتك",
             subtitle: "ده ترتيب شغفك بناءً على إجاباتك. استكشف النتائج عشان تعرف فين يكمن شغفك الأقوى.",
-            downloadButton: "تنزيل التقرير (ملف نصي)",
+            downloadButton: "تنزيل التقرير والشهادة",
             downloading: "جاري إنشاء التقرير...",
             loading: "جاري تحليل وترتيب شغفك...",
             loadingSubtitle: "الذكاء الاصطناعي بيحلل إجاباتك عشان يقدم لك أفضل ترتيب.",
@@ -263,7 +263,7 @@ aiHelper: {
         results: {
             title: "Your Journey Results",
             subtitle: "This is the ranking of your passions based on your answers. Explore the results to find out where your strongest passion lies.",
-            downloadButton: "Download Report (Text File)",
+            downloadButton: "Download Report & Certificate",
             downloading: "Generating Report...",
             loading: "Analyzing and ranking your passions...",
             loadingSubtitle: "AI is used to analyze your answers and provide the best ranking for you.",
@@ -276,3 +276,5 @@ aiHelper: {
         }
     }
 }
+
+    
