@@ -6,10 +6,13 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import type { UserData } from "@/lib/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, User, Users, Clock, ChevronsRight } from "lucide-react";
+import { Loader2, User, Users, Clock, ChevronsRight, CheckSquare, Download } from "lucide-react";
 import { format } from "date-fns";
 import { UserJourneyDetails } from "./UserJourneyDetails";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "../ui/button";
+import * as XLSX from 'xlsx';
+
 
 export function AdminDashboard() {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -36,12 +39,52 @@ export function AdminDashboard() {
     fetchUsers();
   }, []);
 
+  const handleExport = () => {
+    const flattenedData = users.map(user => {
+      const passionsData = user.journeyData?.map(passion => ({
+        passionName: passion.name,
+        purpose: passion.purpose.map(p => `${p.text} (${p.weight})`).join(', '),
+        power: passion.power.map(p => `${p.text} (${p.weight})`).join(', '),
+        proof: passion.proof.map(p => `${p.text} (${p.weight})`).join(', '),
+        problems: passion.problems.map(p => `${p.text} (${p.weight})`).join(', '),
+        possibilities: passion.possibilities.map(p => `${p.text} (${p.weight})`).join(', '),
+        suggestedSolutions: passion.suggestedSolutions?.join(', ')
+      }));
+  
+      return {
+        ID: user.id,
+        Name: user.name,
+        WhatsApp: user.whatsapp,
+        Email: user.email,
+        RegisteredOn: user.createdAt ? format(user.createdAt.toDate(), 'yyyy-MM-dd HH:mm') : '',
+        CurrentStation: user.currentStation,
+        ...passionsData?.reduce((acc, p, i) => ({
+          ...acc,
+          [`Passion ${i+1} Name`]: p.passionName,
+          [`Passion ${i+1} Purpose`]: p.purpose,
+          [`Passion ${i+1} Power`]: p.power,
+          [`Passion ${i+1} Proof`]: p.proof,
+          [`Passion ${i+1} Problems`]: p.problems,
+          [`Passion ${i+1} Possibilities`]: p.possibilities,
+          [`Passion ${i+1} Solutions`]: p.suggestedSolutions,
+        }), {})
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+    XLSX.writeFile(workbook, "PassionPath_Users.xlsx");
+  };
+
   const stationLabels: Record<string, string> = {
     'user-data': 'User Data Entry',
     'passions': 'Passion Entry',
     'journey': 'Journey In Progress',
     'results': 'Results Calculated'
   };
+
+  const completedUsers = users.filter(u => u.currentStation === 'results').length;
 
   if (loading) {
     return (
@@ -57,20 +100,33 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                    <CardTitle className="text-sm font-medium">Total Registered</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{users.length}</div>
                 </CardContent>
             </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Completed Journey</CardTitle>
+                    <CheckSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{completedUsers}</div>
+                </CardContent>
+            </Card>
         </div>
       <Card>
-        <CardHeader>
+        <CardHeader className="flex justify-between items-center">
           <CardTitle>User Journeys</CardTitle>
+          <Button onClick={handleExport} variant="outline" size="sm">
+            <Download className="mr-2 h-4 w-4"/>
+            Export to Excel
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
