@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -49,7 +50,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
               render={({ field }) => (
                 <FormItem>
                     <div className="flex items-center justify-between">
-                        <FormLabel className="font-semibold">{stationContent.singular} {index + 1}</FormLabel>
+                        <FormLabel className="font-semibold text-md">{stationContent.singular} {index + 1}</FormLabel>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -57,8 +58,8 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
                                         <Lightbulb className="h-5 w-5" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{stationContent.hint}</p>
+                                <TooltipContent className="bg-accent text-accent-foreground border-accent-foreground/20" side="top" align="center">
+                                    <p className="max-w-xs">{stationContent.hint}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -94,7 +95,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
                 )}
             />
           </div>
-          {fields.length > 1 && (
+          {fields.length > 3 && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
