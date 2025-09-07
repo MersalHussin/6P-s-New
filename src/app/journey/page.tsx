@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/language-context";
 
-const JOURNEY_STORAGE_KEY = "passionJourneyData";
-const JOURNEY_STEP_KEY = "passionJourneyStep";
+const JOURNEY_STORAGE_KEY = "passionJourneyData_v2"; // Changed key to avoid old data format issues
+const JOURNEY_STEP_KEY = "passionJourneyStep_v2";
 
 const dialogContent = {
     ar: {
@@ -55,7 +55,6 @@ export default function JourneyPage() {
       }
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
-      // Clear potentially corrupted data
       localStorage.removeItem(JOURNEY_STORAGE_KEY);
       localStorage.removeItem(JOURNEY_STEP_KEY);
     }
@@ -71,7 +70,7 @@ export default function JourneyPage() {
         }
     } catch (error) {
         console.error("Failed to load data from localStorage", error);
-        handleStartNewSession(); // Start fresh if loading fails
+        handleStartNewSession();
     }
     setShowContinueDialog(false);
   };
@@ -90,14 +89,19 @@ export default function JourneyPage() {
 
 
   const handlePassionsSubmit = (passions: { name: string }[]) => {
+    const defaultFields = () => [
+        { id: '1', text: "", weight: "" as const },
+        { id: '2', text: "", weight: "" as const },
+        { id: '3', text: "", weight: "" as const },
+    ];
     const initialData: PassionData[] = passions.map((p, index) => ({
       id: `passion-${index}`,
       name: p.name,
-      purpose: [{ id: `passion-${index}-purpose-0`, text: "", weight: "" }],
-      power: [{ id: `passion-${index}-power-0`, text: "" }],
-      proof: [{ id: `passion-${index}-proof-0`, text: "" }],
-      problems: [{ id: `passion-${index}-problems-0`, text: "" }],
-      possibilities: [{ id: `passion-${index}-possibilities-0`, text: "" }],
+      purpose: defaultFields(),
+      power: defaultFields(),
+      proof: defaultFields(),
+      problems: defaultFields(),
+      possibilities: defaultFields(),
       suggestedSolutions: [],
     }));
     setPassionsData(initialData);
@@ -118,6 +122,12 @@ export default function JourneyPage() {
     localStorage.setItem(JOURNEY_STEP_KEY, "results");
   };
 
+  const headerContent = {
+    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية" },
+    en: { title: "Passion Path", home: "Home" }
+  }
+  const hc = headerContent[language];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
         <AlertDialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
@@ -137,11 +147,11 @@ export default function JourneyPage() {
         <div className="container mx-auto flex justify-between items-center">
           <Link href="/" passHref>
             <h1 className="text-2xl font-headline font-bold text-primary">
-              مسار الشغف
+              {hc.title}
             </h1>
           </Link>
           <Link href="/" passHref>
-            <Button variant="ghost">الصفحة الرئيسية</Button>
+            <Button variant="ghost">{hc.home}</Button>
           </Link>
         </div>
       </header>

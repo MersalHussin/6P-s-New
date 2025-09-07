@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import type { PassionData } from "@/lib/types";
-import { rankPassions } from "@/ai/flows/rank-passions";
-import type { RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
-import { generateDetailedReport } from "@/ai/flows/generate-detailed-report";
-import type { GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
+import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
+import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download } from "lucide-react";
@@ -19,14 +17,9 @@ interface ResultsDisplayProps {
   passions: PassionData[];
 }
 
-// Helper to ensure data is always an array of objects with a text property
-const ensureArray = (field: any): { text: string }[] => {
+const ensureArray = (field: any): { text: string, weight: 'high' | 'medium' | 'low' | '' }[] => {
     if (Array.isArray(field)) {
       return field.filter(item => item && typeof item.text === 'string');
-    }
-    if (typeof field === 'string') {
-        // Handle cases where old data might be a string
-        return field.split(',').map(s => s.trim()).filter(s => s).map(s => ({ text: s, id: '' }));
     }
     return [];
 };
@@ -51,7 +44,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
           passions: passions.map(p => ({
             passion: p.name,
             purpose: ensureArray(p.purpose).map(pur => pur.text).filter(t => t),
-            purposeWeights: p.purpose.map(pur => purposeWeightMap[pur.weight]).filter(w => w),
+            purposeWeights: ensureArray(p.purpose).map(pur => purposeWeightMap[pur.weight]).filter(w => w),
             power: ensureArray(p.power).map(item => item.text).filter(t => t),
             proof: ensureArray(p.proof).map(item => item.text).filter(t => t),
             problems: ensureArray(p.problems).map(item => item.text).filter(t => t),
@@ -74,7 +67,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
     };
 
     getRanking();
-  }, [passions, c.error]);
+  }, [passions, c.error, language]);
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
@@ -83,6 +76,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         
         const reportPassions = passions.map(p => ({
           ...p,
+          purpose: ensureArray(p.purpose),
           power: ensureArray(p.power),
           proof: ensureArray(p.proof),
           problems: ensureArray(p.problems),
@@ -92,24 +86,24 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
-        // Use a built-in font that supports Arabic
-        doc.setFont("Amiri-Regular");
-        doc.setR2L(true);
+        doc.addFont('/Amiri-Regular.ttf', 'Amiri-Regular', 'normal');
+        doc.setFont('Amiri-Regular');
+
+        doc.setR2L(language === 'ar');
 
         doc.setFontSize(22);
         doc.text(c.reportTitle, 105, 20, { align: 'center' });
         
         doc.setFontSize(12);
         const splitText = doc.splitTextToSize(report, 180);
-        // Using autoTable to handle RTL text rendering more reliably
         autoTable(doc, {
             body: splitText.map((line: string) => [line]),
             startY: 30,
             theme: 'plain',
             styles: {
                 font: 'Amiri-Regular',
-                halign: 'right',
-                lang: 'ar'
+                halign: language === 'ar' ? 'right' : 'left',
+                lang: language,
             }
         });
         
@@ -147,15 +141,15 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
+    <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="text-center space-y-4">
             <h1 className="text-4xl font-headline font-bold text-primary">{c.title}</h1>
             <p className="text-lg text-muted-foreground">{c.subtitle}</p>
             <Button onClick={handleDownloadReport} disabled={isDownloading}>
               {isDownloading ? (
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className={language === 'ar' ? "ml-2 h-4 w-4 animate-spin" : "mr-2 h-4 w-4 animate-spin"} />
               ) : (
-                <Download className="ml-2 h-4 w-4" />
+                <Download className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
               )}
               {isDownloading ? c.downloading : c.downloadButton}
             </Button>

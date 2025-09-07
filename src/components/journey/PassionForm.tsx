@@ -8,22 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { PlusCircle, Trash2, Flame } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
+import { content } from "@/lib/content";
 
-const passionFormSchema = z.object({
-  passions: z.array(
-    z.object({
-      name: z.string().min(2, { message: "يجب أن يكون الشغف من حرفين على الأقل." }),
-    })
-  ).min(3, { message: "الرجاء إدخال 3 أنواع من الشغف على الأقل." }).max(6, { message: "يمكنك إدخال 6 أنواع من الشغف كحد أقصى." }),
-});
 
-type PassionFormValues = z.infer<typeof passionFormSchema>;
+export function PassionForm({ onSubmit }: { onSubmit: (passions: { name: string }[]) => void; }) {
+  const { language } = useLanguage();
+  const c = content[language].passionForm;
 
-interface PassionFormProps {
-  onSubmit: (passions: { name: string }[]) => void;
-}
+  const passionFormSchema = z.object({
+    passions: z.array(
+      z.object({
+        name: z.string().min(2, { message: c.validation.minLength }),
+      })
+    ).min(3, { message: c.validation.minPassions }).max(6, { message: c.validation.maxPassions }),
+  });
+  
+  type PassionFormValues = z.infer<typeof passionFormSchema>;
 
-export function PassionForm({ onSubmit }: PassionFormProps) {
   const form = useForm<PassionFormValues>({
     resolver: zodResolver(passionFormSchema),
     defaultValues: {
@@ -49,8 +51,8 @@ export function PassionForm({ onSubmit }: PassionFormProps) {
                 <Flame className="w-8 h-8" />
             </div>
             <div>
-                <CardTitle className="font-headline text-2xl">المرحلة الأولى: حدد شغفك</CardTitle>
-                <CardDescription>أدخل من 3 إلى 6 اهتمامات أو مجالات شغف تود استكشافها.</CardDescription>
+                <CardTitle className="font-headline text-2xl">{c.title}</CardTitle>
+                <CardDescription>{c.description}</CardDescription>
             </div>
         </div>
       </CardHeader>
@@ -65,7 +67,7 @@ export function PassionForm({ onSubmit }: PassionFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-2">
-                      <Input placeholder={`الشغف ${index + 1}`} {...field} className="text-base"/>
+                      <Input placeholder={`${c.placeholder} ${index + 1}`} {...field} className="text-base"/>
                       {fields.length > 3 && (
                         <Button
                           type="button"
@@ -94,14 +96,14 @@ export function PassionForm({ onSubmit }: PassionFormProps) {
                 onClick={() => append({ name: "" })}
                 className="w-full"
               >
-                <PlusCircle className="ml-2 h-4 w-4" />
-                إضافة شغف آخر
+                <PlusCircle className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
+                {c.addMoreButton}
               </Button>
             )}
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" size="lg">
-              ابدأ رحلة الاستكشاف
+              {c.cta}
             </Button>
           </CardFooter>
         </form>
