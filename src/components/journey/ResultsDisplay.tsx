@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
 
@@ -81,15 +81,6 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
     try {
         const doc = new jsPDF();
         
-        // Add Zain font
-        const font = await fetch('/Zain-Regular.ttf').then(res => res.arrayBuffer());
-        const fontBase64 = btoa(new Uint8Array(font).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-        doc.addFileToVFS("Zain-Regular.ttf", fontBase64);
-        doc.addFont("Zain-Regular.ttf", "Zain", "normal");
-        doc.setFont("Zain");
-
-        doc.setR2L(true);
-
         const reportPassions = passions.map(p => ({
           ...p,
           power: ensureArray(p.power),
@@ -101,12 +92,26 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
+        // Use a built-in font that supports Arabic
+        doc.setFont("Amiri-Regular");
+        doc.setR2L(true);
+
         doc.setFontSize(22);
         doc.text(c.reportTitle, 105, 20, { align: 'center' });
         
         doc.setFontSize(12);
         const splitText = doc.splitTextToSize(report, 180);
-        doc.text(splitText, 105, 35, { align: 'center' });
+        // Using autoTable to handle RTL text rendering more reliably
+        autoTable(doc, {
+            body: splitText.map((line: string) => [line]),
+            startY: 30,
+            theme: 'plain',
+            styles: {
+                font: 'Amiri-Regular',
+                halign: 'right',
+                lang: 'ar'
+            }
+        });
         
         doc.save("Passion_Path_Report.pdf");
 
