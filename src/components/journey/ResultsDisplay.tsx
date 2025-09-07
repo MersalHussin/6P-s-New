@@ -131,37 +131,33 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         
         const doc = new jsPDF();
         
-        // This is a workaround to load a font that supports Arabic
-        // The font is a standard one, so it should be available.
-        try {
-            doc.addFont('Arial', 'Arial', 'normal');
-            doc.setFont('Arial');
-        } catch (e) {
-            console.warn("Arial font could not be set, using default.", e)
-        }
+        // Use a built-in font that supports a wide range of characters.
+        // Let autotable handle the font assignment.
         
         // We use autotable to handle the complex text layout
         (doc as any).autoTable({
             body: [[report]],
             startY: 10,
             styles: {
-                font: 'Arial', // Ensure the font is set for the table
+                font: 'helvetica', // Using a standard font
                 halign: language === 'ar' ? 'right' : 'left',
             },
             didDrawPage: (data: any) => {
+                const doc = data.doc;
+                const text = report;
+                const textLines = doc.splitTextToSize(text, data.table.width);
                 if (language === 'ar') {
-                     // This is a hack to force RTL rendering in the body
-                    const text = doc.splitTextToSize(report, 180);
-                    doc.text(text, 200, 20, { align: 'right' });
+                    doc.setR2L(true);
+                    doc.text(textLines, data.settings.margin.left, data.cursor.y);
                 } else {
-                    const text = doc.splitTextToSize(report, 180);
-                    doc.text(text, 10, 20);
+                    doc.setR2L(false);
+                    doc.text(textLines, data.settings.margin.left, data.cursor.y);
                 }
             },
             // We hide the header and body of the table itself, 
             // as we are manually drawing the text in didDrawPage
             // This is a hack to get jsPDF to handle RTL text flow.
-            willDrawCell: () => false,
+             willDrawCell: () => false,
         });
 
         doc.save('Passion_Path_Report.pdf');
@@ -304,5 +300,3 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     </div>
   );
 }
-
-    
