@@ -45,7 +45,9 @@ const explainPrompt = ai.definePrompt({
 
   Your task is to provide a clear, detailed, and inspiring explanation of the hint in the context of their specific passion.
   Break down the hint and give them concrete examples or thought-provoking questions related to their passion "{{passionName}}".
-  The response must be in {{language}}.
+  
+  The response must be in the language code: {{language}}.
+  If the language is 'ar', you MUST respond in colloquial Egyptian Arabic (اللهجة المصرية العامية) to be more relatable to a younger audience.
 
   Example structure for your response:
   1.  Start by re-stating the hint's core idea in a simple way.

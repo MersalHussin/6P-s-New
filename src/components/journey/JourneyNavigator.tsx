@@ -376,71 +376,75 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6" ref={containerRef}>
-        <div className="flex justify-between items-center">
-            <div className="space-y-2 flex-grow">
-                <Progress value={progress} className="w-full" />
-                <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{c.progress.station}: {P_STATIONS[currentPIndex].name}</span>
-                    <span>{c.progress.overall}: {Math.round(progress)}%</span>
+    <div className="w-full max-w-4xl mx-auto" ref={containerRef}>
+        <div className="sticky top-4 z-10 bg-background/80 backdrop-blur-sm rounded-lg p-4 mb-6 border shadow-sm">
+            <div className="flex justify-between items-center">
+                <div className="space-y-2 flex-grow">
+                    <Progress value={progress} className="w-full" />
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>{c.progress.station}: {P_STATIONS[currentPIndex].name}</span>
+                        <span>{c.progress.overall}: {Math.round(progress)}%</span>
+                    </div>
+                </div>
+                <div className={cn("flex-shrink-0", language === 'ar' ? "mr-4" : "ml-4")}>
+                    <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+                        {c.progress.exploring}: {currentPassionName}
+                    </Button>
                 </div>
             </div>
-            <div className={cn("flex-shrink-0", language === 'ar' ? "mr-4" : "ml-4")}>
-                <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
-                    {c.progress.exploring}: {currentPassionName}
-                </Button>
-            </div>
-       </div>
+        </div>
 
-        <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <Card className="mt-4 overflow-hidden">
-                  <CardHeader className="bg-muted/30">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-primary/10 text-primary p-3 rounded-full">
-                        <CurrentStationIcon className="w-8 h-8" />
-                      </div>
-                      <div className='flex-grow'>
-                      <CardTitle className="font-headline text-2xl flex items-center gap-2">
-                          {c.progress.station} {currentPIndex + 1}: {station.name}
-                      </CardTitle>
-                      <CardDescription>
-                          {station.description}
-                      </CardDescription>
-                      </div>
-                    </div>
-                     <div className="flex items-center gap-2 mt-4">
-                        {P_STATIONS.map((step, index) => (
-                          <div
-                            key={step.id}
-                            className={cn(
-                              "h-2 flex-1 rounded-full transition-all",
-                              index === currentPIndex ? "bg-accent" : "bg-muted"
-                            )}
-                          />
-                        ))}
-                      </div>
-                  </CardHeader>
-                  <CardContent className="p-4 md:p-6">
-                    {station.id === 'possibilities' ? (
-                       <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
-                    ) : (
-                       <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
-                    )}
-                  </CardContent>
-                </Card>
-            </form>
-        </FormProvider>
-      <div className="flex justify-between items-center mt-6">
-        <Button onClick={handleBack} variant="outline" disabled={currentPassionIndex === 0 && currentPIndex === 0}>
-            <ArrowRight className="h-4 w-4" />
-            <span className="mx-2">{c.nav.back}</span>
-        </Button>
-        <Button onClick={handleNext}>
-            <span className="mx-2">{isLastStep ? c.nav.results : c.nav.next}</span>
-            <ArrowLeft className="h-4 w-4" />
-        </Button>
-      </div>
+        <div className="space-y-6">
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    <Card className="mt-4 overflow-hidden">
+                    <CardHeader className="bg-muted/30">
+                        <div className="flex items-center gap-4">
+                        <div className="bg-primary/10 text-primary p-3 rounded-full">
+                            <CurrentStationIcon className="w-8 h-8" />
+                        </div>
+                        <div className='flex-grow'>
+                        <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                            {c.progress.station} {currentPIndex + 1}: {station.name}
+                        </CardTitle>
+                        <CardDescription>
+                            {station.description}
+                        </CardDescription>
+                        </div>
+                        </div>
+                        <div className="flex items-center gap-2 mt-4">
+                            {P_STATIONS.map((step, index) => (
+                            <div
+                                key={step.id}
+                                className={cn(
+                                "h-2 flex-1 rounded-full transition-all",
+                                index === currentPIndex ? "bg-accent" : "bg-muted"
+                                )}
+                            />
+                            ))}
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-4 md:p-6">
+                        {station.id === 'possibilities' ? (
+                        <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
+                        ) : (
+                        <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
+                        )}
+                    </CardContent>
+                    </Card>
+                </form>
+            </FormProvider>
+        <div className="flex justify-between items-center mt-6">
+            <Button onClick={handleBack} variant="outline" disabled={currentPassionIndex === 0 && currentPIndex === 0}>
+                <ArrowRight className="h-4 w-4" />
+                <span className="mx-2">{c.nav.back}</span>
+            </Button>
+            <Button onClick={handleNext}>
+                <span className="mx-2">{isLastStep ? c.nav.results : c.nav.next}</span>
+                <ArrowLeft className="h-4 w-4" />
+            </Button>
+        </div>
+        </div>
     </div>
   );
 }
