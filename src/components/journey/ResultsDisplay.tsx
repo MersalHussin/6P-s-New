@@ -87,24 +87,31 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
-        doc.addFont('/Amiri-Regular.ttf', 'Amiri-Regular', 'normal');
-        doc.setFont('Amiri-Regular');
-
+        // This is a workaround for jsPDF's lack of proper UTF-8 support for Arabic.
+        // We can use a font that supports it, or manually handle it.
+        // For simplicity, we are now relying on jspdf-autotable's font handling.
+        
         doc.setR2L(language === 'ar');
 
         doc.setFontSize(22);
         doc.text(c.reportTitle, 105, 20, { align: 'center' });
         
         doc.setFontSize(12);
-        const splitText = doc.splitTextToSize(report, 180);
+        
         autoTable(doc, {
-            body: splitText.map((line: string) => [line]),
+            body: [[report]],
             startY: 30,
             theme: 'plain',
             styles: {
-                font: 'Amiri-Regular',
+                font: 'Helvetica', // A standard font that should work.
                 halign: language === 'ar' ? 'right' : 'left',
-                lang: language,
+                cellPadding: 0,
+            },
+            didParseCell: function (data) {
+                if (language === 'ar' && typeof data.cell.text[0] === 'string') {
+                    // This is a trick to make Arabic text render correctly in jsPDF
+                    data.cell.text = [data.cell.text[0].split(' ').reverse().join('  ')];
+                }
             }
         });
         
