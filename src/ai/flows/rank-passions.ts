@@ -14,14 +14,14 @@ import {z} from 'genkit';
 const PassionDetailsSchema = z.object({
   passion: z.string().describe('The name of the passion.'),
   purpose: z.array(z.string()).describe('The purposes for this passion.'),
-  power: z.string().describe('The strengths associated with this passion.'),
-  proof: z.string().describe('Evidence or demonstrations of this passion.'),
-  problems: z.string().describe('Problems or difficulties faced in this passion.'),
-  possibilities: z.string().describe('Potential outcomes or solutions for this passion.'),
+  power: z.array(z.string()).describe('The strengths associated with this passion.'),
+  proof: z.array(z.string()).describe('Evidence or demonstrations of this passion.'),
+  problems: z.array(z.string()).describe('Problems or difficulties faced in this passion.'),
+  possibilities: z.array(z.string()).describe('Potential outcomes or solutions for this passion.'),
   purposeWeights: z.array(z.enum(['high', 'medium', 'low'])).describe('Weights assigned to each purpose (high, medium, low).'),
 });
 
-const RankPassionsInputSchema = z.object({
+export const RankPassionsInputSchema = z.object({
   passions: z.array(PassionDetailsSchema).describe('An array of passions with their details.'),
 });
 export type RankPassionsInput = z.infer<typeof RankPassionsInputSchema>;
@@ -32,7 +32,7 @@ const RankedPassionSchema = z.object({
   reasoning: z.string().describe('Explanation of the score.'),
 });
 
-const RankPassionsOutputSchema = z.object({
+export const RankPassionsOutputSchema = z.object({
   rankedPassions: z.array(RankedPassionSchema).describe('An array of passions ranked by their calculated scores.'),
 });
 export type RankPassionsOutput = z.infer<typeof RankPassionsOutputSchema>;
@@ -59,10 +59,10 @@ const rankPassionsPrompt = ai.definePrompt({
     Passion: {{this.passion}}
     Purposes: {{this.purpose}}
     Purpose Weights: {{this.purposeWeights}}
-    Power: {{this.power}}
-    Proof: {{this.proof}}
-    Problems: {{this.problems}}
-    Possibilities: {{this.possibilities}}
+    Power: {{#each this.power}} - {{this}} {{/each}}
+    Proof: {{#each this.proof}} - {{this}} {{/each}}
+    Problems: {{#each this.problems}} - {{this}} {{/each}}
+    Possibilities: {{#each this.possibilities}} - {{this}} {{/each}}
   {{/each}}
   `,config: {
     safetySettings: [
