@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to create their own document when they sign up
+    match /users/{userId} {
+      allow create: if true;
+      
+      // Allow users to read and update their own journey data
+      allow read, update: if request.auth == null || request.auth.uid == userId;
+
+      // Allow the admin dashboard to list all users
+      allow list: if true;
+    }
+  }
+}
