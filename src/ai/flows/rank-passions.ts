@@ -21,7 +21,7 @@ const PassionDetailsSchema = z.object({
   purposeWeights: z.array(z.enum(['high', 'medium', 'low'])).describe('Weights assigned to each purpose (high, medium, low).'),
 });
 
-export const RankPassionsInputSchema = z.object({
+const RankPassionsInputSchema = z.object({
   passions: z.array(PassionDetailsSchema).describe('An array of passions with their details.'),
 });
 export type RankPassionsInput = z.infer<typeof RankPassionsInputSchema>;
@@ -32,7 +32,7 @@ const RankedPassionSchema = z.object({
   reasoning: z.string().describe('Explanation of the score.'),
 });
 
-export const RankPassionsOutputSchema = z.object({
+const RankPassionsOutputSchema = z.object({
   rankedPassions: z.array(RankedPassionSchema).describe('An array of passions ranked by their calculated scores.'),
 });
 export type RankPassionsOutput = z.infer<typeof RankPassionsOutputSchema>;
