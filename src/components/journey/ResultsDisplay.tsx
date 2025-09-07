@@ -104,8 +104,15 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         
         doc.setFontSize(12);
         
+        // This is a hack to make jsPDF handle Arabic text correctly.
+        // It's not perfect, but it's better than nothing.
+        // The main issue is that jsPDF doesn't handle RTL text layout well.
+        // This splits the text and reverses it for display.
+        const arabicText = report.split('\n').map(line => line.split(' ').reverse().join(' ')).join('\n');
+        const bodyText = language === 'ar' ? arabicText : report;
+
         autoTable(doc, {
-            body: [[report]],
+            body: [[bodyText]],
             startY: 30,
             theme: 'plain',
             styles: {
@@ -113,11 +120,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
                 halign: language === 'ar' ? 'right' : 'left',
                 cellPadding: 2,
                 fontSize: 10,
-            },
-            didParseCell: function (data) {
-                if (language === 'ar') {
-                    data.cell.text = data.cell.text[0].split('\n').map(line => line.split(' ').reverse().join(' ')).join('\n');
-                }
             }
         });
         
