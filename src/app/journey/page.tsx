@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { PassionData } from "@/lib/types";
+import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { PassionForm } from "@/components/journey/PassionForm";
 import { JourneyNavigator } from "@/components/journey/JourneyNavigator";
 import { ResultsDisplay } from "@/components/journey/ResultsDisplay";
@@ -19,8 +20,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/language-context";
 
-const JOURNEY_STORAGE_KEY = "passionJourneyData_v2"; // Changed key to avoid old data format issues
+const JOURNEY_STORAGE_KEY = "passionJourneyData_v2";
 const JOURNEY_STEP_KEY = "passionJourneyStep_v2";
+const JOURNEY_RESULTS_KEY = "passionJourneyResults_v2";
+
 
 const dialogContent = {
     ar: {
@@ -41,6 +44,7 @@ const dialogContent = {
 export default function JourneyPage() {
   const [step, setStep] = useState<"passions" | "journey" | "results">("passions");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
+  const [resultsData, setResultsData] = useState<RankPassionsOutput | null>(null);
   const [showContinueDialog, setShowContinueDialog] = useState(false);
   const { language } = useLanguage();
   const c = dialogContent[language];
@@ -55,8 +59,10 @@ export default function JourneyPage() {
       }
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
+      // Clear potentially corrupted data
       localStorage.removeItem(JOURNEY_STORAGE_KEY);
       localStorage.removeItem(JOURNEY_STEP_KEY);
+      localStorage.removeItem(JOURNEY_RESULTS_KEY);
     }
   }, []);
 
@@ -64,13 +70,20 @@ export default function JourneyPage() {
     try {
         const savedData = localStorage.getItem(JOURNEY_STORAGE_KEY);
         const savedStep = localStorage.getItem(JOURNEY_STEP_KEY);
+        const savedResults = localStorage.getItem(JOURNEY_RESULTS_KEY);
+
         if (savedData && savedStep) {
             setPassionsData(JSON.parse(savedData));
-            setStep(savedStep as "passions" | "journey" | "results");
+            const currentStep = savedStep as "passions" | "journey" | "results";
+            setStep(currentStep);
+            
+            if (currentStep === 'results' && savedResults) {
+                setResultsData(JSON.parse(savedResults));
+            }
         }
     } catch (error) {
-        console.error("Failed to load data from localStorage", error);
-        handleStartNewSession();
+        console.error("Failed to parse saved data from localStorage", error);
+        handleStartNewSession(); // Start fresh if data is corrupted
     }
     setShowContinueDialog(false);
   };
@@ -79,10 +92,12 @@ export default function JourneyPage() {
     try {
         localStorage.removeItem(JOURNEY_STORAGE_KEY);
         localStorage.removeItem(JOURNEY_STEP_KEY);
+        localStorage.removeItem(JOURNEY_RESULTS_KEY);
     } catch (error) {
         console.error("Failed to clear localStorage", error);
     }
     setPassionsData([]);
+    setResultsData(null);
     setStep("passions");
     setShowContinueDialog(false);
   };
@@ -121,6 +136,11 @@ export default function JourneyPage() {
     localStorage.setItem(JOURNEY_STORAGE_KEY, JSON.stringify(finalData));
     localStorage.setItem(JOURNEY_STEP_KEY, "results");
   };
+
+  const handleResultsCalculated = (results: RankPassionsOutput) => {
+    setResultsData(results);
+    localStorage.setItem(JOURNEY_RESULTS_KEY, JSON.stringify(results));
+  }
 
   const headerContent = {
     ar: { title: "مسار الشغف", home: "الصفحة الرئيسية" },
@@ -166,7 +186,13 @@ export default function JourneyPage() {
             onDataChange={handleJourneyUpdate}
           />
         )}
-        {step === "results" && passionsData.length > 0 && <ResultsDisplay passions={passionsData} />}
+        {step === "results" && passionsData.length > 0 && (
+            <ResultsDisplay 
+                passions={passionsData}
+                initialResults={resultsData}
+                onResultsCalculated={handleResultsCalculated}
+            />
+        )}
       </main>
     </div>
   );

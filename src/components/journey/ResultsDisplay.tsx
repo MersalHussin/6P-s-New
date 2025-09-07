@@ -15,6 +15,8 @@ import { content } from "@/lib/content";
 
 interface ResultsDisplayProps {
   passions: PassionData[];
+  initialResults: RankPassionsOutput | null;
+  onResultsCalculated: (results: RankPassionsOutput) => void;
 }
 
 const ensureArray = (field: any): FieldItem[] => {
@@ -29,9 +31,9 @@ const ensureArray = (field: any): FieldItem[] => {
 };
 
 
-export function ResultsDisplay({ passions }: ResultsDisplayProps) {
-  const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(null);
-  const [loading, setLoading] = useState(true);
+export function ResultsDisplay({ passions, initialResults, onResultsCalculated }: ResultsDisplayProps) {
+  const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(initialResults);
+  const [loading, setLoading] = useState(!initialResults);
   const [error, setError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const { language } = useLanguage();
@@ -39,6 +41,13 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
 
   useEffect(() => {
     const getRanking = async () => {
+      // If we already have the results (from props/localStorage), don't fetch again.
+      if (initialResults) {
+        setRankedPassions(initialResults);
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       setError(null);
       try {
@@ -58,6 +67,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         result.rankedPassions.sort((a, b) => b.score - a.score);
         
         setRankedPassions(result);
+        onResultsCalculated(result); // Pass the newly calculated results up to the parent
 
       } catch (e) {
         console.error(e);
@@ -68,7 +78,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
     };
 
     getRanking();
-  }, [passions, c.error, language]);
+  }, [passions, c.error, language, initialResults, onResultsCalculated]);
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
@@ -98,19 +108,22 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         
         doc.setFontSize(12);
         
+        // Let autotable handle the content wrapping and styling
         autoTable(doc, {
             body: [[report]],
             startY: 30,
             theme: 'plain',
             styles: {
-                font: 'Helvetica', // A standard font that should work.
+                font: 'Helvetica', // A standard font
                 halign: language === 'ar' ? 'right' : 'left',
-                cellPadding: 0,
+                cellPadding: 2,
+                fontSize: 10,
             },
             didParseCell: function (data) {
-                if (language === 'ar' && typeof data.cell.text[0] === 'string') {
-                    // This is a trick to make Arabic text render correctly in jsPDF
-                    data.cell.text = [data.cell.text[0].split(' ').reverse().join('  ')];
+                // You might need custom logic for complex text, but autotable handles basic RTL well
+                if (language === 'ar') {
+                    // a more reliable way to reverse for display in some PDF viewers
+                    data.cell.text = data.cell.text[0].split('\n').map(line => line.split(' ').reverse().join(' ')).join('\n');
                 }
             }
         });
