@@ -31,8 +31,8 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         const input: RankPassionsInput = {
           passions: passions.map(p => ({
             passion: p.name,
-            purpose: p.purpose.map(pur => pur.text),
-            purposeWeights: p.purpose.map(pur => purposeWeightMap[pur.weight]),
+            purpose: p.purpose.map(pur => pur.text).filter(t => t),
+            purposeWeights: p.purpose.map(pur => purposeWeightMap[pur.weight]).filter(w => w),
             power: p.power,
             proof: p.proof,
             problems: p.problems,

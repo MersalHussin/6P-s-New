@@ -28,7 +28,7 @@ const PassionDataSchema = z.object({
   suggestedSolutions: z.array(z.string()).optional(),
 });
 
-export const GenerateDetailedReportInputSchema = z.object({
+const GenerateDetailedReportInputSchema = z.object({
   passions: z.array(PassionDataSchema),
 });
 export type GenerateDetailedReportInput = z.infer<typeof GenerateDetailedReportInputSchema>;
