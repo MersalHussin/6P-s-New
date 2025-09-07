@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { PassionData } from "@/lib/types";
+import type { PassionData, UserData } from "@/lib/types";
 import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { PassionForm } from "@/components/journey/PassionForm";
 import { JourneyNavigator } from "@/components/journey/JourneyNavigator";
@@ -19,82 +19,91 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/language-context";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { Loader2 } from "lucide-react";
 
-const JOURNEY_STORAGE_KEY = "passionJourneyData_v2";
-const JOURNEY_STEP_KEY = "passionJourneyStep_v2";
-const JOURNEY_RESULTS_KEY = "passionJourneyResults_v2";
-
+const USER_ID_KEY = "passionJourneyUserId_v2";
 
 const dialogContent = {
     ar: {
         title: "لديك جلسة سابقة",
         description: "لقد وجدنا بيانات محفوظة من رحلتك الأخيرة. هل تود المتابعة من حيث توقفت، أم بدء رحلة جديدة؟",
         continue: "المتابعة",
-        startNew: "بدء رحلة جديدة"
+        startNew: "بدء رحلة جديدة",
+        loading: "جاري تحميل بياناتك...",
+        noUser: "لم نجد مستخدمًا. سيتم توجيهك للبداية."
     },
     en: {
         title: "You have a previous session",
         description: "We found saved data from your last journey. Would you like to continue where you left off, or start a new journey?",
         continue: "Continue",
-        startNew: "Start New Journey"
+        startNew: "Start New Journey",
+        loading: "Loading your data...",
+        noUser: "No user found. Redirecting to start."
     }
 }
 
-
 export default function JourneyPage() {
-  const [step, setStep] = useState<"passions" | "journey" | "results">("passions");
+  const [step, setStep] = useState<"loading" | "passions" | "journey" | "results">("loading");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
   const [resultsData, setResultsData] = useState<RankPassionsOutput | null>(null);
   const [showContinueDialog, setShowContinueDialog] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { language } = useLanguage();
   const c = dialogContent[language];
 
   useEffect(() => {
-    try {
-      const savedData = localStorage.getItem(JOURNEY_STORAGE_KEY);
-      const savedStep = localStorage.getItem(JOURNEY_STEP_KEY);
-
-      if (savedData && savedStep) {
+    const storedUserId = localStorage.getItem(USER_ID_KEY);
+    if (storedUserId) {
+        setUserId(storedUserId);
         setShowContinueDialog(true);
-      }
-    } catch (error) {
-      console.error("Failed to load data from localStorage", error);
-      // Clear potentially corrupted data
-      localStorage.removeItem(JOURNEY_STORAGE_KEY);
-      localStorage.removeItem(JOURNEY_STEP_KEY);
-      localStorage.removeItem(JOURNEY_RESULTS_KEY);
+    } else {
+        console.warn(c.noUser);
+        // Maybe redirect to home page or show a message
+        setStep("passions"); // Or redirect: router.push('/')
     }
-  }, []);
+  }, [c.noUser]);
 
-  const handleContinueSession = () => {
+
+  const loadUserData = async (currentUserId: string) => {
     try {
-        const savedData = localStorage.getItem(JOURNEY_STORAGE_KEY);
-        const savedStep = localStorage.getItem(JOURNEY_STEP_KEY);
-        const savedResults = localStorage.getItem(JOURNEY_RESULTS_KEY);
+        const userDocRef = doc(db, "users", currentUserId);
+        const userDoc = await getDoc(userDocRef);
 
-        if (savedData && savedStep) {
-            setPassionsData(JSON.parse(savedData));
-            const currentStep = savedStep as "passions" | "journey" | "results";
+        if (userDoc.exists()) {
+            const userData = userDoc.data() as UserData;
+            setPassionsData(userData.journeyData || []);
+            setResultsData(userData.resultsData || null);
+            const currentStep = (userData.currentStation as "passions" | "journey" | "results") || "passions";
             setStep(currentStep);
-            
-            if (currentStep === 'results' && savedResults) {
-                setResultsData(JSON.parse(savedResults));
-            }
+        } else {
+            console.error("No user document found for ID:", currentUserId);
+            handleStartNewSession();
         }
     } catch (error) {
-        console.error("Failed to parse saved data from localStorage", error);
-        handleStartNewSession(); // Start fresh if data is corrupted
+        console.error("Failed to load data from Firestore", error);
+        handleStartNewSession();
     }
+  };
+  
+  const handleContinueSession = () => {
+    if(userId) loadUserData(userId);
     setShowContinueDialog(false);
   };
 
-  const handleStartNewSession = () => {
-    try {
-        localStorage.removeItem(JOURNEY_STORAGE_KEY);
-        localStorage.removeItem(JOURNEY_STEP_KEY);
-        localStorage.removeItem(JOURNEY_RESULTS_KEY);
-    } catch (error) {
-        console.error("Failed to clear localStorage", error);
+  const handleStartNewSession = async () => {
+    if(userId) {
+        try {
+            const userDocRef = doc(db, "users", userId);
+            await updateDoc(userDocRef, {
+                journeyData: [],
+                resultsData: null,
+                currentStation: 'passions',
+            });
+        } catch (error) {
+            console.error("Failed to clear user data in Firestore", error);
+        }
     }
     setPassionsData([]);
     setResultsData(null);
@@ -102,6 +111,18 @@ export default function JourneyPage() {
     setShowContinueDialog(false);
   };
 
+  const updateFirestore = async (data: Partial<UserData>) => {
+    if (!userId) return;
+    try {
+        const userDocRef = doc(db, "users", userId);
+        await updateDoc(userDocRef, {
+            ...data,
+            lastUpdated: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error updating document: ", error);
+    }
+  };
 
   const handlePassionsSubmit = (passions: { name: string }[]) => {
     const defaultFields = () => [
@@ -121,30 +142,28 @@ export default function JourneyPage() {
     }));
     setPassionsData(initialData);
     setStep("journey");
-    localStorage.setItem(JOURNEY_STORAGE_KEY, JSON.stringify(initialData));
-    localStorage.setItem(JOURNEY_STEP_KEY, "journey");
+    updateFirestore({ journeyData: initialData, currentStation: "journey" });
   };
   
   const handleJourneyUpdate = (updatedData: PassionData[]) => {
     setPassionsData(updatedData);
-    localStorage.setItem(JOURNEY_STORAGE_KEY, JSON.stringify(updatedData));
+    updateFirestore({ journeyData: updatedData });
   }
 
   const handleJourneyComplete = (finalData: PassionData[]) => {
     setPassionsData(finalData);
     setStep("results");
-    localStorage.setItem(JOURNEY_STORAGE_KEY, JSON.stringify(finalData));
-    localStorage.setItem(JOURNEY_STEP_KEY, "results");
+    updateFirestore({ journeyData: finalData, currentStation: "results" });
   };
 
   const handleResultsCalculated = (results: RankPassionsOutput) => {
     setResultsData(results);
-    localStorage.setItem(JOURNEY_RESULTS_KEY, JSON.stringify(results));
+    updateFirestore({ resultsData: results });
   }
 
   const headerContent = {
-    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية" },
-    en: { title: "Passion Path", home: "Home" }
+    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية", admin: "لوحة التحكم" },
+    en: { title: "Passion Path", home: "Home", admin: "Admin" }
   }
   const hc = headerContent[language];
 
@@ -170,12 +189,23 @@ export default function JourneyPage() {
               {hc.title}
             </h1>
           </Link>
-          <Link href="/" passHref>
-            <Button variant="ghost">{hc.home}</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/admin" passHref>
+                <Button variant="ghost">{hc.admin}</Button>
+            </Link>
+            <Link href="/" passHref>
+                <Button variant="ghost">{hc.home}</Button>
+            </Link>
+          </div>
         </div>
       </header>
       <main className="container mx-auto px-4 py-8">
+        {step === "loading" && (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                <h2 className="text-2xl font-headline text-muted-foreground">{c.loading}</h2>
+            </div>
+        )}
         {step === "passions" && (
           <PassionForm onSubmit={handlePassionsSubmit} />
         )}

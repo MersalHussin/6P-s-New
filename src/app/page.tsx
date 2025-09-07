@@ -1,9 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Globe, MoveLeft, MoveRight } from "lucide-react";
-import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,11 +12,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
+import { UserForm } from "@/components/journey/UserForm";
+import {
+    Dialog,
+    DialogContent,
+    DialogTrigger,
+  } from "@/components/ui/dialog"
+import { useRouter } from "next/navigation";
+
 
 export default function Home() {
   const { language, setLanguage } = useLanguage();
   const c = content[language];
   const ArrowIcon = language === 'ar' ? MoveLeft : MoveRight;
+  const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleUserFormSubmit = (userId: string) => {
+    setIsDialogOpen(false);
+    router.push('/journey');
+  };
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-8 md:p-12">
@@ -62,12 +78,17 @@ export default function Home() {
             <p className="text-center font-body max-w-2xl text-foreground/80">
               {c.description}
             </p>
-            <Link href="/journey" passHref>
-              <Button size="lg" className="font-headline font-bold text-lg">
-                {c.cta}
-                <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
-              </Button>
-            </Link>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="font-headline font-bold text-lg">
+                  {c.cta}
+                  <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                 <UserForm onUserCreated={handleUserFormSubmit} />
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
       </div>
