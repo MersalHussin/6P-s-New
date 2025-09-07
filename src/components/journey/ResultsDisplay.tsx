@@ -6,7 +6,7 @@ import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/
 import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Award, Download, CheckCircle, FileText, Smartphone, Laptop } from "lucide-react";
+import { Loader2, Award, Download, CheckCircle, FileText, Smartphone, Laptop, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
@@ -50,11 +50,10 @@ const downloadContent = {
         reportDialog: {
             title: "تنبيه قبل تنزيل التقرير",
             description: "سيتم تنزيل التقرير كملف نصي (.txt). قد تحتاج إلى تطبيق معين لفتحه على هاتفك.",
-            android: "لمستخدمي أندرويد، نوصي باستخدام تطبيق Files by Google.",
-            ios: "لمستخدمي آيفون، يمكنك استخدام تطبيق Files المدمج في النظام.",
+            android: "لمستخدمي أندرويد، نوصي بتنزيل تطبيق بسيط لعرض الملفات النصية.",
+            ios: "لمستخدمي آيفون، يمكنك استخدام تطبيق Files المدمج في النظام لفتح التقرير.",
             computer: "إذا كنت تستخدم جهاز كمبيوتر، سيفتح الملف بسهولة.",
-            androidLink: "افتح Files by Google",
-            iosLink: "تعرّف على تطبيق Files",
+            androidLink: "تنزيل Text Viewer",
             continue: "تنزيل التقرير",
             cancel: "إلغاء",
             error: "حدث خطأ أثناء إنشاء التقرير. الرجاء المحاولة مرة أخرى.",
@@ -73,11 +72,10 @@ const downloadContent = {
         reportDialog: {
             title: "Heads-up Before Downloading Report",
             description: "The report will be downloaded as a text file (.txt). You might need a specific app to open it on your phone.",
-            android: "For Android users, we recommend using the Files by Google app.",
-            ios: "For iPhone users, you can use the built-in Files app.",
+            android: "For Android users, we recommend downloading a simple app to view text files.",
+            ios: "For iPhone users, you can use the built-in Files app to open the report.",
             computer: "If you're on a computer, the file will open easily.",
-            androidLink: "Get Files by Google",
-            iosLink: "Learn about the Files app",
+            androidLink: "Download Text Viewer",
             continue: "Download Report",
             cancel: "Cancel",
             error: "An error occurred while generating the report. Please try again.",
@@ -281,17 +279,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
             <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <AlertDialogHeader className={cn(language === 'ar' ? "text-right" : "text-left")}>
-                    <AlertDialogTitle className="flex items-center gap-2">{dc.reportDialog.title}</AlertDialogTitle>
-                    <AlertDialogDescription>{dc.reportDialog.description}</AlertDialogDescription>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                       <AlertTriangle className="text-destructive"/> {dc.reportDialog.title}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className={cn(language === 'ar' ? "text-right" : "text-left")}>{dc.reportDialog.description}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className={cn("space-y-4 text-sm", language === 'ar' ? "text-right" : "text-left")}>
                     <div className="flex items-start gap-3">
                         <Smartphone className="h-5 w-5 mt-0.5 text-muted-foreground" />
                         <div className="flex-grow">
-                            <p>{dc.reportDialog.android}</p>
-                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.files" target="_blank" rel="noopener noreferrer" className="text-primary underline">{dc.reportDialog.androidLink}</a>
-                            <p className="mt-2">{dc.reportDialog.ios}</p>
-                            <a href="https://support.apple.com/guide/iphone/view-files-and-folders-iphc61044c68/ios" target="_blank" rel="noopener noreferrer" className="text-primary underline">{dc.reportDialog.iosLink}</a>
+                            <p><b>{language === 'ar' ? "لمستخدمي أندرويد:" : "For Android Users:"}</b> {dc.reportDialog.android}</p>
+                            <a href="https://play.google.com/store/apps/details?id=com.panagola.app.textviewer" target="_blank" rel="noopener noreferrer" className="text-primary underline">{dc.reportDialog.androidLink}</a>
+                            <p className="mt-2"><b>{language === 'ar' ? "لمستخدمي آيفون:" : "For iPhone Users:"}</b> {dc.reportDialog.ios}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -356,5 +355,3 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     </div>
   );
 }
-
-    
