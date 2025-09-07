@@ -8,8 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
 
@@ -83,8 +81,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
   const handleDownloadReport = async () => {
     setIsDownloading(true);
     try {
-        const doc = new jsPDF();
-        
         const reportPassions = passions.map(p => ({
           ...p,
           purpose: ensureArray(p.purpose),
@@ -97,28 +93,15 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
-        doc.setR2L(language === 'ar');
-
-        doc.setFontSize(22);
-        doc.text(c.reportTitle, 105, 20, { align: 'center' });
-        
-        // Split the report into lines to be processed by autoTable
-        const lines = doc.splitTextToSize(report, 180);
-
-        // Use autoTable to draw the text, which handles RTL and text wrapping better
-        autoTable(doc, {
-            body: [lines],
-            startY: 30,
-            theme: 'plain',
-            styles: {
-                font: 'Helvetica', // A standard font that should not cause issues.
-                halign: language === 'ar' ? 'right' : 'left',
-                cellPadding: 2,
-                fontSize: 12,
-            }
-        });
-        
-        doc.save("Passion_Path_Report.pdf");
+        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'Passion_Path_Report.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
 
     } catch (e) {
       console.error(e);
