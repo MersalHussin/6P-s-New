@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import jsPDF from "jspdf";
 import 'jspdf-autotable';
 import { cn } from "@/lib/utils";
+import Confetti from "react-confetti";
 
 
 interface ResultsDisplayProps {
@@ -95,10 +96,25 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
   const [showCertDialog, setShowCertDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
 
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
   const [userName, setUserName] = useState("");
   const { language } = useLanguage();
   const c = content[language].results;
   const dc = downloadContent[language];
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   useEffect(() => {
     const getRanking = async () => {
@@ -128,6 +144,10 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         
         setRankedPassions(result);
         onResultsCalculated(result);
+
+        // Trigger confetti
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 4000); // Hide confetti after 4 seconds
 
       } catch (e) {
         console.error(e);
@@ -241,6 +261,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
         {/* Certificate Download Dialog */}
         <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>

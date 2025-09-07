@@ -34,7 +34,7 @@ export type RankPassionsInput = z.infer<typeof RankPassionsInputSchema>;
 const RankedPassionSchema = z.object({
   passion: z.string().describe('The name of the passion.'),
   score: z.number().describe('The calculated score for the passion.'),
-  reasoning: z.string().describe('Explanation of the score.'),
+  reasoning: z.string().describe('A qualitative, insightful explanation for the ranking. Should include actionable advice for growth.'),
 });
 
 const RankPassionsOutputSchema = z.object({
@@ -51,19 +51,24 @@ const rankPassionsPrompt = ai.definePrompt({
   name: 'rankPassionsPrompt',
   input: {schema: RankPassionsInputSchema},
   output: {schema: RankPassionsOutputSchema},
-  prompt: `You are an expert career coach helping young adults discover their passions.
+  prompt: `You are an expert career coach helping young adults discover their passions. Your tone is encouraging, insightful, and realistic.
 
   You will receive a list of passions with details provided by the user. Rank these passions based on the user's input in each category (Purpose, Power, Proof, Problems, Possibilities).
 
-  The scoring model is as follows:
+  The scoring model is as follows (use this for ranking, but do not mention points in your response):
   - For Purpose, Power, Proof, and Possibilities: high weight = 3 points, medium weight = 2 points, low weight = 1 point. An empty weight counts as 1 point.
   - For Problems: high weight = -3 points, medium weight = -2 points, low weight = -1 point. An empty weight counts as -1 point.
   
-  Calculate a total score for each passion by summing the points from all items across all categories. The score should reflect the overall potential and alignment of the passion with the user's inputs. A higher score is better.
+  Calculate a total score for each passion. Rank the passions from highest to lowest score.
 
-  Return the passions ranked from highest to lowest score. For each passion, provide a comprehensive reasoning that explains how the score was calculated, mentioning the positive contributions from Purpose, Power, Proof, and Possibilities, and the negative impact of the Problems. Be specific and reference the user's own words.
+  For each passion, provide a comprehensive "reasoning" that is both analytical and encouraging. This is the most important part.
+  The reasoning must NOT mention the scoring or points. Instead, it should be a qualitative analysis that feels personal.
+  - Start by summarizing why this passion scored the way it did in a narrative format. For example, "Your passion for [Passion Name] seems to shine brightly because of your strong sense of purpose and the clear strengths you possess. You gave high importance to how it helps you [mention a purpose], which shows a deep connection."
+  - For high-ranking passions, highlight the synergy between their purpose, power, and possibilities.
+  - For lower-ranking passions, gently point out the challenges (problems) or weaker connections in areas like proof or purpose, framing them as areas for growth.
+  - Conclude the reasoning for EACH passion with a "Next Steps" section. Provide 2-3 concrete, actionable pieces of advice to help them develop in this area. Base these tips on the problems and possibilities they listed. For example, "To overcome the challenge of [Problem], you could try [Actionable Tip]."
 
-  The entire response, especially the reasoning, MUST be in the specified language: {{language}}.
+  The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}.
   If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
 
   Here are the passions with their details:
