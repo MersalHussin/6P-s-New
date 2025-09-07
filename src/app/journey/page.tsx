@@ -11,6 +11,10 @@ import { Button } from "@/components/ui/button";
 const JOURNEY_STORAGE_KEY = "passionJourneyData";
 const JOURNEY_STEP_KEY = "passionJourneyStep";
 
+function getInitialFieldValue(idPrefix: string) {
+    return [{ id: `${idPrefix}-0`, text: "", weight: "" }];
+}
+
 export default function JourneyPage() {
   const [step, setStep] = useState<"passions" | "journey" | "results">("passions");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
@@ -35,15 +39,11 @@ export default function JourneyPage() {
     const initialData: PassionData[] = passions.map((p, index) => ({
       id: `passion-${index}`,
       name: p.name,
-      purpose: [
-        { id: "purpose-0", text: "", weight: "" },
-        { id: "purpose-1", text: "", weight: "" },
-        { id: "purpose-2", text: "", weight: "" },
-      ],
-      power: "",
-      proof: "",
-      problems: "",
-      possibilities: "",
+      purpose: [{ id: `passion-${index}-purpose-0`, text: "", weight: "" }],
+      power: [{ id: `passion-${index}-power-0`, text: "" }],
+      proof: [{ id: `passion-${index}-proof-0`, text: "" }],
+      problems: [{ id: `passion-${index}-problems-0`, text: "" }],
+      possibilities: [{ id: `passion-${index}-possibilities-0`, text: "" }],
       suggestedSolutions: [],
     }));
     setPassionsData(initialData);

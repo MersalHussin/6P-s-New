@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { useForm, FormProvider, useFormContext, Controller } from 'react-hook-form';
+import { useForm, FormProvider, useFieldArray, useFormContext } from 'react-hook-form';
 import type { PassionData } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,133 +12,159 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, Zap, FileCheck, AlertTriangle, Goal, Sparkles, MoveLeft, MoveRight } from 'lucide-react';
+import { Loader2, Lightbulb, Zap, FileCheck, AlertTriangle, Goal, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const P_STATIONS = [
-  { id: 'purpose', name: 'الهدف', icon: Goal },
-  { id: 'power', name: 'القوة', icon: Zap },
-  { id: 'proof', name: 'الإثبات', icon: FileCheck },
-  { id: 'problems', name: 'المشاكل', icon: AlertTriangle },
-  { id: 'possibilities', name: 'الاحتمالات', icon: Lightbulb },
+  { id: 'purpose', name: 'الهدف', icon: Goal, hint: 'ما الذي تأمل في تحقيقه أو الشعور به من خلال هذا الشغف؟' },
+  { id: 'power', name: 'القوة', icon: Zap, hint: 'ما هي المهارات والمواهب التي تمتلكها وتتعلق بهذا الشغف؟' },
+  { id: 'proof', name: 'الإثبات', icon: FileCheck, hint: 'ما هي المشاريع أو التجارب السابقة التي تظهر شغفك في هذا المجال؟' },
+  { id: 'problems', name: 'المشاكل', icon: AlertTriangle, hint: 'ما هي العقبات أو التحديات التي تواجهك في ممارسة هذا الشغف؟' },
+  { id: 'possibilities', name: 'الاحتمالات', icon: Lightbulb, hint: 'ما هي الفرص المستقبلية أو المشاريع التي يمكنك القيام بها في هذا المجال؟' },
 ];
 
-const GeneralForm = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: number }) => {
+const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: number }) => {
   const { control } = useFormContext();
   const station = P_STATIONS[pIndex];
-  const fieldName = station.id as 'power' | 'proof' | 'problems' | 'possibilities';
+  const fieldName = station.id as 'purpose' | 'power' | 'proof' | 'problems' | 'possibilities';
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `passions.${passionIndex}.${fieldName}`,
+  });
 
   return (
     <div className="space-y-4">
-      <FormField
-        control={control}
-        name={`passions.${passionIndex}.${fieldName}`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-lg font-headline">أخبرنا عن {station.name}</FormLabel>
-            <FormControl>
-              <Textarea {...field} rows={6} className="text-base" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-  );
-};
+      <div className='flex items-center gap-2'>
+        <FormLabel className="text-lg font-headline">أخبرنا عن {station.name}</FormLabel>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-accent cursor-pointer">
+                        <Lightbulb className="h-5 w-5" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{station.hint}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+      </div>
 
-const PurposeForm = ({ passionIndex }: { passionIndex: number }) => {
-  const { control } = useFormContext();
-  return (
-    <div className="space-y-6">
-      {[0, 1, 2].map((index) => (
-        <div key={index} className="space-y-2 rounded-lg border p-4">
-          <FormField
+      {fields.map((item, index) => (
+        <div key={item.id} className="flex items-center gap-2">
+           <FormField
             control={control}
-            name={`passions.${passionIndex}.purpose.${index}.text`}
+            name={`passions.${passionIndex}.${fieldName}.${index}.text`}
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>الهدف {index + 1}</FormLabel>
+              <FormItem className="flex-grow">
                 <FormControl>
-                  <Input {...field} placeholder={`اكتب هدفك من هذا الشغف...`}/>
+                  <Textarea {...field} rows={2} className="text-base" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={control}
-            name={`passions.${passionIndex}.purpose.${index}.weight`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>درجة الأهمية</FormLabel>
-                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر درجة الأهمية" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="high">عالية (6 نقاط)</SelectItem>
-                    <SelectItem value="medium">متوسطة (4 نقاط)</SelectItem>
-                    <SelectItem value="low">ضعيفة (نقطتان)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {fieldName === 'purpose' && (
+             <FormField
+                control={control}
+                name={`passions.${passionIndex}.purpose.${index}.weight`}
+                render={({ field }) => (
+                <FormItem className="w-48">
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder="الأهمية" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="high">عالية</SelectItem>
+                        <SelectItem value="medium">متوسطة</SelectItem>
+                        <SelectItem value="low">ضعيفة</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+          )}
+          {fields.length > 1 && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => remove(index)}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          )}
         </div>
       ))}
-    </div>
-  );
-};
-
-const ProblemsForm = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: number }) => {
-  const { control, getValues, setValue } = useFormContext();
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSuggestSolutions = async () => {
-    const problemsText = getValues(`passions.${passionIndex}.problems`);
-    if (!problemsText || problemsText.trim() === "") {
-        toast({
-          title: "لا توجد مشاكل",
-          description: "الرجاء كتابة المشاكل التي تواجهك أولاً.",
-          variant: "destructive",
-        });
-        return;
-    }
-    setLoading(true);
-    try {
-      const result = await suggestSolutionsForProblems({ problems: [problemsText] });
-      setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
-      toast({
-        title: "تم إنشاء الاقتراحات بنجاح!",
-        description: "يمكنك رؤية الحلول المقترحة في المحطة التالية.",
-      });
-    } catch (error) {
-        toast({
-          title: "حدث خطأ",
-          description: "لم نتمكن من إنشاء اقتراحات. الرجاء المحاولة مرة أخرى.",
-          variant: "destructive",
-        });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <GeneralForm pIndex={pIndex} passionIndex={passionIndex} />
-      <Button onClick={handleSuggestSolutions} disabled={loading} type="button">
-        {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-        اقترح لي حلولاً
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={() => append({ text: '', weight: '' })}
+      >
+        <PlusCircle className="ml-2 h-4 w-4" />
+        إضافة المزيد
       </Button>
+
+       {station.id === 'problems' && <SuggestSolutionsButton passionIndex={passionIndex} />}
     </div>
   );
 };
+
+const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
+    const { getValues, setValue } = useFormContext();
+    const [loading, setLoading] = useState(false);
+    const { toast } = useToast();
+
+    const handleSuggestSolutions = async () => {
+        const problems = getValues(`passions.${passionIndex}.problems`);
+        const problemsText = problems.map((p: {text: string}) => p.text).join('\n');
+        
+        if (!problemsText || problemsText.trim() === "") {
+            toast({
+              title: "لا توجد مشاكل",
+              description: "الرجاء كتابة المشاكل التي تواجهك أولاً.",
+              variant: "destructive",
+            });
+            return;
+        }
+        setLoading(true);
+        try {
+          const result = await suggestSolutionsForProblems({ problems: [problemsText] });
+          setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
+          toast({
+            title: "تم إنشاء الاقتراحات بنجاح!",
+            description: "يمكنك رؤية الحلول المقترحة في المحطة التالية.",
+          });
+        } catch (error) {
+            toast({
+              title: "حدث خطأ",
+              description: "لم نتمكن من إنشاء اقتراحات. الرجاء المحاولة مرة أخرى.",
+              variant: "destructive",
+            });
+        } finally {
+          setLoading(false);
+        }
+      };
+
+    return (
+        <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="mt-4">
+            {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+            اقترح لي حلولاً
+        </Button>
+    )
+}
 
 const PossibilitiesForm = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: number }) => {
     const { watch } = useFormContext();
@@ -147,9 +173,9 @@ const PossibilitiesForm = ({ pIndex, passionIndex }: { pIndex: number; passionIn
     return (
       <div className="space-y-4">
         {suggestedSolutions && suggestedSolutions.length > 0 && (
-          <Alert>
-            <Sparkles className="h-4 w-4" />
-            <AlertTitle>حلول مقترحة من الذكاء الاصطناعي</AlertTitle>
+          <Alert className="bg-accent/10 border-accent/30">
+            <Sparkles className="h-4 w-4 text-accent" />
+            <AlertTitle className="text-accent">حلول مقترحة من الذكاء الاصطناعي</AlertTitle>
             <AlertDescription>
               <ul className="list-disc pr-5 mt-2 space-y-1">
                 {suggestedSolutions.map((solution: string, index: number) => (
@@ -159,7 +185,7 @@ const PossibilitiesForm = ({ pIndex, passionIndex }: { pIndex: number; passionIn
             </AlertDescription>
           </Alert>
         )}
-        <GeneralForm pIndex={pIndex} passionIndex={passionIndex} />
+        <DynamicFieldArray pIndex={pIndex} passionIndex={passionIndex} />
       </div>
     );
 };
@@ -253,7 +279,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                             key={step.id}
                             className={cn(
                               "h-2 flex-1 rounded-full",
-                              index === currentPIndex ? "bg-primary" : "bg-muted"
+                              index === currentPIndex ? "bg-accent" : "bg-muted"
                             )}
                           />
                         ))}
@@ -262,11 +288,11 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {P_STATIONS[currentPIndex].id === 'purpose' && <PurposeForm passionIndex={currentPassionIndex} />}
-                    {P_STATIONS[currentPIndex].id === 'power' && <GeneralForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
-                    {P_STATIONS[currentPIndex].id === 'proof' && <GeneralForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
-                    {P_STATIONS[currentPIndex].id === 'problems' && <ProblemsForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
-                    {P_STATIONS[currentPIndex].id === 'possibilities' && <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
+                    {P_STATIONS[currentPIndex].id === 'possibilities' ? (
+                       <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />
+                    ) : (
+                       <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} />
+                    )}
                   </CardContent>
                 </Card>
             </form>

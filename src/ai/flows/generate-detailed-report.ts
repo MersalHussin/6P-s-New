@@ -11,9 +11,12 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const PurposeSchema = z.object({
-  id: z.string(),
-  text: z.string(),
+const FieldItemSchema = z.object({
+    id: z.string(),
+    text: z.string(),
+});
+
+const PurposeSchema = FieldItemSchema.extend({
   weight: z.enum(['high', 'medium', 'low', '']),
 });
 
@@ -21,20 +24,21 @@ const PassionDataSchema = z.object({
   id: z.string(),
   name: z.string(),
   purpose: z.array(PurposeSchema),
-  power: z.string(),
-  proof: z.string(),
-  problems: z.string(),
-  possibilities: z.string(),
+  power: z.array(FieldItemSchema),
+  proof: z.array(FieldItemSchema),
+  problems: z.array(FieldItemSchema),
+  possibilities: z.array(FieldItemSchema),
   suggestedSolutions: z.array(z.string()).optional(),
 });
 
 const GenerateDetailedReportInputSchema = z.object({
   passions: z.array(PassionDataSchema),
+  language: z.enum(['ar', 'en']),
 });
 export type GenerateDetailedReportInput = z.infer<typeof GenerateDetailedReportInputSchema>;
 
 const GenerateDetailedReportOutputSchema = z.object({
-  report: z.string().describe('The detailed text report in Arabic.'),
+  report: z.string().describe('The detailed text report in the specified language.'),
 });
 export type GenerateDetailedReportOutput = z.infer<typeof GenerateDetailedReportOutputSchema>;
 
@@ -49,46 +53,54 @@ const reportPrompt = ai.definePrompt({
   input: { schema: GenerateDetailedReportInputSchema },
   output: { schema: GenerateDetailedReportOutputSchema },
   prompt: `
-  أنت مساعد خبير في كتابة التقارير. قم بإنشاء تقرير نصي شامل ومفصل باللغة العربية بناءً على بيانات رحلة اكتشاف الشغف للمستخدم.
+  You are an expert report writer. Create a comprehensive and detailed text report in {{language}} based on the user's passion discovery journey data.
 
-  يجب أن يكون التقرير منظماً بشكل جيد، وسهل القراءة، ويقدم رؤى قيمة للمستخدم.
+  The report should be well-structured, easy to read, and provide valuable insights to the user.
 
-  استخدم العناوين والتنسيق (مثل القوائم النقطية) لجعل التقرير واضحاً. ابدأ بمقدمة موجزة، ثم قدم تحليلاً لكل شغف على حدة، واختتم التقرير بملخص عام وتوصيات.
+  Use headings and formatting (like bullet points) to make the report clear. Start with a brief introduction, then provide an analysis for each passion individually, and conclude the report with a general summary and recommendations.
 
-  البيانات المقدمة من المستخدم:
+  Data provided by the user:
   {{#each passions}}
   ---
-  **الشغف: {{{this.name}}}**
+  **Passion: {{{this.name}}}**
 
-  **1. الهدف (Purpose):**
+  **1. Purpose:**
   {{#each this.purpose}}
-  - الهدف: {{{this.text}}} (الأهمية: {{{this.weight}}})
+  - Purpose: {{{this.text}}} (Weight: {{{this.weight}}})
   {{/each}}
 
-  **2. القوة (Power):**
-  {{{this.power}}}
+  **2. Power:**
+   {{#each this.power}}
+  - {{{this.text}}}
+  {{/each}}
 
-  **3. الإثبات (Proof):**
-  {{{this.proof}}}
+  **3. Proof:**
+   {{#each this.proof}}
+  - {{{this.text}}}
+  {{/each}}
 
-  **4. المشاكل (Problems):**
-  {{{this.problems}}}
+  **4. Problems:**
+   {{#each this.problems}}
+  - {{{this.text}}}
+  {{/each}}
 
-  **5. الحلول المقترحة للمشاكل:**
+  **5. Suggested Solutions for Problems:**
   {{#if this.suggestedSolutions}}
     {{#each this.suggestedSolutions}}
     - {{{this}}}
     {{/each}}
   {{else}}
-    لم يتم إنشاء حلول.
+    No solutions were generated.
   {{/if}}
 
-  **6. الاحتمالات (Possibilities):**
-  {{{this.possibilities}}}
+  **6. Possibilities:**
+  {{#each this.possibilities}}
+  - {{{this.text}}}
+  {{/each}}
   ---
   {{/each}}
 
-  الآن، قم بإنشاء تقرير مفصل بناءً على هذه البيانات.
+  Now, create a detailed report based on this data in {{language}}.
   `,
 });
 
