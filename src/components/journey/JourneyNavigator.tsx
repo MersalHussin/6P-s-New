@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useForm, FormProvider, useFormContext, Controller } from 'react-hook-form';
 import type { PassionData } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -17,7 +16,7 @@ import { Loader2, Lightbulb, Zap, FileCheck, AlertTriangle, Goal, Sparkles, Move
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
 
-const P_STEPS = [
+const P_STATIONS = [
   { id: 'purpose', name: 'الهدف', icon: Goal },
   { id: 'power', name: 'القوة', icon: Zap },
   { id: 'proof', name: 'الإثبات', icon: FileCheck },
@@ -27,8 +26,8 @@ const P_STEPS = [
 
 const GeneralForm = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: number }) => {
   const { control } = useFormContext();
-  const step = P_STEPS[pIndex];
-  const fieldName = step.id as 'power' | 'proof' | 'problems' | 'possibilities';
+  const station = P_STATIONS[pIndex];
+  const fieldName = station.id as 'power' | 'proof' | 'problems' | 'possibilities';
 
   return (
     <div className="space-y-4">
@@ -37,7 +36,7 @@ const GeneralForm = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: n
         name={`passions.${passionIndex}.${fieldName}`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-lg font-headline">أخبرنا عن {step.name}</FormLabel>
+            <FormLabel className="text-lg font-headline">أخبرنا عن {station.name}</FormLabel>
             <FormControl>
               <Textarea {...field} rows={6} className="text-base" />
             </FormControl>
@@ -117,7 +116,7 @@ const ProblemsForm = ({ pIndex, passionIndex }: { pIndex: number; passionIndex: 
       setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
       toast({
         title: "تم إنشاء الاقتراحات بنجاح!",
-        description: "يمكنك رؤية الحلول المقترحة في الخطوة التالية.",
+        description: "يمكنك رؤية الحلول المقترحة في المحطة التالية.",
       });
     } catch (error) {
         toast({
@@ -166,26 +165,36 @@ const PossibilitiesForm = ({ pIndex, passionIndex }: { pIndex: number; passionIn
 };
 
 
-export function JourneyNavigator({ initialPassions, onComplete }: { initialPassions: PassionData[], onComplete: (data: PassionData[]) => void }) {
+export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: { initialPassions: PassionData[], onComplete: (data: PassionData[]) => void, onDataChange: (data: PassionData[]) => void }) {
   const methods = useForm<{ passions: PassionData[] }>({
     defaultValues: { passions: initialPassions }
   });
-  const { handleSubmit } = methods;
+  const { handleSubmit, watch } = methods;
 
   const [currentPassionIndex, setCurrentPassionIndex] = useState(0);
   const [currentPIndex, setCurrentPIndex] = useState(0);
 
-  const totalPSteps = P_STEPS.length;
+  const totalPStations = P_STATIONS.length;
   const totalPassions = initialPassions.length;
   
   const progress = useMemo(() => {
-    const passionStep = 1 / totalPassions;
-    const pStep = passionStep / totalPSteps;
-    return (currentPassionIndex * passionStep + currentPIndex * pStep) * 100;
-  }, [currentPassionIndex, currentPIndex, totalPassions, totalPSteps]);
+    const passionStep = 100 / totalPassions;
+    const pStep = passionStep / totalPStations;
+    const completedPassionsProgress = currentPassionIndex * passionStep;
+    const currentPassionProgress = currentPIndex * pStep;
+    return completedPassionsProgress + currentPassionProgress;
+  }, [currentPassionIndex, currentPIndex, totalPassions, totalPStations]);
+
+  // Save data on change
+  useEffect(() => {
+    const subscription = watch((value) => {
+      onDataChange(value.passions as PassionData[]);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, onDataChange]);
 
   const handleNext = () => {
-    if (currentPIndex < totalPSteps - 1) {
+    if (currentPIndex < totalPStations - 1) {
       setCurrentPIndex(currentPIndex + 1);
     } else if (currentPassionIndex < totalPassions - 1) {
       setCurrentPassionIndex(currentPassionIndex + 1);
@@ -200,47 +209,46 @@ export function JourneyNavigator({ initialPassions, onComplete }: { initialPassi
       setCurrentPIndex(currentPIndex - 1);
     } else if (currentPassionIndex > 0) {
       setCurrentPassionIndex(currentPassionIndex - 1);
-      setCurrentPIndex(totalPSteps - 1);
+      setCurrentPIndex(totalPStations - 1);
     }
   };
 
-  const isLastStep = currentPassionIndex === totalPassions - 1 && currentPIndex === totalPSteps - 1;
+  const isLastStep = currentPassionIndex === totalPassions - 1 && currentPIndex === totalPStations - 1;
 
   const onSubmit = (data: { passions: PassionData[] }) => {
     onComplete(data.passions);
   };
   
-  const CurrentStepIcon = P_STEPS[currentPIndex].icon;
+  const CurrentStationIcon = P_STATIONS[currentPIndex].icon;
+  const currentPassionName = initialPassions[currentPassionIndex].name;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
        <div className="space-y-2">
             <Progress value={progress} className="w-full" />
-            <p className="text-sm text-muted-foreground text-center">
-                التقدم الكلي: {Math.round(progress)}%
-            </p>
+            <div className="flex justify-between text-sm text-muted-foreground">
+                <span>الشغف: {currentPassionIndex + 1} / {totalPassions} ({currentPassionName})</span>
+                <span>التقدم الكلي: {Math.round(progress)}%</span>
+            </div>
        </div>
 
-      <Tabs value={String(currentPassionIndex)} onValueChange={(val) => setCurrentPassionIndex(Number(val))} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          {initialPassions.map((passion, index) => (
-            <TabsTrigger key={passion.id} value={String(index)}>{passion.name}</TabsTrigger>
-          ))}
-        </TabsList>
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="mt-4">
                   <CardHeader>
                     <div className="flex items-center gap-4">
                       <div className="bg-primary/10 text-primary p-3 rounded-full">
-                        <CurrentStepIcon className="w-8 h-8" />
+                        <CurrentStationIcon className="w-8 h-8" />
                       </div>
                       <div>
                       <CardTitle className="font-headline text-2xl">
-                          {P_STEPS[currentPIndex].name}: {initialPassions[currentPassionIndex].name}
+                          المحطة {currentPIndex + 1}: {P_STATIONS[currentPIndex].name}
                       </CardTitle>
+                      <CardDescription>
+                          استكشاف شغف: "{currentPassionName}"
+                      </CardDescription>
                       <div className="flex items-center gap-2 mt-2">
-                        {P_STEPS.map((step, index) => (
+                        {P_STATIONS.map((step, index) => (
                           <div
                             key={step.id}
                             className={cn(
@@ -254,16 +262,15 @@ export function JourneyNavigator({ initialPassions, onComplete }: { initialPassi
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {P_STEPS[currentPIndex].id === 'purpose' && <PurposeForm passionIndex={currentPassionIndex} />}
-                    {P_STEPS[currentPIndex].id === 'power' && <GeneralForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
-                    {P_STEPS[currentPIndex].id === 'proof' && <GeneralForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
-                    {P_STEPS[currentPIndex].id === 'problems' && <ProblemsForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
-                    {P_STEPS[currentPIndex].id === 'possibilities' && <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
+                    {P_STATIONS[currentPIndex].id === 'purpose' && <PurposeForm passionIndex={currentPassionIndex} />}
+                    {P_STATIONS[currentPIndex].id === 'power' && <GeneralForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
+                    {P_STATIONS[currentPIndex].id === 'proof' && <GeneralForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
+                    {P_STATIONS[currentPIndex].id === 'problems' && <ProblemsForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
+                    {P_STATIONS[currentPIndex].id === 'possibilities' && <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} />}
                   </CardContent>
                 </Card>
             </form>
         </FormProvider>
-      </Tabs>
       <div className="flex justify-between items-center mt-6">
         <Button onClick={handleBack} variant="outline" disabled={currentPassionIndex === 0 && currentPIndex === 0}>
             <MoveRight className="ml-2 h-4 w-4" />

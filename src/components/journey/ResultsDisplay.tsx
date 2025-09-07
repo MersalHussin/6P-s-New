@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import type { PassionData } from "@/lib/types";
 import { rankPassions, type RankPassionsInput, type RankPassionsOutput } from "@/ai/flows/rank-passions";
+import { generateDetailedReport, type GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Award, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface ResultsDisplayProps {
@@ -15,6 +17,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const getRanking = async () => {
@@ -37,7 +40,6 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         
         const result = await rankPassions(input);
         
-        // Sort passions by score in descending order
         result.rankedPassions.sort((a, b) => b.score - a.score);
         
         setRankedPassions(result);
@@ -52,6 +54,30 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
 
     getRanking();
   }, [passions]);
+
+  const handleDownloadReport = async () => {
+    setIsDownloading(true);
+    try {
+      const input: GenerateDetailedReportInput = { passions };
+      const { report } = await generateDetailedReport(input);
+
+      const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Passion_Path_Report.txt";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+    } catch (e) {
+      console.error(e);
+      alert("حدث خطأ أثناء إنشاء التقرير. الرجاء المحاولة مرة أخرى.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -78,9 +104,17 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-4">
             <h1 className="text-4xl font-headline font-bold text-primary">نتائج رحلتك</h1>
             <p className="text-lg text-muted-foreground">هذا هو ترتيب شغفك بناءً على إجاباتك. استكشف النتائج لتعرف أين يكمن شغفك الأقوى.</p>
+            <Button onClick={handleDownloadReport} disabled={isDownloading}>
+              {isDownloading ? (
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="ml-2 h-4 w-4" />
+              )}
+              {isDownloading ? 'جاري إنشاء التقرير...' : 'تنزيل التقرير المفصل'}
+            </Button>
         </div>
       <div className="space-y-6">
         {rankedPassions?.rankedPassions.map((passion, index) => (

@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/rank-passions.ts';
 import '@/ai/flows/suggest-solutions-for-problems.ts';
+import '@/ai/flows/generate-detailed-report.ts';
