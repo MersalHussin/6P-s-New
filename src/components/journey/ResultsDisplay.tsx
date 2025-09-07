@@ -60,7 +60,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
             possibilities: ensureArray(p.possibilities),
         }));
 
-        const input: RankPassionsInput = { passions: validatedPassions };
+        const input: RankPassionsInput = { passions: validatedPassions, language };
         
         const result = await rankPassions(input);
         
@@ -97,10 +97,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
-        // This is a workaround for jsPDF's lack of proper UTF-8 support for Arabic.
-        // We can use a font that supports it, or manually handle it.
-        // For simplicity, we are now relying on jspdf-autotable's font handling.
-        
         doc.setR2L(language === 'ar');
 
         doc.setFontSize(22);
@@ -108,21 +104,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         
         doc.setFontSize(12);
         
-        // Let autotable handle the content wrapping and styling
         autoTable(doc, {
             body: [[report]],
             startY: 30,
             theme: 'plain',
             styles: {
-                font: 'Helvetica', // A standard font
+                font: 'Helvetica', 
                 halign: language === 'ar' ? 'right' : 'left',
                 cellPadding: 2,
                 fontSize: 10,
             },
             didParseCell: function (data) {
-                // You might need custom logic for complex text, but autotable handles basic RTL well
                 if (language === 'ar') {
-                    // a more reliable way to reverse for display in some PDF viewers
                     data.cell.text = data.cell.text[0].split('\n').map(line => line.split(' ').reverse().join(' ')).join('\n');
                 }
             }

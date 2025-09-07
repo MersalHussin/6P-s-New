@@ -27,6 +27,7 @@ const PassionDetailsSchema = z.object({
 
 const RankPassionsInputSchema = z.object({
   passions: z.array(PassionDetailsSchema).describe('An array of passions with their details.'),
+  language: z.enum(['ar', 'en']).describe('The language for the response.'),
 });
 export type RankPassionsInput = z.infer<typeof RankPassionsInputSchema>;
 
@@ -61,6 +62,9 @@ const rankPassionsPrompt = ai.definePrompt({
   Calculate a total score for each passion by summing the points from all items across all categories. The score should reflect the overall potential and alignment of the passion with the user's inputs. A higher score is better.
 
   Return the passions ranked from highest to lowest score. For each passion, provide a comprehensive reasoning that explains how the score was calculated, mentioning the positive contributions from Purpose, Power, Proof, and Possibilities, and the negative impact of the Problems. Be specific and reference the user's own words.
+
+  The entire response, especially the reasoning, MUST be in the specified language: {{language}}.
+  If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
 
   Here are the passions with their details:
   {{#each passions}}
