@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import jsPDF from "jspdf";
 import 'jspdf-autotable';
+import { cn } from "@/lib/utils";
 
 
 interface ResultsDisplayProps {
@@ -279,11 +280,11 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         {/* Report Download Alert Dialog */}
         <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
             <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <AlertDialogHeader>
+                <AlertDialogHeader className={cn(language === 'ar' ? "text-right" : "text-left")}>
                     <AlertDialogTitle className="flex items-center gap-2">{dc.reportDialog.title}</AlertDialogTitle>
                     <AlertDialogDescription>{dc.reportDialog.description}</AlertDialogDescription>
                 </AlertDialogHeader>
-                <div className="space-y-4 text-sm">
+                <div className={cn("space-y-4 text-sm", language === 'ar' ? "text-right" : "text-left")}>
                     <div className="flex items-start gap-3">
                         <Smartphone className="h-5 w-5 mt-0.5 text-muted-foreground" />
                         <div className="flex-grow">
@@ -355,3 +356,5 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     </div>
   );
 }
+
+    
