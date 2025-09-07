@@ -39,10 +39,10 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
             passion: p.name,
             purpose: p.purpose.map(pur => pur.text).filter(t => t),
             purposeWeights: p.purpose.map(pur => purposeWeightMap[pur.weight]).filter(w => w),
-            power: p.power.map(item => item.text).join(', '),
-            proof: p.proof.map(item => item.text).join(', '),
-            problems: p.problems.map(item => item.text).join(', '),
-            possibilities: p.possibilities.map(item => item.text).join(', '),
+            power: p.power.map(item => item.text).filter(t => t).join(', '),
+            proof: p.proof.map(item => item.text).filter(t => t).join(', '),
+            problems: p.problems.map(item => item.text).filter(t => t).join(', '),
+            possibilities: p.possibilities.map(item => item.text).filter(t => t).join(', '),
           }))
         };
         
