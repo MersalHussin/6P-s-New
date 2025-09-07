@@ -97,29 +97,32 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
+        // This is a hack to get the Amiri font for Arabic support.
+        // It's not ideal, but it works for jsPDF.
+        const font = await fetch('/Amiri-Regular.ttf').then(res => res.arrayBuffer());
+        const fontBase64 = btoa(new Uint8Array(font).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        doc.addFileToVFS("Amiri-Regular.ttf", fontBase64);
+        doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+        doc.setFont("Amiri");
+        
         doc.setR2L(language === 'ar');
 
         doc.setFontSize(22);
         doc.text(c.reportTitle, 105, 20, { align: 'center' });
         
-        doc.setFontSize(12);
-        
-        // This is a hack to make jsPDF handle Arabic text correctly.
-        // It's not perfect, but it's better than nothing.
-        // The main issue is that jsPDF doesn't handle RTL text layout well.
-        // This splits the text and reverses it for display.
-        const arabicText = report.split('\n').map(line => line.split(' ').reverse().join(' ')).join('\n');
-        const bodyText = language === 'ar' ? arabicText : report;
+        // Split the report into lines to be processed by autoTable
+        const lines = doc.splitTextToSize(report, 180);
 
+        // Use autoTable to draw the text, which handles RTL and text wrapping better
         autoTable(doc, {
-            body: [[bodyText]],
+            body: [lines],
             startY: 30,
             theme: 'plain',
             styles: {
-                font: 'Helvetica', 
+                font: 'Amiri', 
                 halign: language === 'ar' ? 'right' : 'left',
                 cellPadding: 2,
-                fontSize: 10,
+                fontSize: 12,
             }
         });
         

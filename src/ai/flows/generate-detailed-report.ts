@@ -38,7 +38,7 @@ const GenerateDetailedReportInputSchema = z.object({
 export type GenerateDetailedReportInput = z.infer<typeof GenerateDetailedReportInputSchema>;
 
 const GenerateDetailedReportOutputSchema = z.object({
-  report: z.string().describe('The detailed text report in the specified language.'),
+  report: z.string().describe('The detailed text report in the specified language, formatted with markdown for clarity.'),
 });
 export type GenerateDetailedReportOutput = z.infer<typeof GenerateDetailedReportOutputSchema>;
 
@@ -57,7 +57,14 @@ const reportPrompt = ai.definePrompt({
 
   The report should be well-structured, easy to read, and provide valuable insights to the user.
 
-  Use headings and formatting (like bullet points) to make the report clear. Start with a brief introduction, then provide an analysis for each passion individually, and conclude the report with a general summary and recommendations.
+  Structure the report with a main introduction, then a section for each passion.
+  For each passion, use the following markdown format:
+  - Use '##' for the passion name as a main heading.
+  - Use '###' for each of the 6 P's (Purpose, Power, etc.) as subheadings.
+  - Use markdown bullet points ('* ' or '- ') for the items within each section.
+  - If a section has no items, state that clearly (e.g., "No items were provided for this section.").
+  - Conclude the entire report with a general summary and recommendations section under a '##' heading.
+  - If the language is 'ar', the entire report must be in Arabic.
 
   Data provided by the user:
   {{#each passions}}
@@ -100,7 +107,7 @@ const reportPrompt = ai.definePrompt({
   ---
   {{/each}}
 
-  Now, create a detailed report based on this data in {{language}}.
+  Now, create a detailed, well-formatted markdown report based on this data in {{language}}.
   `,
 });
 
