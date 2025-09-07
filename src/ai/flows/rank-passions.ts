@@ -64,9 +64,10 @@ const rankPassionsPrompt = ai.definePrompt({
   For each passion, provide a comprehensive "reasoning" that is both analytical and encouraging. This is the most important part.
   The reasoning must NOT mention the scoring or points. Instead, it should be a qualitative analysis that feels personal.
   - Start by summarizing why this passion scored the way it did in a narrative format. For example, "Your passion for [Passion Name] seems to shine brightly because of your strong sense of purpose and the clear strengths you possess. You gave high importance to how it helps you [mention a purpose], which shows a deep connection."
-  - For high-ranking passions, highlight the synergy between their purpose, power, and possibilities.
-  - For lower-ranking passions, gently point out the challenges (problems) or weaker connections in areas like proof or purpose, framing them as areas for growth.
-  - Conclude the reasoning for EACH passion with a "Next Steps" section. Provide 2-3 concrete, actionable pieces of advice to help them develop in this area. Base these tips on the problems and possibilities they listed. For example, "To overcome the challenge of [Problem], you could try [Actionable Tip]."
+  
+  - Conclude the reasoning for EACH passion with a "Next Steps" section. Provide 2-3 concrete, actionable pieces of advice.
+  - For high-ranking passions, provide focused and detailed next steps to help the user start acting on this passion.
+  - For lower-ranking passions, gently point out the challenges (problems) or weaker connections. The advice should be about re-evaluation, such as suggesting they spend less time on it, or find ways to merge its enjoyable aspects with a higher-ranking passion. For example, "You might find it more fulfilling to integrate your love for [lower-ranked passion] into your journey with [higher-ranked passion]."
 
   The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}.
   If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).

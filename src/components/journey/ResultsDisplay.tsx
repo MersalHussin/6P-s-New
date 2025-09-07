@@ -355,7 +355,9 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
                 </div>
                 <div className="flex-grow">
                     <CardTitle className="text-2xl font-headline">{passion.passion}</CardTitle>
-                    <CardDescription>{c.score}: {passion.score}</CardDescription>
+                    <CardDescription className="font-bold text-lg text-foreground">
+                        {c.score}: {passion.score}
+                    </CardDescription>
                 </div>
                 {index === 0 && (
                     <div className="flex-shrink-0">
