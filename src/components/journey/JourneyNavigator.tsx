@@ -51,7 +51,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
                 <FormItem>
                     <div className="flex items-center justify-between">
                         <FormLabel className="font-semibold text-md">{stationContent.singular} {index + 1}</FormLabel>
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button type="button" className="cursor-help text-muted-foreground hover:text-accent">
@@ -59,7 +59,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent className="bg-accent text-accent-foreground border-accent-foreground/20" side="top" align="center">
-                                    <p className="max-w-xs">{stationContent.hint}</p>
+                                    <p className="max-w-xs">{stationContent.hints[index % stationContent.hints.length]}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>

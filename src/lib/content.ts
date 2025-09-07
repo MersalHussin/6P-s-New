@@ -19,11 +19,46 @@ export const content = {
             },
         },
         stations: [
-            { id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal, hint: 'ما الذي تأمل في تحقيقه أو الشعور به من خلال هذا الشغف؟ (مثال: مساعدة الآخرين، التعبير عن الذات، كسب المال)' },
-            { id: 'power', name: 'القوة', singular: 'القوة', icon: Zap, hint: 'ما هي المهارات والمواهب التي تمتلكها وتتعلق بهذا الشغف؟ (مثال: التصميم، الكتابة، التحدث أمام الجمهور)' },
-            { id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck, hint: 'ما هي المشاريع أو التجارب السابقة التي تظهر شغفك في هذا المجال؟ (مثال: دورة تدريبية، مشروع شخصي، عمل تطوعي)' },
-            { id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle, hint: 'ما هي العقبات أو التحديات التي تواجهك في ممارسة هذا الشغف؟ (مثال: ضيق الوقت، نقص الموارد، قلة الخبرة)' },
-            { id: 'possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb, hint: 'ما هي الفرص المستقبلية أو المشاريع التي يمكنك القيام بها في هذا المجال؟ (مثال: بدء عمل خاص، إنشاء محتوى، تطوير مهارة جديدة)' },
+            { 
+                id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal, 
+                hints: [
+                    'ما الذي تأمل في تحقيقه أو الشعور به من خلال هذا الشغف؟ (مثال: مساعدة الآخرين، التعبير عن الذات)', 
+                    'ما هي القيمة الأساسية التي يدفعك هذا الشغف لتحقيقها؟ (مثال: الإبداع، الحرية المالية، التأثير الإيجابي)',
+                    'كيف يساهم هذا الشغف في تحقيق رؤيتك لحياتك المستقبلية؟ (مثال: بناء مسيرة مهنية، تطوير مهارات جديدة)'
+                ] 
+            },
+            { 
+                id: 'power', name: 'القوة', singular: 'القوة', icon: Zap, 
+                hints: [
+                    'ما هي المهارات والمواهب التي تمتلكها وتتعلق بهذا الشغف؟ (مثال: التصميم، الكتابة، التحدث أمام الجمهور)',
+                    'ما هي نقاط قوتك الشخصية التي تساعدك في هذا المجال؟ (مثال: الصبر، الانضباط الذاتي، الفضول)',
+                    'ما الذي يقوله الآخرون أنك تجيده ويتعلق بهذا الشغف؟ (مثال: القدرة على حل المشاكل، حس فني)'
+                ] 
+            },
+            { 
+                id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck, 
+                hints: [
+                    'ما هي المشاريع أو التجارب السابقة التي تظهر شغفك في هذا المجال؟ (مثال: دورة تدريبية، مشروع شخصي)',
+                    'هل هناك أي إنجازات أو شهادات حصلت عليها تتعلق بهذا الشغف؟ (مثال: جائزة، شهادة إتمام دورة)',
+                    'اذكر مواقف محددة شعرت فيها بالحماس والرضا أثناء ممارسة هذا الشغف.'
+                ] 
+            },
+            { 
+                id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle, 
+                hints: [
+                    'ما هي العقبات أو التحديات التي تواجهك في ممارسة هذا الشغف؟ (مثال: ضيق الوقت، نقص الموارد)',
+                    'ما هي المخاوف أو الشكوك التي لديك حول المضي قدماً في هذا الشغف؟ (مثال: الخوف من الفشل، عدم اليقين)',
+                    'هل هناك مهارات أو معرفة تفتقر إليها وتعيق تقدمك في هذا المجال؟ (مثال: قلة الخبرة في التسويق)'
+                ] 
+            },
+            { 
+                id: 'possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb, 
+                hints: [
+                    'ما هي الفرص المستقبلية أو المشاريع التي يمكنك القيام بها في هذا المجال؟ (مثال: بدء عمل خاص، إنشاء محتوى)',
+                    'كيف يمكنك تطوير هذا الشغف ليصبح مصدر دخل أو مسيرة مهنية؟ (مثال: تقديم استشارات، بيع منتجات)',
+                    'من هم الأشخاص أو الجهات التي يمكن أن تتعاون معها لتنمية هذا الشغف؟ (مثال: الانضمام لمجتمع، البحث عن مرشد)'
+                ] 
+            },
         ],
         journey: {
             progress: {
@@ -100,11 +135,46 @@ export const content = {
             },
         },
         stations: [
-            { id: 'purpose', name: 'Purpose', singular: 'Purpose', icon: Goal, hint: 'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression, making money)' },
-            { id: 'power', name: 'Power', singular: 'Power', icon: Zap, hint: 'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)' },
-            { id: 'proof', name: 'Proof', singular: 'Proof', icon: FileCheck, hint: 'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project, volunteer work)' },
-            { id: 'problems', name: 'Problems', singular: 'Problem', icon: AlertTriangle, hint: 'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources, inexperience)' },
-            { id: 'possibilities', name: 'Possibilities', singular: 'Possibility', icon: Lightbulb, hint: 'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content, developing a new skill)' },
+            { 
+                id: 'purpose', name: 'Purpose', singular: 'Purpose', icon: Goal, 
+                hints: [
+                    'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression)',
+                    'What core value does this passion drive you to fulfill? (e.g., creativity, financial freedom, positive impact)',
+                    'How does this passion contribute to your vision for your future life? (e.g., building a career, developing new skills)'
+                ] 
+            },
+            { 
+                id: 'power', name: 'Power', singular: 'Power', icon: Zap, 
+                hints: [
+                    'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)',
+                    'What are your personal strengths that help you in this area? (e.g., patience, self-discipline, curiosity)',
+                    'What do others say you are good at that relates to this passion? (e.g., problem-solving ability, artistic sense)'
+                ] 
+            },
+            { 
+                id: 'proof', name: 'Proof', singular: 'Proof', icon: FileCheck, 
+                hints: [
+                    'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project)',
+                    'Are there any achievements or certificates you have received related to this passion? (e.g., an award, course completion certificate)',
+                    'Describe specific situations where you felt enthusiastic and satisfied while pursuing this passion.'
+                ] 
+            },
+            { 
+                id: 'problems', name: 'Problems', singular: 'Problem', icon: AlertTriangle, 
+                hints: [
+                    'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources)',
+                    'What fears or doubts do you have about moving forward with this passion? (e.g., fear of failure, uncertainty)',
+                    'Are there skills or knowledge you lack that hinder your progress in this area? (e.g., inexperience in marketing)'
+                ] 
+            },
+            { 
+                id: 'possibilities', name: 'Possibilities', singular: 'Possibility', icon: Lightbulb, 
+                hints: [
+                    'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content)',
+                    'How can you develop this passion into a source of income or a career path? (e.g., offering consultations, selling products)',
+                    'Who are the people or organizations you could collaborate with to grow this passion? (e.g., joining a community, finding a mentor)'
+                ] 
+            },
         ],
         journey: {
             progress: {
