@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { PassionData } from "@/lib/types";
+import type { PassionData, FieldItem } from "@/lib/types";
 import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,9 +17,13 @@ interface ResultsDisplayProps {
   passions: PassionData[];
 }
 
-const ensureArray = (field: any): { text: string, weight: 'high' | 'medium' | 'low' | '' }[] => {
+const ensureArray = (field: any): FieldItem[] => {
     if (Array.isArray(field)) {
-      return field.filter(item => item && typeof item.text === 'string');
+      return field.map(item => ({
+        id: item?.id || Math.random().toString(),
+        text: typeof item?.text === 'string' ? item.text : '',
+        weight: ['high', 'medium', 'low', ''].includes(item?.weight) ? item.weight : ''
+      })).filter(item => item.text);
     }
     return [];
 };
@@ -38,19 +42,16 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
       setLoading(true);
       setError(null);
       try {
-        const purposeWeightMap = { high: 'high', medium: 'medium', low: 'low', '': 'low' } as const;
-        
-        const input: RankPassionsInput = {
-          passions: passions.map(p => ({
+        const validatedPassions = passions.map(p => ({
             passion: p.name,
-            purpose: ensureArray(p.purpose).map(pur => pur.text).filter(t => t),
-            purposeWeights: ensureArray(p.purpose).map(pur => purposeWeightMap[pur.weight]).filter(w => w),
-            power: ensureArray(p.power).map(item => item.text).filter(t => t),
-            proof: ensureArray(p.proof).map(item => item.text).filter(t => t),
-            problems: ensureArray(p.problems).map(item => item.text).filter(t => t),
-            possibilities: ensureArray(p.possibilities).map(item => item.text).filter(t => t),
-          }))
-        };
+            purpose: ensureArray(p.purpose),
+            power: ensureArray(p.power),
+            proof: ensureArray(p.proof),
+            problems: ensureArray(p.problems),
+            possibilities: ensureArray(p.possibilities),
+        }));
+
+        const input: RankPassionsInput = { passions: validatedPassions };
         
         const result = await rankPassions(input);
         
@@ -173,7 +174,7 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
             </CardHeader>
             <CardContent>
               <h4 className="font-bold mb-2">{c.reasoning}:</h4>
-              <p className="text-muted-foreground">{passion.reasoning}</p>
+              <p className="text-muted-foreground whitespace-pre-wrap">{passion.reasoning}</p>
             </CardContent>
           </Card>
         ))}
