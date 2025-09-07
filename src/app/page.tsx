@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, MoveLeft } from "lucide-react";
+import { Globe, MoveLeft, MoveRight } from "lucide-react";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -16,6 +16,7 @@ import { content } from "@/lib/content";
 export default function Home() {
   const { language, setLanguage } = useLanguage();
   const c = content[language];
+  const ArrowIcon = language === 'ar' ? MoveLeft : MoveRight;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-8 md:p-12">
@@ -63,8 +64,8 @@ export default function Home() {
             </p>
             <Link href="/journey" passHref>
               <Button size="lg" className="font-headline font-bold text-lg">
-                <MoveLeft className="ml-2 h-5 w-5" />
                 {c.cta}
+                <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
               </Button>
             </Link>
           </CardContent>
