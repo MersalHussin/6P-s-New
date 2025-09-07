@@ -19,6 +19,19 @@ interface ResultsDisplayProps {
   passions: PassionData[];
 }
 
+// Helper to ensure data is always an array of objects with a text property
+const ensureArray = (field: any): { text: string }[] => {
+    if (Array.isArray(field)) {
+      return field.filter(item => item && typeof item.text === 'string');
+    }
+    if (typeof field === 'string') {
+        // Handle cases where old data might be a string
+        return field.split(',').map(s => s.trim()).filter(s => s).map(s => ({ text: s, id: '' }));
+    }
+    return [];
+};
+
+
 export function ResultsDisplay({ passions }: ResultsDisplayProps) {
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,12 +50,12 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
         const input: RankPassionsInput = {
           passions: passions.map(p => ({
             passion: p.name,
-            purpose: p.purpose.map(pur => pur.text).filter(t => t),
+            purpose: ensureArray(p.purpose).map(pur => pur.text).filter(t => t),
             purposeWeights: p.purpose.map(pur => purposeWeightMap[pur.weight]).filter(w => w),
-            power: p.power.map(item => item.text).filter(t => t),
-            proof: p.proof.map(item => item.text).filter(t => t),
-            problems: p.problems.map(item => item.text).filter(t => t),
-            possibilities: p.possibilities.map(item => item.text).filter(t => t),
+            power: ensureArray(p.power).map(item => item.text).filter(t => t),
+            proof: ensureArray(p.proof).map(item => item.text).filter(t => t),
+            problems: ensureArray(p.problems).map(item => item.text).filter(t => t),
+            possibilities: ensureArray(p.possibilities).map(item => item.text).filter(t => t),
           }))
         };
         
@@ -77,7 +90,15 @@ export function ResultsDisplay({ passions }: ResultsDisplayProps) {
 
         doc.setR2L(true);
 
-        const input: GenerateDetailedReportInput = { passions, language };
+        const reportPassions = passions.map(p => ({
+          ...p,
+          power: ensureArray(p.power),
+          proof: ensureArray(p.proof),
+          problems: ensureArray(p.problems),
+          possibilities: ensureArray(p.possibilities),
+        }));
+
+        const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
         doc.setFontSize(22);
