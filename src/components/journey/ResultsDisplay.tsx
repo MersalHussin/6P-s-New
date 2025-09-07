@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import type { PassionData } from "@/lib/types";
-import { rankPassions, type RankPassionsInput, type RankPassionsOutput } from "@/ai/flows/rank-passions";
-import { generateDetailedReport, type GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
+import { rankPassions } from "@/ai/flows/rank-passions";
+import type { RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
+import { generateDetailedReport } from "@/ai/flows/generate-detailed-report";
+import type { GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download } from "lucide-react";

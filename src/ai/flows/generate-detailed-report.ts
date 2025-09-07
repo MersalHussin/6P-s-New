@@ -33,7 +33,7 @@ export const GenerateDetailedReportInputSchema = z.object({
 });
 export type GenerateDetailedReportInput = z.infer<typeof GenerateDetailedReportInputSchema>;
 
-export const GenerateDetailedReportOutputSchema = z.object({
+const GenerateDetailedReportOutputSchema = z.object({
   report: z.string().describe('The detailed text report in Arabic.'),
 });
 export type GenerateDetailedReportOutput = z.infer<typeof GenerateDetailedReportOutputSchema>;
