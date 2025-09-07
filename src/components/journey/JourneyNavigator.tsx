@@ -36,18 +36,33 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
   });
   
   const c = content[language].journey;
+  const stationContent = content[language].stations[pIndex];
 
   return (
     <div className="space-y-6">
       {fields.map((item, index) => (
         <div key={item.id} className="flex items-start gap-3 p-4 border rounded-lg bg-background/50 relative">
-          <div className="flex-grow w-full space-y-4">
+          <div className="w-full space-y-4">
             <FormField
               control={control}
               name={`passions.${passionIndex}.${fieldName}.${index}.text`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-semibold">{c.fieldLabel} {index + 1}</FormLabel>
+                    <div className="flex items-center justify-between">
+                        <FormLabel className="font-semibold">{stationContent.singular} {index + 1}</FormLabel>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button type="button" className="cursor-help text-muted-foreground hover:text-accent">
+                                        <Lightbulb className="h-5 w-5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{stationContent.hint}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
                   <FormControl>
                     <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
                   </FormControl>
@@ -56,30 +71,28 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
               )}
             />
             
-            {station.id === 'purpose' && (
-              <FormField
-                  control={control}
-                  name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
-                  render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-semibold">{c.weightLabel}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                          <SelectTrigger>
-                          <SelectValue placeholder={c.weightPlaceholder} />
-                          </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                          <SelectItem value="high">{c.weights.high}</SelectItem>
-                          <SelectItem value="medium">{c.weights.medium}</SelectItem>
-                          <SelectItem value="low">{c.weights.low}</SelectItem>
-                      </SelectContent>
-                      </Select>
-                      <FormMessage />
-                  </FormItem>
-                  )}
-              />
-            )}
+            <FormField
+                control={control}
+                name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
+                render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold">{c.weightLabel}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder={c.weightPlaceholder} />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="high">{c.weights.high}</SelectItem>
+                        <SelectItem value="medium">{c.weights.medium}</SelectItem>
+                        <SelectItem value="low">{c.weights.low}</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
           </div>
           {fields.length > 1 && (
             <TooltipProvider>
@@ -89,7 +102,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex }: { pIndex: number; passionIn
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="mt-1 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                    className="mt-8 text-destructive hover:bg-destructive/10 flex-shrink-0"
                     onClick={() => remove(index)}
                   >
                     <Trash2 className="h-5 w-5" />
@@ -281,18 +294,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                       <div className='flex-grow'>
                       <CardTitle className="font-headline text-2xl flex items-center gap-2">
                           {c.progress.station} {currentPIndex + 1}: {station.name}
-                          <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button type="button" className="cursor-help text-accent">
-                                        <Lightbulb className="h-6 w-6" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{station.hint}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
                       </CardTitle>
                       <CardDescription>
                           {c.progress.exploring}: "{currentPassionName}"
@@ -334,5 +335,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
-    

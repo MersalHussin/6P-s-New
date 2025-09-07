@@ -19,11 +19,11 @@ export const content = {
             },
         },
         stations: [
-            { id: 'purpose', name: 'الهدف', icon: Goal, hint: 'ما الذي تأمل في تحقيقه أو الشعور به من خلال هذا الشغف؟ (مثال: مساعدة الآخرين، التعبير عن الذات، كسب المال)' },
-            { id: 'power', name: 'القوة', icon: Zap, hint: 'ما هي المهارات والمواهب التي تمتلكها وتتعلق بهذا الشغف؟ (مثال: التصميم، الكتابة، التحدث أمام الجمهور)' },
-            { id: 'proof', name: 'الإثبات', icon: FileCheck, hint: 'ما هي المشاريع أو التجارب السابقة التي تظهر شغفك في هذا المجال؟ (مثال: دورة تدريبية، مشروع شخصي، عمل تطوعي)' },
-            { id: 'problems', name: 'المشاكل', icon: AlertTriangle, hint: 'ما هي العقبات أو التحديات التي تواجهك في ممارسة هذا الشغف؟ (مثال: ضيق الوقت، نقص الموارد، قلة الخبرة)' },
-            { id: 'possibilities', name: 'الاحتمالات', icon: Lightbulb, hint: 'ما هي الفرص المستقبلية أو المشاريع التي يمكنك القيام بها في هذا المجال؟ (مثال: بدء عمل خاص، إنشاء محتوى، تطوير مهارة جديدة)' },
+            { id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal, hint: 'ما الذي تأمل في تحقيقه أو الشعور به من خلال هذا الشغف؟ (مثال: مساعدة الآخرين، التعبير عن الذات، كسب المال)' },
+            { id: 'power', name: 'القوة', singular: 'القوة', icon: Zap, hint: 'ما هي المهارات والمواهب التي تمتلكها وتتعلق بهذا الشغف؟ (مثال: التصميم، الكتابة، التحدث أمام الجمهور)' },
+            { id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck, hint: 'ما هي المشاريع أو التجارب السابقة التي تظهر شغفك في هذا المجال؟ (مثال: دورة تدريبية، مشروع شخصي، عمل تطوعي)' },
+            { id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle, hint: 'ما هي العقبات أو التحديات التي تواجهك في ممارسة هذا الشغف؟ (مثال: ضيق الوقت، نقص الموارد، قلة الخبرة)' },
+            { id: 'possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb, hint: 'ما هي الفرص المستقبلية أو المشاريع التي يمكنك القيام بها في هذا المجال؟ (مثال: بدء عمل خاص، إنشاء محتوى، تطوير مهارة جديدة)' },
         ],
         journey: {
             progress: {
@@ -100,11 +100,11 @@ export const content = {
             },
         },
         stations: [
-            { id: 'purpose', name: 'Purpose', icon: Goal, hint: 'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression, making money)' },
-            { id: 'power', name: 'Power', icon: Zap, hint: 'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)' },
-            { id: 'proof', name: 'Proof', icon: FileCheck, hint: 'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project, volunteer work)' },
-            { id: 'problems', name: 'Problems', icon: AlertTriangle, hint: 'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources, inexperience)' },
-            { id: 'possibilities', name: 'Possibilities', icon: Lightbulb, hint: 'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content, developing a new skill)' },
+            { id: 'purpose', name: 'Purpose', singular: 'Purpose', icon: Goal, hint: 'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression, making money)' },
+            { id: 'power', name: 'Power', singular: 'Power', icon: Zap, hint: 'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)' },
+            { id: 'proof', name: 'Proof', singular: 'Proof', icon: FileCheck, hint: 'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project, volunteer work)' },
+            { id: 'problems', name: 'Problems', singular: 'Problem', icon: AlertTriangle, hint: 'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources, inexperience)' },
+            { id: 'possibilities', name: 'Possibilities', singular: 'Possibility', icon: Lightbulb, hint: 'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content, developing a new skill)' },
         ],
         journey: {
             progress: {
@@ -164,5 +164,3 @@ export const content = {
         }
     }
 }
-
-    
