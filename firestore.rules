@@ -2,15 +2,12 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to create their own document when they sign up
-    match /users/{userId} {
-      allow create: if true;
-      
-      // Allow users to read and update their own journey data
-      allow read, update: if request.auth == null || request.auth.uid == userId;
-
-      // Allow the admin dashboard to list all users
-      allow list: if true;
+    // This rule allows anyone to read and write to the "users" collection.
+    // This is necessary for the initial user creation (addDoc) and for the admin dashboard to read all user data.
+    // In a production app with real user authentication, you would want to restrict this further.
+    // For example, users should only be able to write to their own document.
+    match /users/{document=**} {
+      allow read, write: if true;
     }
   }
 }
