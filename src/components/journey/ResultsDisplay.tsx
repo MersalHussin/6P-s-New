@@ -6,11 +6,12 @@ import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/
 import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Award, Download, CheckCircle } from "lucide-react";
+import { Loader2, Award, Download, CheckCircle, FileText, Smartphone, Laptop } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import jsPDF from "jspdf";
@@ -36,24 +37,50 @@ const ensureArray = (field: any): FieldItem[] => {
 
 const downloadContent = {
     ar: {
-        dialogTitle: "التقرير النهائي والشهادة",
-        dialogDescription: "أوشكت رحلتك على الانتهاء! أدخل اسمك باللغة الإنجليزية ليتم وضعه على شهادة إتمام رحلة اكتشاف الشغف.",
-        nameLabel: "الاسم (باللغة الإنجليزية)",
-        namePlaceholder: "Your Name",
-        downloadButton: "تنزيل التقرير والشهادة",
-        cancel: "إلغاء",
-        reportError: "حدث خطأ أثناء إنشاء التقرير. الرجاء المحاولة مرة أخرى.",
-        certificateError: "حدث خطأ أثناء إنشاء الشهادة. الرجاء المحاولة مرة أخرى.",
+        certificateDialog: {
+            title: "تنزيل شهادة الإنجاز",
+            description: "أدخل اسمك باللغة الإنجليزية ليتم وضعه على شهادة إتمام رحلة اكتشاف الشغف.",
+            nameLabel: "الاسم (باللغة الإنجليزية)",
+            namePlaceholder: "Your Name",
+            downloadButton: "تنزيل الشهادة",
+            cancel: "إلغاء",
+            error: "حدث خطأ أثناء إنشاء الشهادة. الرجاء المحاولة مرة أخرى.",
+        },
+        reportDialog: {
+            title: "تنبيه قبل تنزيل التقرير",
+            description: "سيتم تنزيل التقرير كملف نصي (.txt). قد تحتاج إلى تطبيق معين لفتحه على هاتفك.",
+            android: "لمستخدمي أندرويد، نوصي باستخدام تطبيق Files by Google.",
+            ios: "لمستخدمي آيفون، يمكنك استخدام تطبيق Files المدمج في النظام.",
+            computer: "إذا كنت تستخدم جهاز كمبيوتر، سيفتح الملف بسهولة.",
+            androidLink: "افتح Files by Google",
+            iosLink: "تعرّف على تطبيق Files",
+            continue: "تنزيل التقرير",
+            cancel: "إلغاء",
+            error: "حدث خطأ أثناء إنشاء التقرير. الرجاء المحاولة مرة أخرى.",
+        }
     },
     en: {
-        dialogTitle: "Final Report & Certificate",
-        dialogDescription: "Your journey is almost complete! Enter your name in English to be placed on your passion discovery journey certificate.",
-        nameLabel: "Name (in English)",
-        namePlaceholder: "Your Name",
-        downloadButton: "Download Report & Certificate",
-        cancel: "Cancel",
-        reportError: "An error occurred while generating the report. Please try again.",
-        certificateError: "An error occurred while generating the certificate. Please try again.",
+        certificateDialog: {
+            title: "Download Certificate of Completion",
+            description: "Enter your name in English to be placed on your passion discovery journey certificate.",
+            nameLabel: "Name (in English)",
+            namePlaceholder: "Your Name",
+            downloadButton: "Download Certificate",
+            cancel: "Cancel",
+            error: "An error occurred while generating the certificate. Please try again.",
+        },
+        reportDialog: {
+            title: "Heads-up Before Downloading Report",
+            description: "The report will be downloaded as a text file (.txt). You might need a specific app to open it on your phone.",
+            android: "For Android users, we recommend using the Files by Google app.",
+            ios: "For iPhone users, you can use the built-in Files app.",
+            computer: "If you're on a computer, the file will open easily.",
+            androidLink: "Get Files by Google",
+            iosLink: "Learn about the Files app",
+            continue: "Download Report",
+            cancel: "Cancel",
+            error: "An error occurred while generating the report. Please try again.",
+        }
     }
 }
 
@@ -62,8 +89,13 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(initialResults);
   const [loading, setLoading] = useState(!initialResults);
   const [error, setError] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [showDownloadDialog, setShowDownloadDialog] = useState(false);
+  
+  const [isDownloadingCert, setIsDownloadingCert] = useState(false);
+  const [isDownloadingReport, setIsDownloadingReport] = useState(false);
+  
+  const [showCertDialog, setShowCertDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+
   const [userName, setUserName] = useState("");
   const { language } = useLanguage();
   const c = content[language].results;
@@ -109,13 +141,8 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     getRanking();
   }, [passions, c.error, language, initialResults, onResultsCalculated]);
 
-  const handleDownload = async () => {
-    if (!userName.trim()) {
-        alert("Please enter your name.");
-        return;
-    }
-    setIsDownloading(true);
-
+  const handleDownloadReport = async () => {
+    setIsDownloadingReport(true);
     try {
         const reportPassions = passions.map(p => ({
           ...p,
@@ -128,46 +155,31 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
 
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
-        
-        const doc = new jsPDF();
-        
-        // Use a built-in font that supports a wide range of characters.
-        // Let autotable handle the font assignment.
-        
-        // We use autotable to handle the complex text layout
-        (doc as any).autoTable({
-            body: [[report]],
-            startY: 10,
-            styles: {
-                font: 'helvetica', // Using a standard font
-                halign: language === 'ar' ? 'right' : 'left',
-            },
-            didDrawPage: (data: any) => {
-                const doc = data.doc;
-                const text = report;
-                const textLines = doc.splitTextToSize(text, data.table.width);
-                if (language === 'ar') {
-                    doc.setR2L(true);
-                    doc.text(textLines, data.settings.margin.left, data.cursor.y);
-                } else {
-                    doc.setR2L(false);
-                    doc.text(textLines, data.settings.margin.left, data.cursor.y);
-                }
-            },
-            // We hide the header and body of the table itself, 
-            // as we are manually drawing the text in didDrawPage
-            // This is a hack to get jsPDF to handle RTL text flow.
-             willDrawCell: () => false,
-        });
 
-        doc.save('Passion_Path_Report.pdf');
-
+        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Passion_Path_Report.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
     } catch (e) {
-      console.error(e);
-      alert(dc.reportError);
+        console.error(e);
+        alert(dc.reportDialog.error);
+    } finally {
+        setIsDownloadingReport(false);
+        setShowReportDialog(false);
     }
+  };
 
-    // 2. Generate and download PDF certificate
+  const handleDownloadCertificate = async () => {
+    if (!userName.trim()) {
+        alert(dc.certificateDialog.namePlaceholder);
+        return;
+    }
+    setIsDownloadingCert(true);
+
     try {
         const certDoc = new jsPDF({
             orientation: 'landscape',
@@ -190,18 +202,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
             certDoc.text(userName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
 
             certDoc.save('Passion_Path_Certificate.pdf');
-            setIsDownloading(false);
-            setShowDownloadDialog(false);
+            setIsDownloadingCert(false);
+            setShowCertDialog(false);
         };
         img.onerror = () => {
-             alert(dc.certificateError);
-             setIsDownloading(false);
+             alert(dc.certificateDialog.error);
+             setIsDownloadingCert(false);
         }
 
     } catch (e) {
         console.error(e);
-        alert(dc.certificateError);
-        setIsDownloading(false);
+        alert(dc.certificateDialog.error);
+        setIsDownloadingCert(false);
     }
   };
   
@@ -230,55 +242,93 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        <Dialog open={showDownloadDialog} onOpenChange={setShowDownloadDialog}>
+        {/* Certificate Download Dialog */}
+        <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <CheckCircle className="text-accent"/>
-                        {dc.dialogTitle}
+                        <Award className="text-accent"/>
+                        {dc.certificateDialog.title}
                     </DialogTitle>
                     <DialogDescription>
-                        {dc.dialogDescription}
+                        {dc.certificateDialog.description}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="py-4 space-y-2">
-                    <Label htmlFor="name">{dc.nameLabel}</Label>
+                    <Label htmlFor="name">{dc.certificateDialog.nameLabel}</Label>
                     <Input 
                         id="name" 
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
-                        placeholder={dc.namePlaceholder}
+                        placeholder={dc.certificateDialog.namePlaceholder}
                         dir="ltr"
                     />
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button variant="ghost">{dc.cancel}</Button>
+                        <Button variant="ghost">{dc.certificateDialog.cancel}</Button>
                     </DialogClose>
-                    <Button onClick={handleDownload} disabled={isDownloading}>
-                         {isDownloading && <Loader2 className={language === 'ar' ? "ml-2 h-4 w-4 animate-spin" : "mr-2 h-4 w-4 animate-spin"} />}
-                         {dc.downloadButton}
+                    <Button onClick={handleDownloadCertificate} disabled={isDownloadingCert}>
+                         {isDownloadingCert && <Loader2 className={language === 'ar' ? "ml-2 h-4 w-4 animate-spin" : "mr-2 h-4 w-4 animate-spin"} />}
+                         {dc.certificateDialog.downloadButton}
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
 
+        {/* Report Download Alert Dialog */}
+        <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+            <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">{dc.reportDialog.title}</AlertDialogTitle>
+                    <AlertDialogDescription>{dc.reportDialog.description}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="space-y-4 text-sm">
+                    <div className="flex items-start gap-3">
+                        <Smartphone className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                        <div className="flex-grow">
+                            <p>{dc.reportDialog.android}</p>
+                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.files" target="_blank" rel="noopener noreferrer" className="text-primary underline">{dc.reportDialog.androidLink}</a>
+                            <p className="mt-2">{dc.reportDialog.ios}</p>
+                            <a href="https://support.apple.com/guide/iphone/view-files-and-folders-iphc61044c68/ios" target="_blank" rel="noopener noreferrer" className="text-primary underline">{dc.reportDialog.iosLink}</a>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Laptop className="h-5 w-5 text-muted-foreground" />
+                        <p>{dc.reportDialog.computer}</p>
+                    </div>
+                </div>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>{dc.reportDialog.cancel}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDownloadReport} disabled={isDownloadingReport}>
+                        {isDownloadingReport && <Loader2 className={language === 'ar' ? "ml-2 h-4 w-4 animate-spin" : "mr-2 h-4 w-4 animate-spin"} />}
+                        {dc.reportDialog.continue}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
 
         <div className="text-center space-y-4">
             <h1 className="text-4xl font-headline font-bold text-primary">{c.title}</h1>
             <p className="text-lg text-muted-foreground">{c.subtitle}</p>
-            <Button onClick={() => setShowDownloadDialog(true)}>
-                <Download className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
-                {c.downloadButton}
-            </Button>
+            <div className="flex justify-center gap-4">
+                <Button onClick={() => setShowReportDialog(true)} variant="outline">
+                    <FileText className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
+                    {c.downloadReportButton}
+                </Button>
+                <Button onClick={() => setShowCertDialog(true)}>
+                    <Award className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
+                    {c.downloadCertificateButton}
+                </Button>
+            </div>
         </div>
 
       <div className="space-y-6">
         {rankedPassions?.rankedPassions.map((passion, index) => (
-          <Card key={passion.passion} className="shadow-md transition-all hover:shadow-xl hover:border-accent/50">
+          <Card key={passion.passion} className={`shadow-md transition-all hover:shadow-xl ${index === 0 ? 'border-accent border-2' : 'hover:border-accent/50'}`}>
             <CardHeader className="flex flex-row items-start gap-4">
                 <div className="flex-shrink-0">
-                    <Badge className="text-3xl font-bold h-16 w-16 rounded-full flex items-center justify-center bg-accent text-accent-foreground">
+                    <Badge className={`text-3xl font-bold h-16 w-16 rounded-full flex items-center justify-center ${index === 0 ? 'bg-accent text-accent-foreground' : 'bg-primary/20 text-primary'}`}>
                         {index + 1}
                     </Badge>
                 </div>
@@ -286,9 +336,14 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
                     <CardTitle className="text-2xl font-headline">{passion.passion}</CardTitle>
                     <CardDescription>{c.score}: {passion.score}</CardDescription>
                 </div>
-                <div className="flex-shrink-0">
-                    <Award className="w-8 h-8 text-yellow-500"/>
-                </div>
+                {index === 0 && (
+                    <div className="flex-shrink-0">
+                        <div className="flex items-center gap-2 text-accent font-bold">
+                             <CheckCircle className="w-8 h-8"/>
+                             <span>{c.topPassion}</span>
+                        </div>
+                    </div>
+                )}
             </CardHeader>
             <CardContent>
               <h4 className="font-bold mb-2">{c.reasoning}:</h4>

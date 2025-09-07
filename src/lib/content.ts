@@ -71,7 +71,7 @@ export const content = {
                     'إزاي ممكن تطور الشغف ده عشان يبقى مصدر دخل أو كارير؟ (مثال: أقدم استشارات، أبيع منتجات)',
                     'مين الناس أو الجهات اللي ممكن تتعاون معاهم عشان تكبر الشغف ده؟ (مثال: أنضم لمجتمع، أدور على مرشد)',
                     'إيه الجديد في المجال ده اللي ممكن تستفيد منه؟',
-                    'لو مفيش أي عوائق، إيه أقصى طموح ليك في الشغf ده؟'
+                    'لو مفيش أي عوائق، إيه أقصى طموح ليك في الشغف ده؟'
                 ] 
             },
         ],
@@ -126,16 +126,16 @@ export const content = {
         results: {
             title: "نتائج رحلتك",
             subtitle: "ده ترتيب شغفك بناءً على إجاباتك. استكشف النتائج عشان تعرف فين يكمن شغفك الأقوى.",
-            downloadButton: "تنزيل التقرير والشهادة",
-            downloading: "جاري إنشاء التقرير...",
+            downloadReportButton: "تنزيل التقرير (TXT)",
+            downloadCertificateButton: "تنزيل الشهادة (PDF)",
             loading: "جاري تحليل وترتيب شغفك...",
             loadingSubtitle: "الذكاء الاصطناعي بيحلل إجاباتك عشان يقدم لك أفضل ترتيب.",
             error: "حدث خطأ أثناء ترتيب شغفك. الرجاء المحاولة مرة أخرى.",
-            reportError: "حدث خطأ أثناء إنشاء التقرير. الرجاء المحاولة مرة أخرى.",
             errorTitle: "حدث خطأ",
             score: "الدرجة",
             reasoning: "سبب التقييم",
             reportTitle: "تقرير رحلة الشغف",
+            topPassion: "الشغف الموصى به"
         }
     },
     en: {
@@ -263,18 +263,16 @@ aiHelper: {
         results: {
             title: "Your Journey Results",
             subtitle: "This is the ranking of your passions based on your answers. Explore the results to find out where your strongest passion lies.",
-            downloadButton: "Download Report & Certificate",
-            downloading: "Generating Report...",
+            downloadReportButton: "Download Report (TXT)",
+            downloadCertificateButton: "Download Certificate (PDF)",
             loading: "Analyzing and ranking your passions...",
             loadingSubtitle: "AI is used to analyze your answers and provide the best ranking for you.",
             error: "An error occurred while ranking your passions. Please try again.",
-            reportError: "An error occurred while generating the report. Please try again.",
             errorTitle: "An error occurred",
             score: "Score",
             reasoning: "Reasoning for the score",
             reportTitle: "Passion Path Report",
+            topPassion: "Top Recommended Passion"
         }
     }
 }
-
-    
