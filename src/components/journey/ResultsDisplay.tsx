@@ -97,14 +97,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
         const { report } = await generateDetailedReport(input);
         
-        // This is a hack to get the Amiri font for Arabic support.
-        // It's not ideal, but it works for jsPDF.
-        const font = await fetch('/Amiri-Regular.ttf').then(res => res.arrayBuffer());
-        const fontBase64 = btoa(new Uint8Array(font).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-        doc.addFileToVFS("Amiri-Regular.ttf", fontBase64);
-        doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-        doc.setFont("Amiri");
-        
         doc.setR2L(language === 'ar');
 
         doc.setFontSize(22);
@@ -119,7 +111,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
             startY: 30,
             theme: 'plain',
             styles: {
-                font: 'Amiri', 
+                font: 'Helvetica', // A standard font that should not cause issues.
                 halign: language === 'ar' ? 'right' : 'left',
                 cellPadding: 2,
                 fontSize: 12,
