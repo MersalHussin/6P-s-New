@@ -350,11 +350,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     const fieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
     const stationData = getValues(`passions.${currentPassionIndex}.${fieldName}`) as PassionData['purpose'];
     
-    // We only validate the first 3 items which are mandatory.
     const firstThreeItems = stationData.slice(0, 3);
   
-    // Create a schema that ensures an array with exactly 3 items,
-    // where each item has non-empty text and a selected weight.
     const validationSchema = z.array(z.object({
       text: z.string().min(1, { message: "Text cannot be empty." }),
       weight: z.string().min(1, { message: "Weight must be selected." }),
@@ -363,17 +360,18 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     const result = validationSchema.safeParse(firstThreeItems);
   
     if (!result.success) {
-      // Find the first error to give a more specific message
       const firstError = result.error.errors[0];
       let specificMessage = t.validationError.description;
   
       if (firstError) {
         const fieldIndex = parseInt(firstError.path[0] as string, 10);
         const fieldType = firstError.path[1];
-        if (fieldType === 'text') {
-            specificMessage = `يرجاء ملء الحقل رقم ${fieldIndex + 1}.`;
-        } else if (fieldType === 'weight') {
-            specificMessage = `يرجاء اختيار الأهمية للحقل رقم ${fieldIndex + 1}.`;
+        if (language === 'ar') {
+          if (fieldType === 'text') {
+              specificMessage = `يرجاء ملء الحقل رقم ${fieldIndex + 1}.`;
+          } else if (fieldType === 'weight') {
+              specificMessage = `يرجاء اختيار الأهمية للحقل رقم ${fieldIndex + 1}.`;
+          }
         }
       }
 
@@ -398,7 +396,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     } else if (currentPassionIndex < totalPassions - 1) {
       setShowNextPassionDialog(true);
     } else {
-        // This is the final step, so we use handleSubmit to trigger full form validation
         await handleSubmit(onSubmit)();
     }
   };
@@ -434,8 +431,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   return (
     <div className="w-full max-w-4xl mx-auto" ref={containerRef}>
          <Dialog open={showNextPassionDialog} onOpenChange={setShowNextPassionDialog}>
-            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'} className="text-center p-8">
-                <DialogHeader>
+            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'} className="p-8">
+                <DialogHeader className="text-center">
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
                         <CheckCircle className="h-10 w-10 text-green-600" />
                     </div>
@@ -444,7 +441,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         {c.nextPassionDialog.description}
                     </DialogDescription>
                 </DialogHeader>
-                <div className="my-6">
+                <div className="my-6 text-center">
                     <p className="text-sm text-muted-foreground mb-2">{c.nextPassionDialog.nextPassion}</p>
                     <p className="text-3xl font-headline font-bold text-primary">
                         {initialPassions[currentPassionIndex + 1]?.name || ""}
@@ -453,7 +450,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                 <DialogClose asChild>
                     <Button onClick={proceedToNextPassion} className="mt-4 w-full" size="lg">
                         {c.nextPassionDialog.cta}
-                        <ArrowRight className="h-5 w-5" />
+                        <ArrowRight className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
                     </Button>
                 </DialogClose>
             </DialogContent>
