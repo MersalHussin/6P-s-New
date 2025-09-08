@@ -533,7 +533,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                 </div>
                 <div className={cn("flex-shrink-0", language === 'ar' ? "mr-4" : "ml-4")}>
                     <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
-                        {c.progress.exploring}: {currentPassionName}
+                        {c.progress.passion}: {currentPassionName}
                     </Button>
                 </div>
             </div>
@@ -601,5 +601,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
+    
 
     
