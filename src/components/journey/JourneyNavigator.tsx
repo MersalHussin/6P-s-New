@@ -13,7 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2 } from 'lucide-react';
+import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
@@ -316,6 +316,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
   const [currentPassionIndex, setCurrentPassionIndex] = useState(0);
   const [currentPIndex, setCurrentPIndex] = useState(0);
+  const [showNextPassionDialog, setShowNextPassionDialog] = useState(false);
 
   const totalPStations = P_STATIONS.length;
   const totalPassions = initialPassions.length;
@@ -347,12 +348,17 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     if (currentPIndex < totalPStations - 1) {
       setCurrentPIndex(currentPIndex + 1);
     } else if (currentPassionIndex < totalPassions - 1) {
-      setCurrentPassionIndex(currentPassionIndex + 1);
-      setCurrentPIndex(0);
+      setShowNextPassionDialog(true);
     } else {
         handleSubmit(onSubmit)();
     }
   };
+
+  const proceedToNextPassion = () => {
+    setShowNextPassionDialog(false);
+    setCurrentPassionIndex(currentPassionIndex + 1);
+    setCurrentPIndex(0);
+  }
 
   const handleBack = () => {
     scrollToTop();
@@ -377,6 +383,23 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
   return (
     <div className="w-full max-w-4xl mx-auto" ref={containerRef}>
+         <Dialog open={showNextPassionDialog} onOpenChange={setShowNextPassionDialog}>
+            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <DialogHeader>
+                    <DialogTitle>{c.nextPassionDialog.title}</DialogTitle>
+                    <DialogDescription>
+                        {c.nextPassionDialog.description(initialPassions[currentPassionIndex + 1]?.name || "")}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogClose asChild>
+                    <Button onClick={proceedToNextPassion} className="mt-4">
+                        {c.nextPassionDialog.cta}
+                        <ArrowRight className="h-4 w-4" />
+                    </Button>
+                </DialogClose>
+            </DialogContent>
+        </Dialog>
+
         <div className="sticky top-4 z-10 bg-background/80 backdrop-blur-sm rounded-lg p-4 mb-6 border shadow-sm">
             <div className="flex justify-between items-center">
                 <div className="space-y-2 flex-grow">
@@ -406,6 +429,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         <div className='flex-grow'>
                         <CardTitle className="font-headline text-2xl flex items-center gap-2">
                             {c.progress.station} {currentPIndex + 1}: {station.name}
+                            {language === 'ar' && <span className='text-lg font-body text-muted-foreground'>({station.id})</span>}
                         </CardTitle>
                         <CardDescription>
                             {station.description}
@@ -448,3 +472,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
+    

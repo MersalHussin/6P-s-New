@@ -20,7 +20,7 @@ export const content = {
         },
         stations: [
             { 
-                id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
+                id: 'Purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
                 description: 'في المحطة دي، هتحدد الأهداف والدوافع العميقة ورا كل شغف.',
                 hints: [
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
@@ -31,7 +31,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
+                id: 'Power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
                 description: 'هنا، هتكتشف نقط قوتك ومهاراتك اللي بتدعم الشغف ده.',
                 hints: [
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
@@ -42,7 +42,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
+                id: 'Proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
                 description: 'في المحطة دي، هتجمع الأدلة والتجارب اللي بتثبت شغفك.',
                 hints: [
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
@@ -53,7 +53,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
+                id: 'Problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
                 description: 'هنا، هتحدد العقبات والتحديات اللي ممكن تقابلك.',
                 hints: [
                     'إيه العقبات أو التحديات اللي بتقابلك وإنت بتمارس الشغف ده؟ (مثال: ضيق الوقت، نقص الموارد)',
@@ -64,7 +64,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb,
+                id: 'Possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb,
                 description: 'في آخر محطة، هتستكشف الفرص والإمكانيات المستقبلية لشغفك.',
                 hints: [
                     'إيه الفرص أو المشاريع اللي ممكن تعملها في المجال ده في المستقبل؟ (مثال: أبدأ بيزنس، أعمل محتوى)',
@@ -107,6 +107,11 @@ export const content = {
                 title: "مساعد الشغف",
                 description: "ده شرح مفصل عشان يساعدك تفكر في النقطة دي بعمق أكتر.",
                 loading: "لحظات، بفكر في أحسن طريقة أساعدك بيها...",
+            },
+            nextPassionDialog: {
+                title: "أحسنت!",
+                description: (passionName: string) => `لقد أكملت استكشاف هذا الشغف. الآن، استعد لاستكشاف شغفك التالي: "${passionName}"`,
+                cta: "لنبدأ"
             }
         },
         toasts: {
@@ -244,6 +249,11 @@ aiHelper: {
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this item more deeply.",
                 loading: "Thinking of the best way to help you...",
+            },
+            nextPassionDialog: {
+                title: "Well Done!",
+                description: (passionName: string) => `You have completed exploring this passion. Now, get ready to explore your next passion: "${passionName}"`,
+                cta: "Let's Go"
             }
         },
         toasts: {
@@ -276,3 +286,5 @@ aiHelper: {
         }
     }
 }
+
+    
