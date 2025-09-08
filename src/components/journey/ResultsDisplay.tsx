@@ -323,13 +323,20 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     setIsDownloadingCert(true);
     try {
         const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
-        
+        let passionForCert = topPassion || "your passion";
+
         if (topPassion && !isFallback) {
-          const { translatedText } = await translateText({ text: topPassion, targetLanguage: 'en' });
-          setPassionInEnglish(translatedText);
-        } else {
-            setPassionInEnglish(topPassion || "your passion");
+          try {
+            const { translatedText } = await translateText({ text: topPassion, targetLanguage: 'en' });
+            passionForCert = translatedText;
+          } catch (e) {
+             console.error("AI translation failed, using original passion name.", e);
+             // If translation fails (e.g., quota exceeded), use the original passion name
+             passionForCert = topPassion;
+          }
         }
+        
+        setPassionInEnglish(passionForCert);
 
         // Wait a tick for the state to update before rendering the canvas
         await new Promise(resolve => setTimeout(resolve, 0));
@@ -540,5 +547,5 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     </div>
   );
 }
-
+    
     
