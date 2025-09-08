@@ -211,15 +211,17 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
           )}
         </div>
       ))}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={() => append({ id: (fields.length + 1).toString(), text: '', weight: '' })}
-      >
-        <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-        {c.addMoreButton}
-      </Button>
+      {fields.length < 6 && (
+        <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => append({ id: `${fields.length + 1}`, text: '', weight: '' })}
+        >
+            <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+            {c.addMoreButton}
+        </Button>
+      )}
 
        {station.id === 'problems' && <SuggestSolutionsButton passionIndex={passionIndex} />}
     </div>
@@ -355,15 +357,16 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     const validationSchema = z.array(z.object({
       text: z.string().min(1, { message: "Text cannot be empty." }),
       weight: z.string().min(1, { message: "Weight must be selected." }),
+      id: z.string()
     })).min(3);
   
     const result = validationSchema.safeParse(firstThreeItems);
   
     if (!result.success) {
-      const firstError = result.error.errors[0];
       let specificMessage = t.validationError.description;
   
-      if (firstError) {
+      if (result.error.errors[0]) {
+        const firstError = result.error.errors[0];
         const fieldIndex = parseInt(firstError.path[0] as string, 10);
         const fieldType = firstError.path[1];
         if (language === 'ar') {
@@ -372,6 +375,12 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
           } else if (fieldType === 'weight') {
               specificMessage = `يرجاء اختيار الأهمية للحقل رقم ${fieldIndex + 1}.`;
           }
+        } else {
+            if (fieldType === 'text') {
+                specificMessage = `Please fill out item #${fieldIndex + 1}.`;
+            } else if (fieldType === 'weight') {
+                specificMessage = `Please select the importance for item #${fieldIndex + 1}.`;
+            }
         }
       }
 
@@ -475,7 +484,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
         <div className="space-y-6">
             <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <Card key={`${currentPassionIndex}-${currentPIndex}`} className="mt-4 overflow-hidden">
                     <CardHeader className="bg-muted/30">
                         <div className="flex items-center gap-4">
@@ -536,5 +545,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
-    
