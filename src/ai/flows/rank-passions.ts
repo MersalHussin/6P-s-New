@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -35,7 +36,7 @@ export type RankPassionsInput = z.infer<typeof RankPassionsInputSchema>;
 const RankedPassionSchema = z.object({
   passion: z.string().describe('The name of the passion.'),
   score: z.number().describe('The calculated score for the passion.'),
-  reasoning: z.string().describe('A qualitative, insightful explanation for the ranking. Should include actionable advice for growth.'),
+  reasoning: z.string().describe('A qualitative, insightful explanation for the ranking. Should include a "Next Steps" section with actionable advice and external resources for growth.'),
 });
 
 const RankPassionsOutputSchema = z.object({
@@ -54,55 +55,56 @@ const rankPassionsPrompt = ai.definePrompt({
   output: {schema: RankPassionsOutputSchema},
   prompt: `You are an expert career coach helping young adults discover their passions. Your tone is encouraging, insightful, and realistic.
 
-  You will receive a list of passions with details provided by the user, including a rating from 1 to 5 for each item. Rank these passions based on the user's input in each category (Purpose, Power, Proof, Problems, Possibilities).
+You will receive a list of passions with details provided by the user, including a rating from 1 to 5 for each item. Rank these passions based on the user's input in each category (Purpose, Power, Proof, Problems, Possibilities).
 
-  The scoring model is as follows (use this for ranking, but do not mention points in your response):
-  - For Purpose, Power, Proof, and Possibilities: the rating (1-5) is the score. A rating of 0 or an empty item counts as 1 point.
-  - For Problems: the rating (1-5) is a negative score (e.g., a rating of 5 becomes -5 points). A rating of 0 or an empty item counts as -1 point.
-  
-  Calculate a total score for each passion. Rank the passions from highest to lowest score.
+The scoring model is as follows:
+- For Purpose, Power, Proof, and Possibilities: the rating (1-5) is the score. An empty item or a rating of 0 should be treated as 1 point.
+- For Problems: the rating (1-5) is a negative score (e.g., a rating of 5 becomes -5 points). An empty item or a rating of 0 should be treated as -1 point.
 
-  For each passion, provide a comprehensive "reasoning" that is both analytical and encouraging. This is the most important part.
-  The reasoning must NOT mention the scoring or points. Instead, it should be a qualitative analysis that feels personal.
-  - Start by summarizing why this passion scored the way it did in a narrative format. For example, "Your passion for [Passion Name] seems to shine brightly because of your strong sense of purpose and the clear strengths you possess. You gave high importance to how it helps you [mention a purpose], which shows a deep connection."
-  
-  - Conclude the reasoning for EACH passion with a "Next Steps" section. Provide 2-3 concrete, actionable pieces of advice.
-  - For high-ranking passions, provide focused and detailed next steps to help the user start acting on this passion.
-  - For lower-ranking passions, gently point out the challenges (problems) or weaker connections. The advice should be about re-evaluation, such as suggesting they spend less time on it, or find ways to merge its enjoyable aspects with a higher-ranking passion. For example, "You might find it more fulfilling to integrate your love for [lower-ranked passion] into your journey with [higher-ranked passion]."
+Calculate a total score for each passion by summing the scores of all items. Rank the passions from highest to lowest score.
 
-  The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}.
-  If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
+For each passion, provide a comprehensive "reasoning" that is both analytical and encouraging. This is the most important part.
+The reasoning must NOT mention the exact scoring or points. Instead, it should be a qualitative, realistic analysis.
+- Start by summarizing why this passion scored the way it did in a narrative format. Be specific. For example, "Your passion for [Passion Name] seems to shine brightly because of your strong sense of purpose. You mentioned that it helps you '[mention a specific purpose with high rating]', which shows a deep connection. Also, your strength in '[mention a specific power with high rating]' is a huge asset here."
+- If the score is low, be gentle but clear about the challenges. For example, "While you're interested in [Passion Name], it seems you've identified some significant challenges, like '[mention a specific problem with a high rating]', which might be holding you back."
 
-  Here are the passions with their details:
-  {{#each passions}}
-    Passion: {{this.passion}}
-    {{#if this.purpose}}
-    Purposes:
-    {{#each this.purpose}} - "{{this.text}}" (Rating: {{this.weight}})
-    {{/each}}
-    {{/if}}
-    {{#if this.power}}
-    Powers:
-    {{#each this.power}} - "{{this.text}}" (Rating: {{this.weight}})
-    {{/each}}
-    {{/if}}
-    {{#if this.proof}}
-    Proofs:
-    {{#each this.proof}} - "{{this.text}}" (Rating: {{this.weight}})
-    {{/each}}
-    {{/if}}
-    {{#if this.problems}}
-    Problems:
-    {{#each this.problems}} - "{{this.text}}" (Rating: {{this.weight}})
-    {{/each}}
-    {{/if}}
-    {{#if this.possibilities}}
-    Possibilities:
-    {{#each this.possibilities}} - "{{this.text}}" (Rating: {{this.weight}})
-    {{/each}}
-    {{/if}}
-    ---
+- After the main reasoning, you MUST include a separate section titled "**الخطوات القادمة:**" (for Arabic) or "**Next Steps:**" (for English). This section must contain:
+  1.  **Actionable Advice:** 2-3 concrete, actionable pieces of advice. For high-ranking passions, focus on starting. For lower-ranking ones, focus on exploration or re-evaluation.
+  2.  **Resource Suggestions:** Provide at least one specific, real, and relevant external resource (like a famous YouTube channel, a well-known website, or a platform). For example, for "Programming", suggest "Elzero Web School" for Arabic content or "freeCodeCamp" for English. Be creative and helpful. For "Graphic Design", suggest "Canva" or "Behance". For "Content Creation", suggest "YouTube Creator Academy".
+
+The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}.
+If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
+
+Here are the passions with their details:
+{{#each passions}}
+  Passion: {{this.passion}}
+  {{#if this.purpose}}
+  Purposes:
+  {{#each this.purpose}} - "{{this.text}}" (Rating: {{this.weight}})
   {{/each}}
+  {{/if}}
+  {{#if this.power}}
+  Powers:
+  {{#each this.power}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{/each}}
+  {{/if}}
+  {{#if this.proof}}
+  Proofs:
+  {{#each this.proof}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{/each}}
+  {{/if}}
+  {{#if this.problems}}
+  Problems:
+  {{#each this.problems}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{/each}}
+  {{/if}}
+  {{#if this.possibilities}}
+  Possibilities:
+  {{#each this.possibilities}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{/each}}
+  {{/if}}
+  ---
+{{/each}}
   `,config: {
     safetySettings: [
       {

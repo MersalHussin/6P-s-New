@@ -298,6 +298,42 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
 
+  // A helper function to render the reasoning and next steps
+  const renderReasoning = (reasoning: string) => {
+    const parts = reasoning.split('**الخطوات القادمة:**');
+    const mainReasoning = parts[0];
+    const nextSteps = parts[1];
+
+    if (language === 'en') {
+        const enParts = reasoning.split('**Next Steps:**');
+        const mainEnReasoning = enParts[0];
+        const nextEnSteps = enParts[1];
+        return (
+            <div>
+                <p className="text-muted-foreground whitespace-pre-wrap">{mainEnReasoning}</p>
+                {nextEnSteps && (
+                <div className="mt-4 p-4 bg-secondary/50 rounded-lg">
+                    <h5 className="font-bold mb-2 text-green-700 dark:text-green-400">Next Steps:</h5>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{nextEnSteps}</p>
+                </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <p className="text-muted-foreground whitespace-pre-wrap">{mainReasoning}</p>
+            {nextSteps && (
+            <div className="mt-4 p-4 bg-secondary/50 rounded-lg">
+                <h5 className="font-bold mb-2 text-green-700 dark:text-green-400">الخطوات القادمة:</h5>
+                <p className="text-muted-foreground whitespace-pre-wrap">{nextSteps}</p>
+            </div>
+            )}
+        </div>
+    );
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={certificateId} />
@@ -410,7 +446,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             </CardHeader>
             <CardContent>
               <h4 className="font-bold mb-2">{c.reasoning}:</h4>
-              <p className="text-muted-foreground whitespace-pre-wrap">{passion.reasoning}</p>
+              {renderReasoning(passion.reasoning)}
             </CardContent>
           </Card>
         ))}
@@ -418,5 +454,3 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     </div>
   );
 }
-
-    

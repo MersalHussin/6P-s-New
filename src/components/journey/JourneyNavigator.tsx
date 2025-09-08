@@ -114,6 +114,9 @@ const StarRating = ({ field, stationId }: { field: any, stationId: string }) => 
     const [hover, setHover] = useState(0);
     const { language } = useLanguage();
     const ratingContent = content[language].journey.ratings[stationId] || content[language].journey.ratings.default;
+
+    const isProblemStation = stationId === 'problems';
+    const activeColor = isProblemStation ? "text-red-500" : "text-yellow-400";
   
     return (
       <div className="space-y-2">
@@ -129,7 +132,7 @@ const StarRating = ({ field, stationId }: { field: any, stationId: string }) => 
                                 key={ratingValue}
                                 className={cn(
                                     "h-8 w-8 transition-colors",
-                                    ratingValue <= (hover || field.value) ? "text-yellow-400" : "text-gray-300"
+                                    ratingValue <= (hover || field.value) ? activeColor : "text-gray-300"
                                 )}
                                 onClick={() => field.onChange(ratingValue)}
                                 onMouseEnter={() => setHover(ratingValue)}
