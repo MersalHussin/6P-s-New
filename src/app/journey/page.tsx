@@ -14,17 +14,40 @@ import { useLanguage } from "@/context/language-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
 
 const USER_ID_KEY = "passionJourneyUserId_v2";
 
 const loadingContent = {
     ar: {
         loading: "جاري تحميل رحلتك...",
-        noUser: "لم نجد مستخدمًا. سيتم توجيهك للبداية."
+        noUser: "لم نجد مستخدمًا. سيتم توجيهك للبداية.",
+        exitWarning: {
+            title: "هل أنت متأكد من رغبتك في الخروج؟",
+            description: "إذا خرجت الآن، قد لا يتم حفظ تقدمك الحالي. هذه الرحلة مهمة لمستقبلك.",
+            cancel: "إلغاء",
+            confirm: "تأكيد الخروج"
+        }
     },
     en: {
         loading: "Loading your journey...",
-        noUser: "No user found. Redirecting to start."
+        noUser: "No user found. Redirecting to start.",
+        exitWarning: {
+            title: "Are you sure you want to exit?",
+            description: "If you exit now, your current progress might not be saved. This journey is important for your future.",
+            cancel: "Cancel",
+            confirm: "Confirm Exit"
+        }
     }
 }
 
@@ -142,19 +165,48 @@ export default function JourneyPage() {
   }
   const hc = headerContent[language];
 
+  const ExitWarningDialog = ({ children }: { children: React.ReactNode }) => (
+    <AlertDialog>
+        <AlertDialogTrigger asChild>
+            {children}
+        </AlertDialogTrigger>
+        <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <AlertDialogHeader>
+                <AlertDialogTitle>{c.exitWarning.title}</AlertDialogTitle>
+                <AlertDialogDescription>{c.exitWarning.description}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="w-full aspect-video rounded-lg overflow-hidden border shadow-inner">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/Fzzs5vrE5e0"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <AlertDialogFooter>
+                <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
+                <AlertDialogAction onClick={() => router.push('/')}>
+                    {c.exitWarning.confirm}
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+  );
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="py-4 border-b">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" passHref>
-            <h1 className="text-2xl font-headline font-bold text-primary">
+        <ExitWarningDialog>
+            <h1 className="text-2xl font-headline font-bold text-primary cursor-pointer">
               {hc.title}
             </h1>
-          </Link>
+          </ExitWarningDialog>
           <div className="flex items-center gap-2">
-            <Link href="/" passHref>
+            <ExitWarningDialog>
                 <Button variant="ghost">{hc.home}</Button>
-            </Link>
+            </ExitWarningDialog>
           </div>
         </div>
       </header>
