@@ -50,7 +50,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         </div>
 
         {/* Date */}
-        <p className="absolute bottom-[173px] left-[340px] text-black text-[22px] font-semibold">
+        <p className="absolute bottom-[173px] left-[290px] text-black text-[22px] font-semibold">
           {dateStr}
         </p>
       </div>
