@@ -14,16 +14,13 @@ import { z } from 'genkit';
 const FieldItemSchema = z.object({
     id: z.string(),
     text: z.string(),
-});
-
-const PurposeSchema = FieldItemSchema.extend({
-  weight: z.enum(['high', 'medium', 'low', '']),
+    weight: z.number(),
 });
 
 const PassionDataSchema = z.object({
   id: z.string(),
   name: z.string(),
-  purpose: z.array(PurposeSchema),
+  purpose: z.array(FieldItemSchema),
   power: z.array(FieldItemSchema),
   proof: z.array(FieldItemSchema),
   problems: z.array(FieldItemSchema),
@@ -73,22 +70,22 @@ const reportPrompt = ai.definePrompt({
 
   **1. Purpose:**
   {{#each this.purpose}}
-  - Purpose: {{{this.text}}} (Weight: {{{this.weight}}})
+  - Purpose: {{{this.text}}} (Rating: {{{this.weight}}}/5)
   {{/each}}
 
   **2. Power:**
    {{#each this.power}}
-  - {{{this.text}}}
+  - {{{this.text}}} (Rating: {{{this.weight}}}/5)
   {{/each}}
 
   **3. Proof:**
    {{#each this.proof}}
-  - {{{this.text}}}
+  - {{{this.text}}} (Rating: {{{this.weight}}}/5)
   {{/each}}
 
   **4. Problems:**
    {{#each this.problems}}
-  - {{{this.text}}}
+  - {{{this.text}}} (Rating: {{{this.weight}}}/5)
   {{/each}}
 
   **5. Suggested Solutions for Problems:**
@@ -102,7 +99,7 @@ const reportPrompt = ai.definePrompt({
 
   **6. Possibilities:**
   {{#each this.possibilities}}
-  - {{{this.text}}}
+  - {{{this.text}}} (Rating: {{{this.weight}}}/5)
   {{/each}}
   ---
   {{/each}}
