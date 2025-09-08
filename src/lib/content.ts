@@ -52,7 +52,7 @@ export const content = {
                     'احكي عن مواقف معينة حسيت فيها بحماس وانبساط وإنت بتمارس الشغف ده.',
                     'بتقضي وقت قد إيه في الشغف ده أو بتتعلم عنه؟',
                     'هل استثمرت فلوس في الشغف ده؟ (كورسات، كتب، معدات)'
-                ]
+                ] 
             },
             { 
                 id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
@@ -168,7 +168,12 @@ export const content = {
             score: "النتيجة",
             reasoning: "سبب النتيجة",
             reportTitle: "تقرير مسار الشغف",
-            topPassion: "الشغف الموصى به"
+            topPassion: "الشغف الموصى به",
+            fallback: {
+                title: "النتائج الأولية لرحلتك",
+                subtitle: "واجهنا مشكلة في الاتصال بالذكاء الاصطناعي للحصول على تحليل تفصيلي. لكن لا تقلق، هذه هي النتائج الأولية بناءً على حساب النقاط.",
+                reasoning: "التحليل التفصيلي غير متاح حاليًا. حاول تحديث الصفحة أو العودة لاحقًا للحصول على تقرير كامل بالذكاء الاصطناعي.",
+            },
         }
     },
     en: {
@@ -337,7 +342,12 @@ export const content = {
             score: "Score",
             reasoning: "Reasoning for the score",
             reportTitle: "Passion Path Report",
-            topPassion: "Top Recommended Passion"
+            topPassion: "Top Recommended Passion",
+            fallback: {
+                title: "Your Preliminary Journey Results",
+                subtitle: "We had trouble connecting to the AI for a detailed analysis. But don't worry, here are the preliminary results based on point calculation.",
+                reasoning: "Detailed analysis is currently unavailable. Try refreshing the page or come back later for a full AI-powered report.",
+            },
         }
     }
 }

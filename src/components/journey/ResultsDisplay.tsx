@@ -39,6 +39,25 @@ const filterRatedItems = (items: FieldItem[] | undefined): FieldItem[] => {
     return items.filter(item => item.text && item.weight > 0);
 };
 
+// Fallback score calculation function
+const calculateScore = (passion: { purpose: FieldItem[], power: FieldItem[], proof: FieldItem[], problems: FieldItem[], possibilities: FieldItem[] }): number => {
+    let score = 0;
+    const calculate = (items: FieldItem[], multiplier: 1 | -1) => {
+        return items.reduce((acc, item) => {
+            const weight = item.weight || 1;
+            return acc + (weight * multiplier);
+        }, 0);
+    };
+
+    score += calculate(passion.purpose, 1);
+    score += calculate(passion.power, 1);
+    score += calculate(passion.proof, 1);
+    score += calculate(passion.possibilities, 1);
+    score += calculate(passion.problems, -1);
+    
+    return score;
+}
+
 const downloadContent = {
     ar: {
         certificateDialog: {
@@ -91,6 +110,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(initialResults);
   const [loading, setLoading] = useState(!initialResults);
   const [error, setError] = useState<string | null>(null);
+  const [isFallback, setIsFallback] = useState(false);
   
   const [isDownloadingCert, setIsDownloadingCert] = useState(false);
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
@@ -156,18 +176,17 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
       
       setLoading(true);
       setError(null);
-      try {
-        const validatedPassions = passions.map(p => ({
-            passion: p.name,
-            purpose: filterRatedItems(p.purpose),
-            power: filterRatedItems(p.power),
-            proof: filterRatedItems(p.proof),
-            problems: filterRatedItems(p.problems),
-            possibilities: filterRatedItems(p.possibilities),
-        }));
+      const validatedPassions = passions.map(p => ({
+        passion: p.name,
+        purpose: filterRatedItems(p.purpose),
+        power: filterRatedItems(p.power),
+        proof: filterRatedItems(p.proof),
+        problems: filterRatedItems(p.problems),
+        possibilities: filterRatedItems(p.possibilities),
+    }));
 
+      try {
         const input: RankPassionsInput = { passions: validatedPassions, language };
-        
         const result = await rankPassions(input);
         
         result.rankedPassions.sort((a, b) => b.score - a.score);
@@ -177,11 +196,26 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
         // Trigger confetti
         setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 4000); // Hide confetti after 4 seconds
+        setTimeout(() => setShowConfetti(false), 4000);
 
       } catch (e) {
-        console.error(e);
-        setError(c.error);
+        console.error("AI ranking failed, using fallback.", e);
+        setError(null); // Clear any previous errors
+        setIsFallback(true);
+
+        // Fallback logic
+        const passionsWithScores = validatedPassions.map(p => ({
+            passion: p.passion,
+            score: calculateScore(p),
+            reasoning: c.fallback.reasoning,
+        }));
+
+        passionsWithScores.sort((a, b) => b.score - a.score);
+
+        const fallbackResult: RankPassionsOutput = { rankedPassions: passionsWithScores };
+        setRankedPassions(fallbackResult);
+        onResultsCalculated(fallbackResult);
+
       } finally {
         setLoading(false);
       }
@@ -190,7 +224,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     if(passions.length > 0){
         getRanking();
     }
-  }, [passions, c.error, language, initialResults, onResultsCalculated]);
+  }, [passions, c.error, language, initialResults, onResultsCalculated, c.fallback.reasoning]);
 
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
@@ -338,7 +372,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={certificateId} />
 
-        {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
+        {showConfetti && !isFallback && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
         {/* Certificate Download Dialog */}
         <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -406,10 +440,10 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         </AlertDialog>
 
         <div className="text-center space-y-4">
-            <h1 className="text-4xl font-headline font-bold text-primary">{c.title}</h1>
-            <p className="text-lg text-muted-foreground">{c.subtitle}</p>
+            <h1 className="text-4xl font-headline font-bold text-primary">{isFallback ? c.fallback.title : c.title}</h1>
+            <p className="text-lg text-muted-foreground">{isFallback ? c.fallback.subtitle : c.subtitle}</p>
             <div className="flex justify-center gap-4">
-                <Button onClick={() => setShowReportDialog(true)} variant="outline">
+                <Button onClick={() => setShowReportDialog(true)} variant="outline" disabled={isFallback}>
                     <FileText className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
                     {c.downloadReportButton}
                 </Button>
