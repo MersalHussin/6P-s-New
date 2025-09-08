@@ -151,7 +151,7 @@ export function UserForm({ onUserCreated }: { onUserCreated: (userId: string) =>
               <FormItem>
                 <FormLabel>{c.whatsappLabel}</FormLabel>
                 <FormControl>
-                  <Input placeholder={c.whatsappPlaceholder} {...field} dir="ltr" />
+                  <Input placeholder={c.whatsappPlaceholder} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -164,7 +164,7 @@ export function UserForm({ onUserCreated }: { onUserCreated: (userId: string) =>
               <FormItem>
                 <FormLabel>{c.emailLabel}</FormLabel>
                 <FormControl>
-                  <Input placeholder={c.emailPlaceholder} {...field} dir="ltr" />
+                  <Input placeholder={c.emailPlaceholder} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
