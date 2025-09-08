@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { PassionData, FieldItem } from "@/lib/types";
+import type { PassionData, FieldItem, UserData } from "@/lib/types";
 import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,12 +19,15 @@ import jsPDF from "jspdf";
 import 'jspdf-autotable';
 import { cn } from "@/lib/utils";
 import Confetti from "react-confetti";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 
 interface ResultsDisplayProps {
   passions: PassionData[];
   initialResults: RankPassionsOutput | null;
   onResultsCalculated: (results: RankPassionsOutput) => void;
+  userId: string;
 }
 
 const filterRatedItems = (items: FieldItem[] | undefined): FieldItem[] => {
@@ -82,7 +85,7 @@ const downloadContent = {
 }
 
 
-export function ResultsDisplay({ passions, initialResults, onResultsCalculated }: ResultsDisplayProps) {
+export function ResultsDisplay({ passions, initialResults, onResultsCalculated, userId }: ResultsDisplayProps) {
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(initialResults);
   const [loading, setLoading] = useState(!initialResults);
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +105,22 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
   const dc = downloadContent[language];
 
   useEffect(() => {
+    const fetchUserData = async () => {
+        if (userId) {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if(userDoc.exists()){
+                const userData = userDoc.data() as UserData;
+                if(userData.name) {
+                    setUserName(userData.name);
+                }
+            }
+        }
+    };
+    fetchUserData();
+  }, [userId]);
+
+
+  useEffect(() => {
     const handleResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     };
@@ -118,6 +137,8 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
       if (initialResults) {
         setRankedPassions(initialResults);
         setLoading(false);
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 4000);
         return;
       }
       
@@ -154,7 +175,9 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
       }
     };
 
-    getRanking();
+    if(passions.length > 0){
+        getRanking();
+    }
   }, [passions, c.error, language, initialResults, onResultsCalculated]);
 
   const handleDownloadReport = async () => {
@@ -205,17 +228,41 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
 
         const img = new Image();
         img.crossOrigin = "Anonymous";
-        img.src = "https://i.suar.me/j5GBz/l";
+        img.src = "https://i.suar.me/9laZP/l";
         
         img.onload = () => {
             const pageWidth = certDoc.internal.pageSize.getWidth();
             const pageHeight = certDoc.internal.pageSize.getHeight();
             certDoc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
 
-            certDoc.setFontSize(30);
+            // Add Certificate Code
+            certDoc.setFontSize(10);
+            certDoc.setTextColor('#444444');
+            certDoc.setFont('helvetica', 'normal');
+            certDoc.text(`Certificate ID: ${userId}`, 40, 40);
+
+            // Add Name
+            certDoc.setFontSize(40);
             certDoc.setTextColor('#000000');
             certDoc.setFont('helvetica', 'bold');
-            certDoc.text(userName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
+            certDoc.text(userName, pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
+
+            // Add Encouraging Message
+            const topPassion = rankedPassions?.rankedPassions[0]?.passion || "your passion";
+            const message = `Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: ${topPassion}. We are proud of your effort and wish you success in turning your passion into impact.`;
+            certDoc.setFontSize(12);
+            certDoc.setTextColor('#002B7F'); // Blue color
+            certDoc.setFont('helvetica', 'normal');
+            const splitMessage = certDoc.splitTextToSize(message, pageWidth - 160);
+            certDoc.text(splitMessage, pageWidth / 2, pageHeight / 2 + 30, { align: 'center' });
+            
+            // Add Date
+            const today = new Date();
+            const dateStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+            certDoc.setFontSize(12);
+            certDoc.setTextColor('#000000');
+            certDoc.text(dateStr, 118, pageHeight - 95, { align: 'center'});
+
 
             certDoc.save('Passion_Path_Certificate.pdf');
             setIsDownloadingCert(false);
@@ -278,7 +325,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder={dc.certificateDialog.namePlaceholder}
-                        dir="ltr"
                     />
                 </div>
                 <DialogFooter>
@@ -375,5 +421,3 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     </div>
   );
 }
-
-    

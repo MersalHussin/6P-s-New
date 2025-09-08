@@ -88,7 +88,7 @@ export default function JourneyPage() {
             setResultsData(resultsData);
 
             // Logic to determine the correct step
-            if (currentStep === 'results' || resultsData) {
+            if (currentStep === 'results' || (resultsData && resultsData.rankedPassions.length > 0)) {
                 setStep('results');
             } else if (currentStep === 'journey' && journeyData.length > 0) {
                 setStep('journey');
@@ -228,11 +228,12 @@ export default function JourneyPage() {
             onDataChange={handleJourneyUpdate}
           />
         )}
-        {step === "results" && passionsData.length > 0 && (
+        {step === "results" && passionsData.length > 0 && userId && (
             <ResultsDisplay 
                 passions={passionsData}
                 initialResults={resultsData}
                 onResultsCalculated={handleResultsCalculated}
+                userId={userId}
             />
         )}
       </main>
