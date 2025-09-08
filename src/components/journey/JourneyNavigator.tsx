@@ -161,7 +161,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   const { control, watch } = useFormContext();
   const { language } = useLanguage();
   const stations = content[language].stations;
-  const station = stations[pIndex];
+  const station = stations[pIndex + 1];
   const fieldName = station.id as 'purpose' | 'power' | 'proof' | 'problems' | 'possibilities';
 
   const { fields, append, remove } = useFieldArray({
@@ -172,7 +172,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   const passionValues = watch(`passions.${passionIndex}.${fieldName}`);
 
   useEffect(() => {
-    if (passionValues.length === 0) {
+    if (passionValues && passionValues.length === 0) {
       append({ id: '1', text: '', weight: 0 });
       append({ id: '2', text: '', weight: 0 });
       append({ id: '3', text: '', weight: 0 });
@@ -180,7 +180,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   }, [passionValues, append]);
   
   const c = content[language].journey;
-  const stationContent = content[language].stations[pIndex];
+  const stationContent = content[language].stations[pIndex + 1];
 
   return (
     <div className="space-y-6">
@@ -362,7 +362,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const c = content[language].journey;
   const t = content[language].toasts;
   const { toast } = useToast();
-  const P_STATIONS = content[language].stations;
+  const P_STATIONS = content[language].stations.filter(s => s.id !== 'passion-selection');
   const ArrowLeft = language === 'ar' ? MoveLeft : MoveRight;
   const ArrowRight = language === 'ar' ? MoveRight : MoveLeft;
 
@@ -399,6 +399,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     const fieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
     const stationData = getValues(`passions.${currentPassionIndex}.${fieldName}`) as PassionData['purpose'];
     
+    if (!stationData) return false;
+
     const firstThreeItems = stationData.slice(0, 3);
   
     const validationSchema = z.array(z.object({
@@ -540,7 +542,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         </div>
                         <div>
                             <CardTitle className="font-headline text-2xl">
-                            {c.progress.station} {currentPIndex + 1}: {station.name}
+                                {station.name}
                             </CardTitle>
                             <CardDescription className="mt-2">
                                 {station.description}

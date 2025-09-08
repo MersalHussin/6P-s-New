@@ -86,7 +86,7 @@ export function PassionForm({ onSubmit }: { onSubmit: (passions: { name: string 
                 )}
               />
             ))}
-             {form.formState.errors.passions && fields.length > 0 && (
+             {form.formState.errors.passions && (
                 <p className="text-sm font-medium text-destructive">{form.formState.errors.passions.message}</p>
              )}
 
