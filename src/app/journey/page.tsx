@@ -162,8 +162,8 @@ export default function JourneyPage() {
   }
 
   const headerContent = {
-    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية", admin: "لوحة التحكم" },
-    en: { title: "Passion Path", home: "Home", admin: "Admin" }
+    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية" },
+    en: { title: "Passion Path", home: "Home" }
   }
   const hc = headerContent[language];
 
@@ -190,9 +190,6 @@ export default function JourneyPage() {
             </h1>
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/admin" passHref>
-                <Button variant="ghost">{hc.admin}</Button>
-            </Link>
             <Link href="/" passHref>
                 <Button variant="ghost">{hc.home}</Button>
             </Link>
