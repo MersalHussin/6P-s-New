@@ -105,7 +105,8 @@ Here are the passions with their details:
   {{/if}}
   ---
 {{/each}}
-  `,config: {
+  `,
+  config: {
     safetySettings: [
       {
         category: 'HARM_CATEGORY_HATE_SPEECH',
