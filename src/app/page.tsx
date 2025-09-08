@@ -141,7 +141,7 @@ export default function Home() {
                                     <CardTitle className="font-headline text-xl">{station.name}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-muted-foreground">{station.description}</p>
+                                    <p className="text-muted-foreground">{station.description('')}</p>
                                 </CardContent>
                             </Card>
                         )
