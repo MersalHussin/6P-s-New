@@ -158,7 +158,7 @@ const StarRating = ({ field, stationId }: { field: any, stationId: string }) => 
   
 
 const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: number; passionIndex: number, passionName: string }) => {
-  const { control } = useFormContext();
+  const { control, watch } = useFormContext();
   const { language } = useLanguage();
   const stations = content[language].stations;
   const station = stations[pIndex];
@@ -168,6 +168,16 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
     control,
     name: `passions.${passionIndex}.${fieldName}`,
   });
+
+  const passionValues = watch(`passions.${passionIndex}.${fieldName}`);
+
+  useEffect(() => {
+    if (passionValues.length === 0) {
+      append({ id: '1', text: '', weight: 0 });
+      append({ id: '2', text: '', weight: 0 });
+      append({ id: '3', text: '', weight: 0 });
+    }
+  }, [passionValues, append]);
   
   const c = content[language].journey;
   const stationContent = content[language].stations[pIndex];
@@ -353,7 +363,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const t = content[language].toasts;
   const { toast } = useToast();
   const P_STATIONS = content[language].stations;
-  const P_STATIONS_EN = content['en'].stations;
   const ArrowLeft = language === 'ar' ? MoveLeft : MoveRight;
   const ArrowRight = language === 'ar' ? MoveRight : MoveLeft;
 
@@ -529,12 +538,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         <div className="bg-primary/10 text-primary p-3 rounded-full">
                             <CurrentStationIcon className="w-8 h-8" />
                         </div>
-                        <div className='flex-grow'>
+                        <div>
                             <CardTitle className="font-headline text-2xl">
-                                {c.progress.station} {currentPIndex + 1}: {station.name}
-                                {language === 'ar' && (
-                                    <span className="text-lg font-normal text-muted-foreground ml-2">({P_STATIONS_EN[currentPIndex + 1].name})</span>
-                                )}
+                            {c.progress.station} {currentPIndex + 1}: {station.name}
                             </CardTitle>
                             <CardDescription className="mt-2">
                                 {station.description}

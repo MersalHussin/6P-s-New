@@ -123,20 +123,14 @@ export default function JourneyPage() {
   };
 
   const handlePassionsSubmit = (passions: { name: string }[]) => {
-    const defaultFields = () => Array.from({ length: 3 }, (_, i) => ({
-      id: `${i + 1}`,
-      text: "",
-      weight: 0,
-    }));
-    
     const initialData: PassionData[] = passions.map((p, index) => ({
       id: `passion-${index}`,
       name: p.name,
-      purpose: defaultFields(),
-      power: defaultFields(),
-      proof: defaultFields(),
-      problems: defaultFields(),
-      possibilities: defaultFields(),
+      purpose: [],
+      power: [],
+      proof: [],
+      problems: [],
+      possibilities: [],
       suggestedSolutions: [],
     }));
     setPassionsData(initialData);
