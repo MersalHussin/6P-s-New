@@ -30,7 +30,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         </p>
 
         {/* User Name */}
-        <p className="absolute top-[320px] w-full text-center text-black text-[50px] font-headline font-bold">
+        <p className="absolute top-[320px] w-full text-center text-black text-[60px] font-headline font-bold">
           {name}
         </p>
 

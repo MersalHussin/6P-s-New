@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import type { PassionData, FieldItem, UserData } from "@/lib/types";
 import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
+import { translateText } from "@/ai/flows/translate-text";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download, CheckCircle, FileText, Smartphone, Laptop, AlertTriangle } from "lucide-react";
@@ -100,6 +101,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   const [userName, setUserName] = useState("");
+  const [passionInEnglish, setPassionInEnglish] = useState("");
   const { language } = useLanguage();
   const c = content[language].results;
   const dc = downloadContent[language];
@@ -226,6 +228,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
     setIsDownloadingCert(true);
     try {
+        // Translate passion name if needed
+        const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
+        if (topPassion) {
+          const { translatedText } = await translateText({ text: topPassion, targetLanguage: 'en' });
+          setPassionInEnglish(translatedText);
+        } else {
+            setPassionInEnglish("your passion");
+        }
+
+        // Wait a tick for the state to update before rendering the canvas
+        await new Promise(resolve => setTimeout(resolve, 0));
+
         const canvas = await html2canvas(certificateRef.current, {
             scale: 2, // Higher scale for better quality
             useCORS: true,
@@ -272,7 +286,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        <Certificate ref={certificateRef} name={userName} passion={topPassion} userId={userId} />
+        <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={userId} />
 
         {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
         {/* Certificate Download Dialog */}
