@@ -38,12 +38,12 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         </p>
 
         {/* User Name */}
-        <p className="absolute top-[220px] w-full text-center text-black text-[80px] font-headline">
+        <p className="absolute top-1/2 w-full text-center text-black text-[80px] font-headline" style={{ transform: 'translateY(-100%)', fontWeight: 900 }}>
           {name}
         </p>
 
         {/* Encouraging Message */}
-        <div className="absolute top-[340px] w-full text-center px-[220px]">
+        <div className="absolute top-1/2 w-full text-center px-[220px]" style={{ transform: 'translateY(-20%)' }}>
            <p className="text-[#002B7F] text-[22px] leading-snug">
             Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: {passion}. We are proud of your effort and wish you success in turning your passion into impact.
            </p>
