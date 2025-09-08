@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -26,15 +27,11 @@ interface ResultsDisplayProps {
   onResultsCalculated: (results: RankPassionsOutput) => void;
 }
 
-const ensureArray = (field: any): FieldItem[] => {
-    if (Array.isArray(field)) {
-      return field.map(item => ({
-        id: item?.id || Math.random().toString(),
-        text: typeof item?.text === 'string' ? item.text : '',
-        weight: ['high', 'medium', 'low', ''].includes(item?.weight) ? item.weight : ''
-      })).filter(item => item.text);
+const filterRatedItems = (items: FieldItem[] | undefined): FieldItem[] => {
+    if (!Array.isArray(items)) {
+        return [];
     }
-    return [];
+    return items.filter(item => item.text && item.weight > 0);
 };
 
 const downloadContent = {
@@ -129,11 +126,11 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
       try {
         const validatedPassions = passions.map(p => ({
             passion: p.name,
-            purpose: ensureArray(p.purpose),
-            power: ensureArray(p.power),
-            proof: ensureArray(p.proof),
-            problems: ensureArray(p.problems),
-            possibilities: ensureArray(p.possibilities),
+            purpose: filterRatedItems(p.purpose),
+            power: filterRatedItems(p.power),
+            proof: filterRatedItems(p.proof),
+            problems: filterRatedItems(p.problems),
+            possibilities: filterRatedItems(p.possibilities),
         }));
 
         const input: RankPassionsInput = { passions: validatedPassions, language };
@@ -165,11 +162,11 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     try {
         const reportPassions = passions.map(p => ({
           ...p,
-          purpose: ensureArray(p.purpose),
-          power: ensureArray(p.power),
-          proof: ensureArray(p.proof),
-          problems: ensureArray(p.problems),
-          possibilities: ensureArray(p.possibilities),
+          purpose: filterRatedItems(p.purpose),
+          power: filterRatedItems(p.power),
+          proof: filterRatedItems(p.proof),
+          problems: filterRatedItems(p.problems),
+          possibilities: filterRatedItems(p.possibilities),
         }));
 
         const input: GenerateDetailedReportInput = { passions: reportPassions, language };
@@ -378,3 +375,5 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated }
     </div>
   );
 }
+
+    
