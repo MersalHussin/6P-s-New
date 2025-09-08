@@ -22,6 +22,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
+      dir="ltr"
     >
       <div className="relative w-full h-full">
         {/* Certificate ID */}
