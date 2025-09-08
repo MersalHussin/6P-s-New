@@ -1,13 +1,63 @@
 
-import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb } from "lucide-react";
+import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb, type LucideIcon } from "lucide-react";
 
-export const content = {
+interface StationInfo {
+    id: string;
+    name: string;
+    singular: string;
+    icon: LucideIcon;
+    description: string;
+    hints: string[];
+}
+
+export const content: {
+    [key: string]: {
+        title: string;
+        subtitle: string;
+        description: string;
+        cta: string;
+        verifyCertificate: string;
+        hero: {
+            title: string;
+            subtitle: string;
+        };
+        howItWorks: {
+            title: string;
+            description: string;
+        };
+        passionForm: {
+            title: string;
+            description: string;
+            placeholder: string;
+            addMoreButton: string;
+            cta: string;
+            validation: {
+                minLength: string;
+                minPassions: string;
+                maxPassions: string;
+            };
+        };
+        stations: StationInfo[];
+        journey: any;
+        toasts: any;
+        results: any;
+        footer: any;
+    }
+} = {
     ar: {
         title: "مش عارف شغفك فين؟",
         subtitle: "اكتشف نفسك مع رحلة الـ 6Ps",
         description: "رحلة الـ 6Ps هي بوصلتك عشان تكتشف شغفك الحقيقي. من خلال 6 محطات هتتعرف على أهدافك، قوتك، وتحدياتك. مستعد تلاقي الشغف اللي هيغير حياتك؟",
         cta: "ابدأ رحلتك الآن",
         verifyCertificate: "التحقق من الشهادة",
+        hero: {
+            title: "اكتشف شغفك، ارسم مستقبلك",
+            subtitle: "انضم لآلاف الشباب في رحلة فريدة من 6 خطوات للعثور على الشغف الحقيقي الذي سيقود مسيرتك المهنية والعملية."
+        },
+        howItWorks: {
+            title: "كيف تعمل الرحلة؟",
+            description: "رحلتك نحو اكتشاف الشغف تتكون من 6 محطات أساسية، كل محطة مصممة لتكشف لك جانبًا جديدًا من نفسك ومن اهتماماتك."
+        },
         passionForm: {
             title: "المرحلة الأولى: حدد شغفك",
             description: "أدخل من 3 إلى 6 اهتمامات أو مجالات شغف تود استكشافها.",
@@ -187,6 +237,14 @@ export const content = {
         description: "The 6Ps Journey is your compass to find your true passion. Through 6 stations, you'll uncover your goals, strengths, and challenges. Ready to find the passion that will change your life?",
         cta: "Start Your Journey Now",
         verifyCertificate: "Verify Certificate",
+        hero: {
+            title: "Discover Your Passion, Design Your Future",
+            subtitle: "Join thousands of youths on a unique 6-step journey to find the true passion that will drive your professional and practical career."
+        },
+        howItWorks: {
+            title: "How Does the Journey Work?",
+            description: "Your journey towards discovering your passion consists of 6 essential stations, each designed to reveal a new aspect of yourself and your interests."
+        },
         passionForm: {
             title: "Stage One: Define Your Passions",
             description: "Enter 3 to 6 interests or passions you would like to explore.",
