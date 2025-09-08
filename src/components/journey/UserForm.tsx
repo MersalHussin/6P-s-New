@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -33,7 +34,7 @@ const content = {
     nameLabel: "الاسم",
     namePlaceholder: "اسمك الكامل",
     whatsappLabel: "رقم الواتساب",
-    whatsappPlaceholder: "مثال: 9665xxxxxxxx",
+    whatsappPlaceholder: "مثال: 0123456789",
     emailLabel: "البريد الإلكتروني (اختياري)",
     emailPlaceholder: "example@mail.com",
     cta: "ابدأ الآن",
