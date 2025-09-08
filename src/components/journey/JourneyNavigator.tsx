@@ -39,6 +39,7 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
     const [explanation, setExplanation] = useState("");
     const { language } = useLanguage();
     const c = content[language].journey;
+    const { toast } = useToast();
     const toastContent = content[language].toasts;
   
     const handleAIClick = async () => {
@@ -236,7 +237,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
               )}
             />
           </div>
-          {index >= 3 && (
+          {index >= 2 && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -366,6 +367,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const { handleSubmit, watch, getValues } = methods;
 
   const { language } = useLanguage();
+  const { toast } = useToast();
   const c = content[language].journey;
   const t = content[language].toasts;
   const P_STATIONS = content[language].stations.filter(s => s.id !== 'passion-selection');
