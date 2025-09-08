@@ -1,3 +1,4 @@
+
 import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 import type { Timestamp } from "firebase/firestore";
 
@@ -28,4 +29,5 @@ export interface UserData {
     currentStation: 'user-data' | 'passions' | 'journey' | 'results';
     journeyData: PassionData[];
     resultsData?: RankPassionsOutput | null;
+    shortId?: string;
 }

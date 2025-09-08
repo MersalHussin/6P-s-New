@@ -95,11 +95,17 @@ export function UserForm({ onUserCreated }: { onUserCreated: (userId: string) =>
     },
   });
 
+  const generateShortId = () => {
+    return Math.random().toString(36).substring(2, 10).toUpperCase();
+  };
+
   const handleFormSubmit = async (data: UserFormValues) => {
     setIsLoading(true);
     try {
+      const shortId = generateShortId();
       const docRef = await addDoc(collection(db, "users"), {
         ...data,
+        shortId: shortId,
         createdAt: serverTimestamp(),
         currentStation: "user-data",
         journeyData: [],

@@ -101,6 +101,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   const [userName, setUserName] = useState("");
+  const [certificateId, setCertificateId] = useState("");
   const [passionInEnglish, setPassionInEnglish] = useState("");
   const { language } = useLanguage();
   const c = content[language].results;
@@ -116,6 +117,12 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
                 const userData = userDoc.data() as UserData;
                 if(userData.name) {
                     setUserName(userData.name);
+                }
+                if(userData.shortId) {
+                    setCertificateId(userData.shortId);
+                } else {
+                    // Fallback to full ID if shortId doesn't exist for some reason
+                    setCertificateId(userId.slice(0, 8).toUpperCase());
                 }
             }
         }
@@ -286,7 +293,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={userId} />
+        <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={certificateId} />
 
         {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
         {/* Certificate Download Dialog */}
