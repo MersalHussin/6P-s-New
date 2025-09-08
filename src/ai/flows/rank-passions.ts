@@ -12,22 +12,23 @@ import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 const FieldDetailsSchema = z.object({
+    id: z.string(),
     text: z.string().describe('The text content of the item.'),
-    weight: z.enum(['high', 'medium', 'low', '']).describe('The weight assigned to the item.'),
+    weight: z.number().describe('The rating assigned to the item, from 1 to 5.'),
 });
 
 const PassionDetailsSchema = z.object({
   passion: z.string().describe('The name of the passion.'),
-  purpose: z.array(FieldDetailsSchema).describe('The purposes for this passion with their weights.'),
-  power: z.array(FieldDetailsSchema).describe('The strengths for this passion with their weights.'),
-  proof: z.array(FieldDetailsSchema).describe('The proofs for this passion with their weights.'),
-  problems: z.array(FieldDetailsSchema).describe('The problems for this passion with their weights.'),
-  possibilities: z.array(FieldDetailsSchema).describe('The possibilities for this passion with their weights.'),
+  purpose: z.array(FieldDetailsSchema).describe('The purposes for this passion with their ratings.'),
+  power: z.array(FieldDetailsSchema).describe('The strengths for this passion with their ratings.'),
+  proof: z.array(FieldDetailsSchema).describe('The proofs for this passion with their ratings.'),
+  problems: z.array(FieldDetailsSchema).describe('The problems for this passion with their ratings.'),
+  possibilities: z.array(FieldDetailsSchema).describe('The possibilities for this passion with their ratings.'),
 });
 
 const RankPassionsInputSchema = z.object({
   passions: z.array(PassionDetailsSchema).describe('An array of passions with their details.'),
-  language: z.enum(['ar', 'en']).describe('The language for the response.'),
+  language: z.enum(['ar', 'en']).describe('The language for a response.'),
 });
 export type RankPassionsInput = z.infer<typeof RankPassionsInputSchema>;
 
@@ -53,11 +54,11 @@ const rankPassionsPrompt = ai.definePrompt({
   output: {schema: RankPassionsOutputSchema},
   prompt: `You are an expert career coach helping young adults discover their passions. Your tone is encouraging, insightful, and realistic.
 
-  You will receive a list of passions with details provided by the user. Rank these passions based on the user's input in each category (Purpose, Power, Proof, Problems, Possibilities).
+  You will receive a list of passions with details provided by the user, including a rating from 1 to 5 for each item. Rank these passions based on the user's input in each category (Purpose, Power, Proof, Problems, Possibilities).
 
   The scoring model is as follows (use this for ranking, but do not mention points in your response):
-  - For Purpose, Power, Proof, and Possibilities: high weight = 3 points, medium weight = 2 points, low weight = 1 point. An empty weight counts as 1 point.
-  - For Problems: high weight = -3 points, medium weight = -2 points, low weight = -1 point. An empty weight counts as -1 point.
+  - For Purpose, Power, Proof, and Possibilities: the rating (1-5) is the score. A rating of 0 or an empty item counts as 1 point.
+  - For Problems: the rating (1-5) is a negative score (e.g., a rating of 5 becomes -5 points). A rating of 0 or an empty item counts as -1 point.
   
   Calculate a total score for each passion. Rank the passions from highest to lowest score.
 
@@ -77,27 +78,27 @@ const rankPassionsPrompt = ai.definePrompt({
     Passion: {{this.passion}}
     {{#if this.purpose}}
     Purposes:
-    {{#each this.purpose}} - "{{this.text}}" (Weight: {{this.weight}})
+    {{#each this.purpose}} - "{{this.text}}" (Rating: {{this.weight}})
     {{/each}}
     {{/if}}
     {{#if this.power}}
     Powers:
-    {{#each this.power}} - "{{this.text}}" (Weight: {{this.weight}})
+    {{#each this.power}} - "{{this.text}}" (Rating: {{this.weight}})
     {{/each}}
     {{/if}}
     {{#if this.proof}}
     Proofs:
-    {{#each this.proof}} - "{{this.text}}" (Weight: {{this.weight}})
+    {{#each this.proof}} - "{{this.text}}" (Rating: {{this.weight}})
     {{/each}}
     {{/if}}
     {{#if this.problems}}
     Problems:
-    {{#each this.problems}} - "{{this.text}}" (Weight: {{this.weight}})
+    {{#each this.problems}} - "{{this.text}}" (Rating: {{this.weight}})
     {{/each}}
     {{/if}}
     {{#if this.possibilities}}
     Possibilities:
-    {{#each this.possibilities}} - "{{this.text}}" (Weight: {{this.weight}})
+    {{#each this.possibilities}} - "{{this.text}}" (Rating: {{this.weight}})
     {{/each}}
     {{/if}}
     ---

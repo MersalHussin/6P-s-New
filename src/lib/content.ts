@@ -90,22 +90,29 @@ export const content = {
             },
             fieldLabel: "البند",
             fieldPlaceholder: "اكتب هنا...",
-            weightLabel: "تقييمك",
+            weightLabels: {
+                purpose: "مدى أهمية الهدف ده ليك؟",
+                power: "مدى قوة المهارة دي عندك؟",
+                proof: "مدى قوة الإثبات ده؟",
+                problems: "مدى تأثير المشكلة دي عليك؟",
+                possibilities: "مدى حماسك للاحتمال ده؟",
+                default: "تقييمك"
+            },
             ratings: {
                 purpose: [
-                    "ليس له معنى", "عادي", "مهم", "مهم جدًا", "هدفي الأسمى"
+                    "مالوش معنى بالنسبالي", "عادي", "مهم شوية", "مهم جدًا", "ده هو هدفي الأسمى"
                 ],
                 power: [
-                    "ضعيفة جدًا", "ضعيفة", "متوسطة", "قوية", "قوية جدًا"
+                    "ضعيفة جدًا عندي", "لسه بتعلمها", "متوسطة", "قوية عندي", "دي لعبتي"
                 ],
                 proof: [
-                    "مجرد فكرة", "اهتمام بسيط", "توجد تجارب", "تجارب قوية", "إثباتات كثيرة"
+                    "مجرد فكرة", "عندي اهتمام", "عندي تجارب بسيطة", "تجاربي قوية", "عندي إثباتات كتير"
                 ],
                 problems: [
-                    "لا توجد مشاكل", "مشاكل بسيطة", "مشاكل متوسطة", "مشاكل كبيرة", "مشاكل مستعصية"
+                    "مشكلة تافهة", "بسيطة وأقدر أحلها", "متوسطة ومحتاجة مجهود", "كبيرة ومأثرة عليا", "بتخليني أفكر أسيب الشغف ده"
                 ],
                 possibilities: [
-                    "لا توجد فرص", "فرص محدودة", "فرص جيدة", "فرص كبيرة", "إمكانيات لا نهائية"
+                    "مش متحمس خالص", "ممكن أفكر فيها", "فكرة حلوة", "متحمس جدًا ليها", "دي فرصة عمري"
                 ],
                 default: [
                     "1", "2", "3", "4", "5"
@@ -251,7 +258,14 @@ export const content = {
             },
             fieldLabel: "Item",
             fieldPlaceholder: "Type here...",
-            weightLabel: "Your Rating",
+            weightLabels: {
+                purpose: "How important is this goal to you?",
+                power: "How strong is this skill of yours?",
+                proof: "How strong is this proof?",
+                problems: "How impactful is this problem?",
+                possibilities: "How excited are you about this possibility?",
+                default: "Your Rating"
+            },
             ratings: {
                 purpose: [
                     "Meaningless", "Neutral", "Important", "Very Important", "Ultimate Goal"

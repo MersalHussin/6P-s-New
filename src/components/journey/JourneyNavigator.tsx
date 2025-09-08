@@ -214,7 +214,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
               name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-semibold text-center block mb-2">{c.weightLabel}</FormLabel>
+                  <FormLabel className="font-semibold text-center block mb-2">{c.weightLabels[station.id] || c.weightLabels.default}</FormLabel>
                   <FormControl>
                     <StarRating field={field} stationId={station.id} />
                   </FormControl>
