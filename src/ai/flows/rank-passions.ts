@@ -49,22 +49,29 @@ export async function rankPassions(input: RankPassionsInput): Promise<RankPassio
   return rankPassionsFlow(input);
 }
 
+
+const PassionWithScoreSchema = PassionDetailsSchema.extend({
+    score: z.number().describe('The calculated total score for the passion.'),
+});
+
+const RankPassionsPromptInputSchema = z.object({
+    passion: PassionWithScoreSchema,
+    language: z.enum(['ar', 'en']).describe('The language for a response.'),
+});
+
+const RankPassionsPromptOutputSchema = z.object({
+    reasoning: z.string().describe('A qualitative, insightful explanation for the ranking. Should include a "Next Steps" section with actionable advice and external resources for growth.'),
+});
+
 const rankPassionsPrompt = ai.definePrompt({
   name: 'rankPassionsPrompt',
-  input: {schema: RankPassionsInputSchema},
-  output: {schema: RankPassionsOutputSchema},
+  input: {schema: RankPassionsPromptInputSchema},
+  output: {schema: RankPassionsPromptOutputSchema},
   prompt: `You are an expert career coach helping young adults discover their passions. Your tone is encouraging, insightful, and realistic.
 
-You will receive a list of passions with details provided by the user, including a rating from 1 to 5 for each item. Rank these passions based on the user's input in each category (Purpose, Power, Proof, Problems, Possibilities).
+You will receive a single passion with its details and a pre-calculated score. Your task is to provide a comprehensive "reasoning" for why it received this score. This is the most important part.
 
-The scoring model is as follows:
-- For Purpose, Power, Proof, and Possibilities: the rating (1-5) is the score. An empty item or a rating of 0 should be treated as 1 point.
-- For Problems: the rating (1-5) is a negative score (e.g., a rating of 5 becomes -5 points). An empty item or a rating of 0 should be treated as -1 point.
-
-Calculate a total score for each passion by summing the scores of all items. Rank the passions from highest to lowest score.
-
-For each passion, provide a comprehensive "reasoning" that is both analytical and encouraging. This is the most important part.
-The reasoning must NOT mention the exact scoring or points. Instead, it should be a qualitative, realistic analysis.
+The reasoning must NOT mention the exact score or points. Instead, it should be a qualitative, realistic analysis based on the user's input.
 - Start by summarizing why this passion scored the way it did in a narrative format. Be specific. For example, "Your passion for [Passion Name] seems to shine brightly because of your strong sense of purpose. You mentioned that it helps you '[mention a specific purpose with high rating]', which shows a deep connection. Also, your strength in '[mention a specific power with high rating]' is a huge asset here."
 - If the score is low, be gentle but clear about the challenges. For example, "While you're interested in [Passion Name], it seems you've identified some significant challenges, like '[mention a specific problem with a high rating]', which might be holding you back."
 
@@ -75,36 +82,35 @@ The reasoning must NOT mention the exact scoring or points. Instead, it should b
 The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}.
 If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
 
-Here are the passions with their details:
-{{#each passions}}
-  Passion: {{this.passion}}
-  {{#if this.purpose}}
+Here is the passion with its score and details:
+  Passion: {{passion.passion}}
+  Score: {{passion.score}}
+  {{#if passion.purpose}}
   Purposes:
-  {{#each this.purpose}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{#each passion.purpose}} - "{{this.text}}" (Rating: {{this.weight}})
   {{/each}}
   {{/if}}
-  {{#if this.power}}
+  {{#if passion.power}}
   Powers:
-  {{#each this.power}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{#each passion.power}} - "{{this.text}}" (Rating: {{this.weight}})
   {{/each}}
   {{/if}}
-  {{#if this.proof}}
+  {{#if passion.proof}}
   Proofs:
-  {{#each this.proof}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{#each passion.proof}} - "{{this.text}}" (Rating: {{this.weight}})
   {{/each}}
   {{/if}}
-  {{#if this.problems}}
+  {{#if passion.problems}}
   Problems:
-  {{#each this.problems}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{#each passion.problems}} - "{{this.text}}" (Rating: {{this.weight}})
   {{/each}}
   {{/if}}
-  {{#if this.possibilities}}
+  {{#if passion.possibilities}}
   Possibilities:
-  {{#each this.possibilities}} - "{{this.text}}" (Rating: {{this.weight}})
+  {{#each passion.possibilities}} - "{{this.text}}" (Rating: {{this.weight}})
   {{/each}}
   {{/if}}
   ---
-{{/each}}
   `,
   config: {
     safetySettings: [
@@ -128,14 +134,52 @@ Here are the passions with their details:
   },
 });
 
+const calculateScore = (passion: z.infer<typeof PassionDetailsSchema>): number => {
+    let score = 0;
+    const calculate = (items: z.infer<typeof FieldDetailsSchema>[], multiplier: 1 | -1) => {
+        return items.reduce((acc, item) => {
+            const weight = item.weight || 1; // Treat 0 or empty as 1
+            return acc + (weight * multiplier);
+        }, 0);
+    };
+
+    score += calculate(passion.purpose, 1);
+    score += calculate(passion.power, 1);
+    score += calculate(passion.proof, 1);
+    score += calculate(passion.possibilities, 1);
+    score += calculate(passion.problems, -1);
+    
+    return score;
+}
+
 const rankPassionsFlow = ai.defineFlow(
   {
     name: 'rankPassionsFlow',
     inputSchema: RankPassionsInputSchema,
     outputSchema: RankPassionsOutputSchema,
   },
-  async input => {
-    const {output} = await rankPassionsPrompt(input);
-    return output!;
+  async ({ passions, language }) => {
+    // 1. Calculate scores for all passions
+    const passionsWithScores = passions.map(p => ({
+        ...p,
+        score: calculateScore(p),
+    }));
+
+    // 2. Generate reasoning for each passion in parallel
+    const reasoningPromises = passionsWithScores.map(async (p) => {
+        const { output } = await rankPassionsPrompt({ passion: p, language });
+        return {
+            passion: p.passion,
+            score: p.score,
+            reasoning: output!.reasoning,
+        };
+    });
+
+    const rankedPassions = await Promise.all(reasoningPromises);
+
+    // 3. Sort by score
+    rankedPassions.sort((a, b) => b.score - a.score);
+    
+    return { rankedPassions };
   }
 );
