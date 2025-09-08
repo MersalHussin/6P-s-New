@@ -254,7 +254,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             certDoc.setFontSize(14);
             certDoc.setTextColor('#002B7F'); // Blue color
             certDoc.setFont('helvetica', 'normal');
-            const splitMessage = certDoc.splitTextToSize(message, 500); // approx 300pt
+            const splitMessage = certDoc.splitTextToSize(message, 500);
             certDoc.text(splitMessage, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
             
             // Add Date
