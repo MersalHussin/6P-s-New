@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Search, Award, User, Sparkles } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { UserData } from "@/lib/types";
 import Link from "next/link";
@@ -68,17 +68,26 @@ export default function CheckCertificatePage() {
     setLoading(true);
     setResult(null);
 
-    if (!certificateId.trim()) {
+    const trimmedId = certificateId.trim();
+    if (!trimmedId) {
         setLoading(false);
         return;
     }
 
     try {
-      const userDocRef = doc(db, "users", certificateId.trim());
-      const userDoc = await getDoc(userDocRef);
+      const usersCollection = collection(db, "users");
+      const q = query(usersCollection, where("shortId", "==", trimmedId), limit(1));
+      const querySnapshot = await getDocs(q);
 
-      if (userDoc.exists() && userDoc.data().resultsData) {
-        setResult(userDoc.data() as UserData);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        if (userDoc.exists() && userDoc.data().resultsData) {
+          setResult(userDoc.data() as UserData);
+        } else {
+          // This case might happen if user exists but results are not calculated yet.
+          // For the purpose of verification, we can treat it as not found.
+          setResult('not-found');
+        }
       } else {
         setResult('not-found');
       }
