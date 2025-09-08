@@ -43,14 +43,14 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         </p>
 
         {/* Encouraging Message */}
-        <div className="absolute top-1/2 w-full text-center px-[220px]" style={{ transform: 'translateY(0%)' }}>
+        <div className="absolute top-1/2 w-full text-center px-[220px]" style={{ transform: 'translateY(40%)' }}>
            <p className="text-[#002B7F] text-[22px] leading-snug">
             Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: {passion}. We are proud of your effort and wish you success in turning your passion into impact.
            </p>
         </div>
 
         {/* Date */}
-        <p className="absolute bottom-[173px] left-[190px] text-black text-[22px] font-semibold">
+        <p className="absolute bottom-[173px] left-[340px] text-black text-[22px] font-semibold">
           {dateStr}
         </p>
       </div>
