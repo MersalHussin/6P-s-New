@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { PassionData, FieldItem, UserData } from "@/lib/types";
 import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
@@ -15,12 +15,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import jsPDF from "jspdf";
-import 'jspdf-autotable';
 import { cn } from "@/lib/utils";
 import Confetti from "react-confetti";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import html2canvas from 'html2canvas';
+import { Certificate } from "./Certificate";
 
 
 interface ResultsDisplayProps {
@@ -41,10 +41,10 @@ const downloadContent = {
     ar: {
         certificateDialog: {
             title: "تنزيل شهادة الإنجاز",
-            description: "أدخل اسمك باللغة الإنجليزية ليتم وضعه على شهادة إتمام رحلة اكتشاف الشغف.",
-            nameLabel: "الاسم (باللغة الإنجليزية)",
-            namePlaceholder: "Your Name",
-            downloadButton: "تنزيل الشهادة",
+            description: "أدخل اسمك ليتم وضعه على شهادة إتمام رحلة اكتشاف الشغف. استخدم اسمك باللغة الإنجليزية للحصول على أفضل نتيجة.",
+            nameLabel: "الاسم",
+            namePlaceholder: "اسمك الكامل",
+            downloadButton: "تنزيل الشهادة (PNG)",
             cancel: "إلغاء",
             error: "حدث خطأ أثناء إنشاء الشهادة. الرجاء المحاولة مرة أخرى.",
         },
@@ -63,10 +63,10 @@ const downloadContent = {
     en: {
         certificateDialog: {
             title: "Download Certificate of Completion",
-            description: "Enter your name in English to be placed on your passion discovery journey certificate.",
-            nameLabel: "Name (in English)",
-            namePlaceholder: "Your Name",
-            downloadButton: "Download Certificate",
+            description: "Enter your name to be placed on your passion discovery journey certificate. Use your English name for best results.",
+            nameLabel: "Name",
+            namePlaceholder: "Your Full Name",
+            downloadButton: "Download Certificate (PNG)",
             cancel: "Cancel",
             error: "An error occurred while generating the certificate. Please try again.",
         },
@@ -103,6 +103,8 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const { language } = useLanguage();
   const c = content[language].results;
   const dc = downloadContent[language];
+
+  const certificateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -183,7 +185,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
     try {
-        const reportPassions = passions.map(p => ({
+        const reportPassionsInput = passions.map(p => ({
           ...p,
           purpose: filterRatedItems(p.purpose),
           power: filterRatedItems(p.power),
@@ -192,7 +194,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
           possibilities: filterRatedItems(p.possibilities),
         }));
 
-        const input: GenerateDetailedReportInput = { passions: reportPassions, language };
+        const input: GenerateDetailedReportInput = { passions: reportPassionsInput, language };
         const { report } = await generateDetailedReport(input);
 
         const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
@@ -214,71 +216,32 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   const handleDownloadCertificate = async () => {
     if (!userName.trim()) {
-        alert(dc.certificateDialog.namePlaceholder);
+      alert(dc.certificateDialog.namePlaceholder);
+      return;
+    }
+    if (!certificateRef.current) {
+        alert(dc.certificateDialog.error);
         return;
     }
+
     setIsDownloadingCert(true);
-
     try {
-        const certDoc = new jsPDF({
-            orientation: 'landscape',
-            unit: 'px',
-            format: 'a4'
+        const canvas = await html2canvas(certificateRef.current, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true,
+            backgroundColor: null,
         });
-
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.src = "https://i.suar.me/9laZP/l";
-        
-        img.onload = () => {
-            const pageWidth = certDoc.internal.pageSize.getWidth();
-            const pageHeight = certDoc.internal.pageSize.getHeight();
-            certDoc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
-
-            certDoc.setFont('helvetica', 'normal');
-
-            // Add Certificate Code
-            certDoc.setFontSize(10);
-            certDoc.setTextColor('#444444');
-            certDoc.text(`Certificate ID: ${userId}`, 40, 35, { align: 'left'});
-
-            // Add Name
-            certDoc.setFontSize(36);
-            certDoc.setTextColor('#000000');
-            certDoc.setFont('helvetica', 'bold');
-            certDoc.text(userName, pageWidth / 2, pageHeight / 2 - 25, { align: 'center' });
-
-            // Add Encouraging Message
-            const topPassion = rankedPassions?.rankedPassions[0]?.passion || "your passion";
-            const message = `Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: ${topPassion}. We are proud of your effort and wish you success in turning your passion into impact.`;
-            certDoc.setFontSize(14);
-            certDoc.setTextColor('#002B7F'); // Blue color
-            certDoc.setFont('helvetica', 'normal');
-            const splitMessage = certDoc.splitTextToSize(message, 500);
-            certDoc.text(splitMessage, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
-            
-            // Add Date
-            const today = new Date();
-            const dateStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-            certDoc.setFontSize(14);
-            certDoc.setTextColor('#000000');
-            certDoc.setFont('helvetica', 'normal');
-            certDoc.text(dateStr, 125, pageHeight - 92, { align: 'center'});
-
-
-            certDoc.save('Passion_Path_Certificate.pdf');
-            setIsDownloadingCert(false);
-            setShowCertDialog(false);
-        };
-        img.onerror = () => {
-             alert(dc.certificateDialog.error);
-             setIsDownloadingCert(false);
-        }
-
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = 'Passion_Path_Certificate.png';
+        link.href = dataUrl;
+        link.click();
     } catch (e) {
         console.error(e);
         alert(dc.certificateDialog.error);
+    } finally {
         setIsDownloadingCert(false);
+        setShowCertDialog(false);
     }
   };
   
@@ -305,8 +268,12 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     );
   }
 
+  const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <Certificate ref={certificateRef} name={userName} passion={topPassion} userId={userId} />
+
         {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
         {/* Certificate Download Dialog */}
         <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
