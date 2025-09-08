@@ -188,7 +188,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                 )}
             />
           </div>
-          {fields.length > 3 && (
+          {index >= 3 && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -389,9 +389,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
                         <CheckCircle className="h-10 w-10 text-green-600" />
                     </div>
-                    <DialogTitle className="text-2xl font-bold">{c.nextPassionDialog.title}</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold">{c.nextPassionDialog.title(initialPassions[currentPassionIndex].name)}</DialogTitle>
                     <DialogDescription className="text-muted-foreground text-base leading-relaxed mt-2">
-                        {c.nextPassionDialog.description(initialPassions[currentPassionIndex].name)}
+                        {c.nextPassionDialog.description}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="my-6">
@@ -481,5 +481,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
-    

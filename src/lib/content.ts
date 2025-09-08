@@ -21,7 +21,7 @@ export const content = {
         },
         stations: [
             { 
-                id: 'Purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
+                id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
                 description: 'في المحطة دي، هتحدد الأهداف والدوافع العميقة ورا كل شغف.',
                 hints: [
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
@@ -32,7 +32,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'Power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
+                id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
                 description: 'هنا، هتكتشف نقط قوتك ومهاراتك اللي بتدعم الشغف ده.',
                 hints: [
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
@@ -43,7 +43,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'Proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
+                id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
                 description: 'في المحطة دي، هتجمع الأدلة والتجارب اللي بتثبت شغفك.',
                 hints: [
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
@@ -54,7 +54,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'Problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
+                id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
                 description: 'هنا، هتحدد العقبات والتحديات اللي ممكن تقابلك.',
                 hints: [
                     'إيه العقبات أو التحديات اللي بتقابلك وإنت بتمارس الشغف ده؟ (مثال: ضيق الوقت، نقص الموارد)',
@@ -65,7 +65,7 @@ export const content = {
                 ] 
             },
             { 
-                id: 'Possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb,
+                id: 'possibilities', name: 'الاحتمالات', singular: 'الاحتمال', icon: Lightbulb,
                 description: 'في آخر محطة، هتستكشف الفرص والإمكانيات المستقبلية لشغفك.',
                 hints: [
                     'إيه الفرص أو المشاريع اللي ممكن تعملها في المجال ده في المستقبل؟ (مثال: أبدأ بيزنس، أعمل محتوى)',
@@ -110,9 +110,9 @@ export const content = {
                 loading: "لحظات، بفكر في أحسن طريقة أساعدك بيها...",
             },
             nextPassionDialog: {
-                title: "أحسنت!",
-                description: (passionName: string) => `لقد أكملت استكشاف شغفك بـ "${passionName}".`,
-                nextPassion: "والآن تستعد لاستكشاف:",
+                title: (passionName: string) => `أحسنت! لقد أكملت شغف "${passionName}"`,
+                description: "الآن أنت على وشك اكتشاف شغف جديد. استعد!",
+                nextPassion: "الشغف التالي:",
                 cta: "هيا بنا!"
             }
         },
@@ -246,16 +246,16 @@ export const content = {
             aiSolutions: {
                 title: "AI Suggested Solutions",
             },
-            aiHelper: {
+aiHelper: {
                 tooltip: "Get help from AI",
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this item more deeply.",
                 loading: "Thinking of the best way to help you...",
             },
             nextPassionDialog: {
-                title: "Well Done!",
-                description: (passionName: string) => `You've completed exploring your passion for "${passionName}".`,
-                nextPassion: "Now you're getting ready to explore:",
+                title: (passionName: string) => `Well Done! You've completed "${passionName}"`,
+                description: "Now you're getting ready to explore a new passion. Get ready!",
+                nextPassion: "Next Passion:",
                 cta: "Let's Go!"
             }
         },
