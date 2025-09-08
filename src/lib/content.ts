@@ -1,5 +1,5 @@
 
-import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb, type LucideIcon } from "lucide-react";
+import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb, Flame, type LucideIcon } from "lucide-react";
 
 interface StationInfo {
     id: string;
@@ -56,7 +56,7 @@ export const content: {
         },
         howItWorks: {
             title: "كيف تعمل الرحلة؟",
-            description: "رحلتك نحو اكتشاف الشغف تتكون من 6 محطات أساسية، كل محطة مصممة لتكشف لك جانبًا جديدًا من نفسك ومن اهتماماتك."
+            description: "رحلتك نحو اكتشاف الشغف تتكون من خطوات أساسية، كل خطوة مصممة لتكشف لك جانبًا جديدًا من نفسك ومن اهتماماتك."
         },
         passionForm: {
             title: "المرحلة الأولى: حدد شغفك",
@@ -72,8 +72,13 @@ export const content: {
         },
         stations: [
             { 
+                id: 'passion-selection', name: 'تحديد الشغف', singular: 'الشغف', icon: Flame,
+                description: 'أول خطوة هي تحديد الاهتمامات اللي بتحبها. هتختار من 3 لـ 6 مجالات عشان نبدأ رحلة استكشافهم مع بعض.',
+                hints: []
+            },
+            { 
                 id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
-                description: 'في المحطة دي، هتحدد الأهداف والدوافع العميقة ورا كل شغف.',
+                description: 'في المحطة دي، هتحدد الأهداف والدوافع العميقة ورا كل شغف، وإيه القيمة اللي بيضيفها لحياتك.',
                 hints: [
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
                     'إيه القيمة الأساسية اللي الشغف ده بيخليك عايز تحققها؟ (مثال: الإبداع، الحرية المالية، التأثير الإيجابي)',
@@ -84,7 +89,7 @@ export const content: {
             },
             { 
                 id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
-                description: 'هنا، هتكتشف نقط قوتك ومهاراتك اللي بتدعم الشغف ده.',
+                description: 'هنا، هتكتشف نقط قوتك ومهاراتك الحالية اللي بتدعم كل شغف، وازاي تقدر تستغلها لصالحك.',
                 hints: [
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
                     'إيه نقط قوتك الشخصية اللي بتساعدك في المجال ده؟ (مثال: الصبر، الانضباط، الفضول)',
@@ -95,7 +100,7 @@ export const content: {
             },
             { 
                 id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
-                description: 'في المحطة دي، هتجمع الأدلة والتجارب اللي بتثبت شغفك.',
+                description: 'في المحطة دي، هتجمع الأدلة والتجارب اللي بتثبت شغفك واهتمامك الفعلي بكل مجال.',
                 hints: [
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
                     'هل فيه أي إنجازات أو شهادات أخدتها ليها علاقة بالشغف ده؟ (مثال: جايزة، شهادة كورس)',
@@ -106,7 +111,7 @@ export const content: {
             },
             { 
                 id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
-                description: 'هنا، هتحدد العقبات والتحديات اللي ممكن تواجهك.',
+                description: 'هنا، هتحدد العقبات والتحديات اللي ممكن تواجهك في كل شغف عشان تكون واقعي ومستعد.',
                 hints: [
                     'إيه العقبات أو التحديات اللي بتواجهك عشان تمارس الشغف ده؟ (مثال: نقص الوقت، نقص الموارد)',
                     'إيه المخاوف أو الشكوك اللي عندك في إنك تكمل في الشغف ده؟ (مثال: الخوف من الفشل، عدم اليقين)',
@@ -117,7 +122,7 @@ export const content: {
             },
             { 
                 id: 'possibilities', name: 'الإمكانيات', singular: 'الإمكانية', icon: Lightbulb,
-                description: 'في المحطة الأخيرة، هتستكشف الفرص المستقبلية والإمكانيات اللي ممكن تطلع بيها من شغفك.',
+                description: 'في المحطة الأخيرة، هتستكشف الفرص المستقبلية والإمكانيات اللي ممكن تطلع بيها من كل شغف.',
                 hints: [
                     'إيه الفرص أو المشاريع المستقبلية اللي ممكن تعملها في المجال ده؟ (مثال: تبدأ بزنس، تعمل محتوى)',
                     'إزاي ممكن تطور الشغف ده عشان يبقى مصدر دخل أو كارير؟ (مثال: تقدم استشارات، تبيع منتجات)',
@@ -243,7 +248,7 @@ export const content: {
         },
         howItWorks: {
             title: "How Does the Journey Work?",
-            description: "Your journey towards discovering your passion consists of 6 essential stations, each designed to reveal a new aspect of yourself and your interests."
+            description: "Your journey to discovering your passion consists of essential steps, each designed to reveal a new aspect of yourself and your interests."
         },
         passionForm: {
             title: "Stage One: Define Your Passions",
@@ -259,8 +264,13 @@ export const content: {
         },
         stations: [
             { 
+                id: 'passion-selection', name: 'Passion Selection', singular: 'Passion', icon: Flame,
+                description: 'The first step is to identify the interests you love. You will choose from 3 to 6 areas to begin our journey of exploring them together.',
+                hints: []
+            },
+            { 
                 id: 'purpose', name: 'Purpose', singular: 'Purpose', icon: Goal,
-                description: 'In this station, you will define the deep goals and motivations behind each passion.',
+                description: 'In this station, you will define the deep goals and motivations behind each passion, and what value it adds to your life.',
                 hints: [
                     'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression)',
                     'What core value does this passion drive you to fulfill? (e.g., creativity, financial freedom, positive impact)',
@@ -271,7 +281,7 @@ export const content: {
             },
             { 
                 id: 'power', name: 'Power', singular: 'Power', icon: Zap,
-                description: 'Here, you will discover your strengths and skills that support this passion.',
+                description: 'Here, you will discover your current strengths and skills that support each passion, and how you can leverage them.',
                 hints: [
                     'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)',
                     'What are your personal strengths that help you in this area? (e.g., patience, self-discipline, curiosity)',
@@ -282,7 +292,7 @@ export const content: {
             },
             { 
                 id: 'proof', name: 'Proof', singular: 'Proof', icon: FileCheck,
-                description: 'In this station, you will gather evidence and experiences that prove your passion.',
+                description: 'In this station, you will gather evidence and experiences that prove your passion and actual interest in each field.',
                 hints: [
                     'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project)',
                     'Are there any achievements or certificates you have received related to this passion? (e.g., an award, course completion certificate)',
@@ -293,7 +303,7 @@ export const content: {
             },
             { 
                 id: 'problems', name: 'Problems', singular: 'Problem', icon: AlertTriangle,
-                description: 'Here, you will identify the obstacles and challenges you might face.',
+                description: 'Here, you will identify the obstacles and challenges you might face in each passion to be realistic and prepared.',
                 hints: [
                     'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources)',
                     'What fears or doubts do you have about moving forward with this passion? (e.g., fear of failure, uncertainty)',
@@ -304,7 +314,7 @@ export const content: {
             },
             { 
                 id: 'possibilities', name: 'Possibilities', singular: 'Possibility', icon: Lightbulb,
-                description: 'In the final station, you will explore the future opportunities and potential of your passion.',
+                description: 'In the final station, you will explore the future opportunities and potential that can emerge from each passion.',
                 hints: [
                     'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content)',
                     'How can you develop this passion into a source of income or a career path? (e.g., offering consultations, selling products)',
