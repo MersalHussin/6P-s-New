@@ -32,6 +32,7 @@ import {
     DialogClose,
   } from "@/components/ui/dialog"
 import { content } from "@/lib/content";
+import * as z from "zod";
 
 const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, passionName: string, stationName: string }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -306,10 +307,12 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const methods = useForm<{ passions: PassionData[] }>({
     defaultValues: { passions: initialPassions }
   });
-  const { handleSubmit, watch } = methods;
+  const { handleSubmit, watch, getValues } = methods;
 
   const { language } = useLanguage();
   const c = content[language].journey;
+  const t = content[language].toasts;
+  const { toast } = useToast();
   const P_STATIONS = content[language].stations;
   const ArrowLeft = language === 'ar' ? MoveLeft : MoveRight;
   const ArrowRight = language === 'ar' ? MoveRight : MoveLeft;
@@ -342,15 +345,42 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     containerRef.current?.scrollTo(0, 0);
     window.scrollTo(0, 0);
   };
+  
+  const isCurrentStepValid = () => {
+    const fieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
+    const stationData = getValues(`passions.${currentPassionIndex}.${fieldName}`) as PassionData['purpose'];
+    
+    const validationSchema = z.array(z.object({
+        text: z.string().min(1),
+        weight: z.string().min(1),
+    })).min(3);
 
-  const handleNext = () => {
+    const firstThreeItems = stationData.slice(0, 3);
+    const result = validationSchema.safeParse(firstThreeItems);
+
+    if (!result.success) {
+        toast({
+            title: t.validationError.title,
+            description: t.validationError.description,
+            variant: "destructive",
+        });
+        return false;
+    }
+    return true;
+  }
+
+  const handleNext = async () => {
+    if (!isCurrentStepValid()) {
+      return;
+    }
     scrollToTop();
     if (currentPIndex < totalPStations - 1) {
       setCurrentPIndex(currentPIndex + 1);
     } else if (currentPassionIndex < totalPassions - 1) {
       setShowNextPassionDialog(true);
     } else {
-        handleSubmit(onSubmit)();
+        // This is the final step, so we use handleSubmit to trigger full form validation
+        await handleSubmit(onSubmit)();
     }
   };
 
@@ -373,6 +403,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const isLastStep = currentPassionIndex === totalPassions - 1 && currentPIndex === totalPStations - 1;
 
   const onSubmit = (data: { passions: PassionData[] }) => {
+    if(!isCurrentStepValid()) return;
     onComplete(data.passions);
   };
   
@@ -465,19 +496,29 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         )}
                     </CardContent>
                     </Card>
+                    <div className="flex justify-between items-center mt-6">
+                        <Button type="button" onClick={handleBack} variant="outline" disabled={currentPassionIndex === 0 && currentPIndex === 0}>
+                            <ArrowRight className="h-4 w-4" />
+                            <span className="mx-2">{c.nav.back}</span>
+                        </Button>
+                        
+                        {isLastStep ? (
+                            <Button type="submit">
+                                <span className="mx-2">{c.nav.results}</span>
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        ) : (
+                            <Button type="button" onClick={handleNext}>
+                                <span className="mx-2">{c.nav.next}</span>
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
                 </form>
             </FormProvider>
-        <div className="flex justify-between items-center mt-6">
-            <Button onClick={handleBack} variant="outline" disabled={currentPassionIndex === 0 && currentPIndex === 0}>
-                <ArrowRight className="h-4 w-4" />
-                <span className="mx-2">{c.nav.back}</span>
-            </Button>
-            <Button onClick={handleNext}>
-                <span className="mx-2">{isLastStep ? c.nav.results : c.nav.next}</span>
-                <ArrowLeft className="h-4 w-4" />
-            </Button>
-        </div>
         </div>
     </div>
   );
 }
+
+    

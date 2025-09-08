@@ -128,6 +128,10 @@ export const content = {
             error: {
                 title: "حدث خطأ",
                 description: "لم نتمكن من إكمال طلبك. الرجاء المحاولة مرة أخرى.",
+            },
+            validationError: {
+                title: "البيانات غير مكتملة",
+                description: "الرجاء ملء أول 3 حقول على الأقل وتحديد أهميتها للمتابعة.",
             }
         },
         results: {
@@ -271,6 +275,10 @@ aiHelper: {
             error: {
                 title: "An Error Occurred",
                 description: "We could not complete your request. Please try again.",
+            },
+            validationError: {
+                title: "Incomplete Data",
+                description: "Please fill in at least the first 3 items and select their importance to continue.",
             }
         },
         results: {
@@ -289,3 +297,5 @@ aiHelper: {
         }
     }
 }
+
+    
