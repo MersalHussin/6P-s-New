@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import type { PassionData, UserData } from "@/lib/types";
 import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { PassionForm } from "@/components/journey/PassionForm";
@@ -8,16 +10,6 @@ import { JourneyNavigator } from "@/components/journey/JourneyNavigator";
 import { ResultsDisplay } from "@/components/journey/ResultsDisplay";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/language-context";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
@@ -25,21 +17,13 @@ import { Loader2 } from "lucide-react";
 
 const USER_ID_KEY = "passionJourneyUserId_v2";
 
-const dialogContent = {
+const loadingContent = {
     ar: {
-        title: "لديك جلسة سابقة",
-        description: "لقد وجدنا بيانات محفوظة من رحلتك الأخيرة. هل تود المتابعة من حيث توقفت، أم بدء رحلة جديدة؟",
-        continue: "المتابعة",
-        startNew: "بدء رحلة جديدة",
-        loading: "جاري تحميل بياناتك...",
+        loading: "جاري تحميل رحلتك...",
         noUser: "لم نجد مستخدمًا. سيتم توجيهك للبداية."
     },
     en: {
-        title: "You have a previous session",
-        description: "We found saved data from your last journey. Would you like to continue where you left off, or start a new journey?",
-        continue: "Continue",
-        startNew: "Start New Journey",
-        loading: "Loading your data...",
+        loading: "Loading your journey...",
         noUser: "No user found. Redirecting to start."
     }
 }
@@ -48,77 +32,68 @@ export default function JourneyPage() {
   const [step, setStep] = useState<"loading" | "passions" | "journey" | "results">("loading");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
   const [resultsData, setResultsData] = useState<RankPassionsOutput | null>(null);
-  const [showContinueDialog, setShowContinueDialog] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const { language } = useLanguage();
-  const c = dialogContent[language];
+  const router = useRouter();
+  const c = loadingContent[language];
 
   useEffect(() => {
     const storedUserId = localStorage.getItem(USER_ID_KEY);
     if (storedUserId) {
         setUserId(storedUserId);
-        setShowContinueDialog(true);
+        loadUserData(storedUserId);
     } else {
         console.warn(c.noUser);
-        // Maybe redirect to home page or show a message
-        setStep("passions"); // Or redirect: router.push('/')
+        router.push('/');
     }
-  }, [c.noUser]);
+  }, [router, c.noUser]);
 
 
   const loadUserData = async (currentUserId: string) => {
+    setStep("loading");
     try {
         const userDocRef = doc(db, "users", currentUserId);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
             const userData = userDoc.data() as UserData;
-            setPassionsData(userData.journeyData || []);
-            setResultsData(userData.resultsData || null);
-            const currentStep = (userData.currentStation as "passions" | "journey" | "results") || "passions";
-            setStep(currentStep);
+            const journeyData = userData.journeyData || [];
+            const resultsData = userData.resultsData || null;
+            let currentStep = (userData.currentStation as "passions" | "journey" | "results") || "passions";
+
+            setPassionsData(journeyData);
+            setResultsData(resultsData);
+
+            // Logic to determine the correct step
+            if (currentStep === 'results' || resultsData) {
+                setStep('results');
+            } else if (currentStep === 'journey' && journeyData.length > 0) {
+                setStep('journey');
+            } else {
+                setStep('passions');
+            }
         } else {
-            console.error("No user document found for ID:", currentUserId);
-            handleStartNewSession();
+            console.error("No user document found for ID:", currentUserId, "Redirecting home.");
+            localStorage.removeItem(USER_ID_KEY);
+            router.push('/');
         }
     } catch (error) {
         console.error("Failed to load data from Firestore", error);
-        handleStartNewSession();
+        // Maybe show an error message before redirecting
+        router.push('/');
     }
-  };
-  
-  const handleContinueSession = () => {
-    if(userId) loadUserData(userId);
-    setShowContinueDialog(false);
-  };
-
-  const handleStartNewSession = async () => {
-    if(userId) {
-        try {
-            const userDocRef = doc(db, "users", userId);
-            await updateDoc(userDocRef, {
-                journeyData: [],
-                resultsData: null,
-                currentStation: 'passions',
-            });
-        } catch (error) {
-            console.error("Failed to clear user data in Firestore", error);
-        }
-    }
-    setPassionsData([]);
-    setResultsData(null);
-    setStep("passions");
-    setShowContinueDialog(false);
   };
 
   const updateFirestore = async (data: Partial<UserData>) => {
     if (!userId) return;
     try {
         const userDocRef = doc(db, "users", userId);
-        await updateDoc(userDocRef, {
+        // Use setDoc with merge to create the document if it doesn't exist,
+        // which can happen in some edge cases, although less likely now.
+        await setDoc(userDocRef, {
             ...data,
             lastUpdated: serverTimestamp()
-        });
+        }, { merge: true });
     } catch (error) {
         console.error("Error updating document: ", error);
     }
@@ -169,19 +144,6 @@ export default function JourneyPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-        <AlertDialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
-            <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{c.title}</AlertDialogTitle>
-                    <AlertDialogDescription>{c.description}</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleStartNewSession}>{c.startNew}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleContinueSession}>{c.continue}</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-
       <header className="py-4 border-b">
         <div className="container mx-auto flex justify-between items-center">
           <Link href="/" passHref>
