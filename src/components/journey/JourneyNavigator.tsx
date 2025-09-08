@@ -237,7 +237,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
               )}
             />
           </div>
-          {index >= 2 && (
+          {index >= 3 && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -354,6 +354,7 @@ const PossibilitiesForm = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 
 export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: { initialPassions: PassionData[], onComplete: (data: PassionData[]) => void, onDataChange: (data: PassionData[]) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
   const methods = useForm<{ passions: PassionData[] }>({
     defaultValues: { passions: initialPassions.map(p => ({
         ...p,
@@ -367,7 +368,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const { handleSubmit, watch, getValues } = methods;
 
   const { language } = useLanguage();
-  const { toast } = useToast();
   const c = content[language].journey;
   const t = content[language].toasts;
   const P_STATIONS = content[language].stations.filter(s => s.id !== 'passion-selection');
@@ -601,3 +601,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
+    
