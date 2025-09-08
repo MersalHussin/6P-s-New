@@ -37,8 +37,9 @@ export default function Home() {
 
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-8 md:p-12">
-      <div className="absolute top-4 right-4">
+    <div className="flex flex-col min-h-screen bg-background">
+    <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 md:p-12">
+      <div className="absolute top-4 right-4 z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
@@ -71,7 +72,7 @@ export default function Home() {
             <div className="w-full aspect-video rounded-lg overflow-hidden border shadow-inner">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/Fzzs5vrE5e0"
+                src="https://www.youtube.com/embed/PR-gESOEbSQ"
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -80,7 +81,7 @@ export default function Home() {
             <p className="text-center font-body max-w-2xl text-foreground/80">
               {c.description}
             </p>
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button size="lg" className="font-headline font-bold text-lg">
@@ -100,5 +101,17 @@ export default function Home() {
         </Card>
       </div>
     </main>
+    <footer className="bg-primary text-primary-foreground mt-12 py-8">
+        <div className="container mx-auto text-center">
+            <p className="font-bold text-lg">{c.footer.title}</p>
+            <p className="text-sm opacity-80 mt-2">{c.footer.subtitle}</p>
+            <div className="mt-4">
+                <Link href="/certificate/check" passHref>
+                    <Button variant="secondary" className="text-primary hover:bg-primary-foreground/20">{c.footer.link}</Button>
+                </Link>
+            </div>
+        </div>
+    </footer>
+    </div>
   );
 }

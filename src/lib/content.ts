@@ -3,10 +3,10 @@ import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb } from "lucide-react";
 
 export const content = {
     ar: {
-        title: "مسار الشغف",
-        subtitle: "اكتشف شغفك وانطلق في رحلة الـ 6Ps",
-        description: "تطبيق رحلة الـ 6Ps يساعدك على اكتشاف شغفك الحقيقي من خلال 6 محطات أساسية. ابدأ رحلتك الآن لتحديد أهدافك، استغلال نقاط قوتك، ومواجهة التحديات لتحقيق إمكانياتك الكاملة.",
-        cta: "ابدأ رحلتك",
+        title: "مش عارف شغفك فين؟",
+        subtitle: "اكتشف نفسك مع رحلة الـ 6Ps",
+        description: "رحلة الـ 6Ps هي بوصلتك عشان تكتشف شغفك الحقيقي. من خلال 6 محطات هتتعرف على أهدافك، قوتك، وتحدياتك. مستعد تلاقي الشغف اللي هيغير حياتك؟",
+        cta: "ابدأ رحلتك الآن",
         verifyCertificate: "التحقق من الشهادة",
         passionForm: {
             title: "المرحلة الأولى: حدد شغفك",
@@ -174,13 +174,18 @@ export const content = {
                 subtitle: "واجهنا مشكلة في الاتصال بالذكاء الاصطناعي للحصول على تحليل تفصيلي. لكن لا تقلق، هذه هي النتائج الأولية بناءً على حساب النقاط.",
                 reasoning: "التحليل التفصيلي غير متاح حاليًا. حاول تحديث الصفحة أو العودة لاحقًا للحصول على تقرير كامل بالذكاء الاصطناعي.",
             },
+        },
+        footer: {
+            title: "مسار الشغف",
+            subtitle: "تم تصميمه لمساعدتك على إيجاد طريقك.",
+            link: "التحقق من الشهادة"
         }
     },
     en: {
-        title: "Passion Path",
-        subtitle: "Discover your passion and embark on the 6Ps journey",
-        description: "The 6Ps Journey application helps you discover your true passion through 6 essential stations. Start your journey now to define your goals, leverage your strengths, and face challenges to realize your full potential.",
-        cta: "Start Your Journey",
+        title: "Lost Your Spark?",
+        subtitle: "Rediscover Yourself with the 6Ps Journey",
+        description: "The 6Ps Journey is your compass to find your true passion. Through 6 stations, you'll uncover your goals, strengths, and challenges. Ready to find the passion that will change your life?",
+        cta: "Start Your Journey Now",
         verifyCertificate: "Verify Certificate",
         passionForm: {
             title: "Stage One: Define Your Passions",
@@ -348,6 +353,11 @@ export const content = {
                 subtitle: "We had trouble connecting to the AI for a detailed analysis. But don't worry, here are the preliminary results based on point calculation.",
                 reasoning: "Detailed analysis is currently unavailable. Try refreshing the page or come back later for a full AI-powered report.",
             },
+        },
+        footer: {
+            title: "Passion Path",
+            subtitle: "Designed to help you find your way.",
+            link: "Verify Certificate"
         }
     }
 }
