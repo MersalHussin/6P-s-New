@@ -21,6 +21,7 @@ import Confetti from "react-confetti";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { Certificate } from "./Certificate";
 
 
@@ -45,7 +46,7 @@ const downloadContent = {
             description: "أدخل اسمك ليتم وضعه على شهادة إتمام رحلة اكتشاف الشغف. استخدم اسمك باللغة الإنجليزية للحصول على أفضل نتيجة.",
             nameLabel: "الاسم",
             namePlaceholder: "اسمك الكامل",
-            downloadButton: "تنزيل الشهادة (PNG)",
+            downloadButton: "تنزيل الشهادة (PDF)",
             cancel: "إلغاء",
             error: "حدث خطأ أثناء إنشاء الشهادة. الرجاء المحاولة مرة أخرى.",
         },
@@ -67,7 +68,7 @@ const downloadContent = {
             description: "Enter your name to be placed on your passion discovery journey certificate. Use your English name for best results.",
             nameLabel: "Name",
             namePlaceholder: "Your Full Name",
-            downloadButton: "Download Certificate (PNG)",
+            downloadButton: "Download Certificate (PDF)",
             cancel: "Cancel",
             error: "An error occurred while generating the certificate. Please try again.",
         },
@@ -252,11 +253,17 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             useCORS: true,
             backgroundColor: null,
         });
-        const dataUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = 'Passion_Path_Certificate.png';
-        link.href = dataUrl;
-        link.click();
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('Passion_Path_Certificate.pdf');
+
     } catch (e) {
         console.error(e);
         alert(dc.certificateDialog.error);
@@ -411,3 +418,5 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     </div>
   );
 }
+
+    

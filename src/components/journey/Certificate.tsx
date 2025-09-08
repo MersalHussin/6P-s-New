@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -50,7 +51,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         </div>
 
         {/* Date */}
-        <p className="absolute bottom-[173px] left-[305px] text-black text-[22px] font-semibold">
+        <p className="absolute bottom-[173px] left-[320px] text-black text-[22px] font-semibold">
           {dateStr}
         </p>
       </div>
@@ -59,3 +60,5 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
 });
 
 Certificate.displayName = 'Certificate';
+
+    
