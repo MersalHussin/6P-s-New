@@ -354,14 +354,20 @@ const PossibilitiesForm = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: { initialPassions: PassionData[], onComplete: (data: PassionData[]) => void, onDataChange: (data: PassionData[]) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const methods = useForm<{ passions: PassionData[] }>({
-    defaultValues: { passions: initialPassions }
+    defaultValues: { passions: initialPassions.map(p => ({
+        ...p,
+        purpose: p.purpose && p.purpose.length > 0 ? p.purpose : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+        power: p.power && p.power.length > 0 ? p.power : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+        proof: p.proof && p.proof.length > 0 ? p.proof : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+        problems: p.problems && p.problems.length > 0 ? p.problems : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+        possibilities: p.possibilities && p.possibilities.length > 0 ? p.possibilities : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+    })) }
   });
   const { handleSubmit, watch, getValues } = methods;
 
   const { language } = useLanguage();
   const c = content[language].journey;
   const t = content[language].toasts;
-  const { toast } = useToast();
   const P_STATIONS = content[language].stations.filter(s => s.id !== 'passion-selection');
   const ArrowLeft = language === 'ar' ? MoveLeft : MoveRight;
   const ArrowRight = language === 'ar' ? MoveRight : MoveLeft;
@@ -542,10 +548,10 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         </div>
                         <div>
                             <CardTitle className="font-headline text-2xl">
-                                {station.name}
+                                {language === 'ar' ? `محطة: ${station.name} (${station.id})` : station.name}
                             </CardTitle>
                             <CardDescription className="mt-2">
-                                {station.description}
+                                {station.description(currentPassionName)}
                             </CardDescription>
                         </div>
                         </div>
