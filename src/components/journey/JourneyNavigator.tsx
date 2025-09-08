@@ -350,24 +350,43 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     const fieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
     const stationData = getValues(`passions.${currentPassionIndex}.${fieldName}`) as PassionData['purpose'];
     
-    const validationSchema = z.array(z.object({
-        text: z.string().min(1),
-        weight: z.string().min(1),
-    })).min(3);
-
+    // We only validate the first 3 items which are mandatory.
     const firstThreeItems = stationData.slice(0, 3);
+  
+    // Create a schema that ensures an array with exactly 3 items,
+    // where each item has non-empty text and a selected weight.
+    const validationSchema = z.array(z.object({
+      text: z.string().min(1, { message: "Text cannot be empty." }),
+      weight: z.string().min(1, { message: "Weight must be selected." }),
+    })).min(3);
+  
     const result = validationSchema.safeParse(firstThreeItems);
-
+  
     if (!result.success) {
-        toast({
-            title: t.validationError.title,
-            description: t.validationError.description,
-            variant: "destructive",
-        });
-        return false;
+      // Find the first error to give a more specific message
+      const firstError = result.error.errors[0];
+      let specificMessage = t.validationError.description;
+  
+      if (firstError) {
+        const fieldIndex = parseInt(firstError.path[0] as string, 10);
+        const fieldType = firstError.path[1];
+        if (fieldType === 'text') {
+            specificMessage = `يرجاء ملء الحقل رقم ${fieldIndex + 1}.`;
+        } else if (fieldType === 'weight') {
+            specificMessage = `يرجاء اختيار الأهمية للحقل رقم ${fieldIndex + 1}.`;
+        }
+      }
+
+      toast({
+        title: t.validationError.title,
+        description: specificMessage,
+        variant: "destructive",
+      });
+      return false;
     }
+  
     return true;
-  }
+  };
 
   const handleNext = async () => {
     if (!isCurrentStepValid()) {
@@ -460,7 +479,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
         <div className="space-y-6">
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                    <Card className="mt-4 overflow-hidden">
+                    <Card key={`${currentPassionIndex}-${currentPIndex}`} className="mt-4 overflow-hidden">
                     <CardHeader className="bg-muted/30">
                         <div className="flex items-center gap-4">
                         <div className="bg-primary/10 text-primary p-3 rounded-full">
