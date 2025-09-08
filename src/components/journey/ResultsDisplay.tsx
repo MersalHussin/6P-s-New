@@ -235,17 +235,17 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             const pageHeight = certDoc.internal.pageSize.getHeight();
             certDoc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
 
+            certDoc.setFont('helvetica', 'normal');
+
             // Add Certificate Code
             certDoc.setFontSize(10);
             certDoc.setTextColor('#444444');
-            certDoc.setFont('times', 'normal');
             certDoc.text(`Certificate ID: ${userId}`, 40, 35, { align: 'left'});
 
-
             // Add Name
-            certDoc.setFontSize(32);
+            certDoc.setFontSize(36);
             certDoc.setTextColor('#000000');
-            certDoc.setFont('times', 'bold');
+            certDoc.setFont('helvetica', 'bold');
             certDoc.text(userName, pageWidth / 2, pageHeight / 2 - 25, { align: 'center' });
 
             // Add Encouraging Message
@@ -253,17 +253,17 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             const message = `Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: ${topPassion}. We are proud of your effort and wish you success in turning your passion into impact.`;
             certDoc.setFontSize(14);
             certDoc.setTextColor('#002B7F'); // Blue color
-            certDoc.setFont('times', 'normal');
-            const splitMessage = certDoc.splitTextToSize(message, pageWidth - 200);
+            certDoc.setFont('helvetica', 'normal');
+            const splitMessage = certDoc.splitTextToSize(message, 500); // approx 300pt
             certDoc.text(splitMessage, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
             
             // Add Date
             const today = new Date();
             const dateStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-            certDoc.setFontSize(12);
+            certDoc.setFontSize(14);
             certDoc.setTextColor('#000000');
-            certDoc.setFont('times', 'normal');
-            certDoc.text(dateStr, 118, pageHeight - 95, { align: 'center'});
+            certDoc.setFont('helvetica', 'normal');
+            certDoc.text(dateStr, 125, pageHeight - 92, { align: 'center'});
 
 
             certDoc.save('Passion_Path_Certificate.pdf');
