@@ -1,6 +1,6 @@
 "use client";
 
-import type { UserData, PassionData } from "@/lib/types";
+import type { UserData, PassionData, FieldItem } from "@/lib/types";
 import {
   Accordion,
   AccordionContent,
@@ -19,7 +19,7 @@ import { CheckCircle, Award } from "lucide-react";
 export function UserJourneyDetails({ user }: { user: UserData }) {
     const { name, whatsapp, email, journeyData, resultsData } = user;
 
-    const renderFieldItems = (items: PassionData['purpose'] | undefined) => {
+    const renderFieldItems = (items: FieldItem[] | undefined) => {
         if (!items || items.length === 0 || items.every(i => !i.text)) {
             return <p className="text-sm text-muted-foreground">No data provided.</p>;
         }
@@ -29,7 +29,7 @@ export function UserJourneyDetails({ user }: { user: UserData }) {
                     <li key={item.id}>
                         {item.text}
                         {item.weight && (
-                            <Badge variant="secondary" className="ml-2">{item.weight}</Badge>
+                            <Badge variant="secondary" className="ml-2">Rating: {item.weight}/5</Badge>
                         )}
                     </li>
                 ))}

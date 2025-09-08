@@ -4,7 +4,7 @@ import type { Timestamp } from "firebase/firestore";
 export interface FieldItem {
   id: string;
   text: string;
-  weight: 'high' | 'medium' | 'low' | '';
+  weight: number; // Changed from 'high' | 'medium' | 'low' | '' to number
 }
 
 export interface PassionData {

@@ -90,12 +90,26 @@ export const content = {
             },
             fieldLabel: "البند",
             fieldPlaceholder: "اكتب هنا...",
-            weightLabel: "الأهمية",
-            weightPlaceholder: "اختر الأهمية",
-            weights: {
-                high: "عالية",
-                medium: "متوسطة",
-                low: "ضعيفة"
+            weightLabel: "تقييمك",
+            ratings: {
+                purpose: [
+                    "ليس له معنى", "عادي", "مهم", "مهم جدًا", "هدفي الأسمى"
+                ],
+                power: [
+                    "ضعيفة جدًا", "ضعيفة", "متوسطة", "قوية", "قوية جدًا"
+                ],
+                proof: [
+                    "مجرد فكرة", "اهتمام بسيط", "توجد تجارب", "تجارب قوية", "إثباتات كثيرة"
+                ],
+                problems: [
+                    "لا توجد مشاكل", "مشاكل بسيطة", "مشاكل متوسطة", "مشاكل كبيرة", "مشاكل مستعصية"
+                ],
+                possibilities: [
+                    "لا توجد فرص", "فرص محدودة", "فرص جيدة", "فرص كبيرة", "إمكانيات لا نهائية"
+                ],
+                default: [
+                    "1", "2", "3", "4", "5"
+                ]
             },
             addMoreButton: "إضافة بند آخر",
             removeButton: "إزالة البند",
@@ -131,7 +145,7 @@ export const content = {
             },
             validationError: {
                 title: "البيانات غير مكتملة",
-                description: "الرجاء ملء أول 3 حقول على الأقل وتحديد أهميتها للمتابعة.",
+                description: "الرجاء ملء أول 3 حقول على الأقل وتقييمها للمتابعة.",
             }
         },
         results: {
@@ -237,12 +251,26 @@ export const content = {
             },
             fieldLabel: "Item",
             fieldPlaceholder: "Type here...",
-            weightLabel: "Importance",
-            weightPlaceholder: "Select importance",
-            weights: {
-                high: "High",
-                medium: "Medium",
-                low: "Low"
+            weightLabel: "Your Rating",
+            ratings: {
+                purpose: [
+                    "Meaningless", "Neutral", "Important", "Very Important", "Ultimate Goal"
+                ],
+                power: [
+                    "Very Weak", "Weak", "Average", "Strong", "Very Strong"
+                ],
+                proof: [
+                    "Just an Idea", "Slight Interest", "Some Experience", "Strong Experience", "Solid Proof"
+                ],
+                problems: [
+                    "No Problems", "Minor Problems", "Moderate Problems", "Significant Problems", "Insurmountable Problems"
+                ],
+                possibilities: [
+                    "No Opportunities", "Limited Opportunities", "Good Opportunities", "Great Opportunities", "Endless Possibilities"
+                ],
+                default: [
+                    "1", "2", "3", "4", "5"
+                ]
             },
             addMoreButton: "Add Another Item",
             removeButton: "Remove Item",
@@ -250,7 +278,7 @@ export const content = {
             aiSolutions: {
                 title: "AI Suggested Solutions",
             },
-aiHelper: {
+            aiHelper: {
                 tooltip: "Get help from AI",
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this item more deeply.",
@@ -278,7 +306,7 @@ aiHelper: {
             },
             validationError: {
                 title: "Incomplete Data",
-                description: "Please fill in at least the first 3 items and select their importance to continue.",
+                description: "Please fill in at least the first 3 items and rate them to continue.",
             }
         },
         results: {
@@ -297,5 +325,3 @@ aiHelper: {
         }
     }
 }
-
-    

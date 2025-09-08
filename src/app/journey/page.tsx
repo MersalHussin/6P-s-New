@@ -126,7 +126,7 @@ export default function JourneyPage() {
     const defaultFields = () => Array.from({ length: 3 }, (_, i) => ({
       id: `${i + 1}`,
       text: "",
-      weight: "" as const,
+      weight: 0,
     }));
     
     const initialData: PassionData[] = passions.map((p, index) => ({

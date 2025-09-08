@@ -8,12 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight, CheckCircle } from 'lucide-react';
+import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight, CheckCircle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
@@ -111,6 +110,50 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
     );
   };
 
+const StarRating = ({ field, stationId }: { field: any, stationId: string }) => {
+    const [hover, setHover] = useState(0);
+    const { language } = useLanguage();
+    const ratingContent = content[language].journey.ratings[stationId] || content[language].journey.ratings.default;
+  
+    return (
+      <div className="space-y-2">
+        <div dir="ltr" className="flex items-center justify-center gap-2">
+          {[...Array(5)].map((_, index) => {
+            const ratingValue = index + 1;
+            return (
+                <TooltipProvider key={ratingValue} delayDuration={0}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                type="button"
+                                key={ratingValue}
+                                className={cn(
+                                    "h-8 w-8 transition-colors",
+                                    ratingValue <= (hover || field.value) ? "text-yellow-400" : "text-gray-300"
+                                )}
+                                onClick={() => field.onChange(ratingValue)}
+                                onMouseEnter={() => setHover(ratingValue)}
+                                onMouseLeave={() => setHover(0)}
+                            >
+                                <Star className="h-full w-full" fill="currentColor" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{ratingValue}: {ratingContent[ratingValue-1]}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            );
+          })}
+        </div>
+        <div className="text-center text-sm font-semibold text-primary h-5">
+            {hover > 0 ? ratingContent[hover-1] : field.value > 0 ? ratingContent[field.value-1] : " " }
+        </div>
+      </div>
+    );
+};
+  
+
 const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: number; passionIndex: number, passionName: string }) => {
   const { control } = useFormContext();
   const { language } = useLanguage();
@@ -167,26 +210,17 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
             />
             
             <FormField
-                control={control}
-                name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
-                render={({ field }) => (
+              control={control}
+              name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-semibold">{c.weightLabel}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                        <SelectTrigger>
-                        <SelectValue placeholder={c.weightPlaceholder} />
-                        </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                        <SelectItem value="high">{c.weights.high}</SelectItem>
-                        <SelectItem value="medium">{c.weights.medium}</SelectItem>
-                        <SelectItem value="low">{c.weights.low}</SelectItem>
-                    </SelectContent>
-                    </Select>
-                    <FormMessage />
+                  <FormLabel className="font-semibold text-center block mb-2">{c.weightLabel}</FormLabel>
+                  <FormControl>
+                    <StarRating field={field} stationId={station.id} />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-                )}
+              )}
             />
           </div>
           {index >= 3 && (
@@ -216,7 +250,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
             type="button"
             variant="outline"
             className="w-full"
-            onClick={() => append({ id: `${fields.length + 1}`, text: '', weight: '' })}
+            onClick={() => append({ id: `${fields.length + 1}`, text: '', weight: 0 })}
         >
             <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
             {c.addMoreButton}
@@ -356,7 +390,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   
     const validationSchema = z.array(z.object({
       text: z.string().min(1, { message: "Text cannot be empty." }),
-      weight: z.string().min(1, { message: "Weight must be selected." }),
+      weight: z.number().min(1, { message: "Weight must be selected." }),
       id: z.string()
     })).min(3);
   
@@ -373,13 +407,13 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
           if (fieldType === 'text') {
               specificMessage = `يرجاء ملء الحقل رقم ${fieldIndex + 1}.`;
           } else if (fieldType === 'weight') {
-              specificMessage = `يرجاء اختيار الأهمية للحقل رقم ${fieldIndex + 1}.`;
+              specificMessage = `يرجاء اختيار تقييم للحقل رقم ${fieldIndex + 1}.`;
           }
         } else {
             if (fieldType === 'text') {
                 specificMessage = `Please fill out item #${fieldIndex + 1}.`;
             } else if (fieldType === 'weight') {
-                specificMessage = `Please select the importance for item #${fieldIndex + 1}.`;
+                specificMessage = `Please select a rating for item #${fieldIndex + 1}.`;
             }
         }
       }
