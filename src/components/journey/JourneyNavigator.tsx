@@ -353,6 +353,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const t = content[language].toasts;
   const { toast } = useToast();
   const P_STATIONS = content[language].stations;
+  const P_STATIONS_EN = content['en'].stations;
   const ArrowLeft = language === 'ar' ? MoveLeft : MoveRight;
   const ArrowRight = language === 'ar' ? MoveRight : MoveLeft;
 
@@ -531,6 +532,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         <div className='flex-grow'>
                             <CardTitle className="font-headline text-2xl">
                                 {c.progress.station} {currentPIndex + 1}: {station.name}
+                                {language === 'ar' && (
+                                    <span className="text-lg font-normal text-muted-foreground ml-2">({P_STATIONS_EN[currentPIndex + 1].name})</span>
+                                )}
                             </CardTitle>
                             <CardDescription className="mt-2">
                                 {station.description}
