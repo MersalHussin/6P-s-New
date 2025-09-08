@@ -48,7 +48,7 @@ export function UserJourneyDetails({ user }: { user: UserData }) {
         <div className="py-4 space-y-6">
             
             {journeyData && journeyData.length > 0 ? (
-                 <Accordion type="multiple" collapsible className="w-full">
+                 <Accordion type="multiple" className="w-full">
                     {journeyData.map((passion) => (
                         <AccordionItem value={passion.id} key={passion.id}>
                             <AccordionTrigger className="text-xl font-semibold text-primary">{passion.name}</AccordionTrigger>
