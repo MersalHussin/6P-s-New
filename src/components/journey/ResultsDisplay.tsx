@@ -227,68 +227,59 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passions, language, initialResults, onResultsCalculated]);
 
-  const generateSimpleReport = () => {
+  const generateSimpleReport = (reportPassionsData: PassionData[]) => {
     let report = `${c.reportTitle}\n\n`;
     report += "==================================\n\n";
-
-    const reportPassionsData = passions.map(p => ({
-      ...p,
-      purpose: filterRatedItems(p.purpose),
-      power: filterRatedItems(p.power),
-      proof: filterRatedItems(p.proof),
-      problems: filterRatedItems(p.problems),
-      possibilities: filterRatedItems(p.possibilities),
-    }));
-
+  
     reportPassionsData.forEach(passion => {
-        report += `## ${passion.name}\n\n`;
-
-        const renderSection = (title: string, items: FieldItem[] | undefined) => {
-            if (items && items.length > 0) {
-                report += `### ${title}\n`;
-                items.forEach(item => {
-                    report += `- ${item.text} (Rating: ${item.weight}/5)\n`;
-                });
-                report += '\n';
-            }
-        };
-
-        renderSection('Purpose', passion.purpose);
-        renderSection('Power', passion.power);
-        renderSection('Proof', passion.proof);
-        renderSection('Problems', passion.problems);
-        renderSection('Possibilities', passion.possibilities);
-
-        if (passion.suggestedSolutions && passion.suggestedSolutions.length > 0) {
-            report += `### Suggested Solutions\n`;
-            passion.suggestedSolutions.forEach(solution => {
-                report += `- ${solution}\n`;
-            });
-            report += '\n';
+      report += `## ${passion.name}\n\n`;
+  
+      const renderSection = (title: string, items: FieldItem[] | undefined) => {
+        if (items && items.length > 0) {
+          report += `### ${title}\n`;
+          items.forEach(item => {
+            report += `- ${item.text} (Rating: ${item.weight}/5)\n`;
+          });
+          report += '\n';
         }
-        report += "----------------------------------\n\n";
+      };
+  
+      renderSection('Purpose', passion.purpose);
+      renderSection('Power', passion.power);
+      renderSection('Proof', passion.proof);
+      renderSection('Problems', passion.problems);
+      renderSection('Possibilities', passion.possibilities);
+  
+      if (passion.suggestedSolutions && passion.suggestedSolutions.length > 0) {
+        report += `### Suggested Solutions\n`;
+        passion.suggestedSolutions.forEach(solution => {
+          report += `- ${solution}\n`;
+        });
+        report += '\n';
+      }
+      report += "----------------------------------\n\n";
     });
-
+  
     return report;
   };
 
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
     try {
+        const filteredPassions = passions.map(p => ({
+            ...p,
+            purpose: filterRatedItems(p.purpose),
+            power: filterRatedItems(p.power),
+            proof: filterRatedItems(p.proof),
+            problems: filterRatedItems(p.problems),
+            possibilities: filterRatedItems(p.possibilities),
+          }));
+
         let reportText = "";
         if (isFallback) {
-            reportText = generateSimpleReport();
+            reportText = generateSimpleReport(filteredPassions);
         } else {
-            const reportPassionsInput = passions.map(p => ({
-              ...p,
-              purpose: filterRatedItems(p.purpose),
-              power: filterRatedItems(p.power),
-              proof: filterRatedItems(p.proof),
-              problems: filterRatedItems(p.problems),
-              possibilities: filterRatedItems(p.possibilities),
-            }));
-    
-            const input: GenerateDetailedReportInput = { passions: reportPassionsInput, language };
+            const input: GenerateDetailedReportInput = { passions: filteredPassions, language };
             const { report } = await generateDetailedReport(input);
             reportText = report;
         }
@@ -331,7 +322,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             passionForCert = translatedText;
           } catch (e) {
              console.error("AI translation failed, using original passion name.", e);
-             // If translation fails (e.g., quota exceeded), use the original passion name
              passionForCert = topPassion;
           }
         }
