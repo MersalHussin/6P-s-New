@@ -224,24 +224,76 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     if(passions.length > 0){
         getRanking();
     }
-  }, [passions, c.error, language, initialResults, onResultsCalculated, c.fallback.reasoning]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passions, language, initialResults, onResultsCalculated]);
+
+  const generateSimpleReport = () => {
+    let report = `${c.reportTitle}\n\n`;
+    report += "==================================\n\n";
+
+    const reportPassionsData = passions.map(p => ({
+      ...p,
+      purpose: filterRatedItems(p.purpose),
+      power: filterRatedItems(p.power),
+      proof: filterRatedItems(p.proof),
+      problems: filterRatedItems(p.problems),
+      possibilities: filterRatedItems(p.possibilities),
+    }));
+
+    reportPassionsData.forEach(passion => {
+        report += `## ${passion.name}\n\n`;
+
+        const renderSection = (title: string, items: FieldItem[] | undefined) => {
+            if (items && items.length > 0) {
+                report += `### ${title}\n`;
+                items.forEach(item => {
+                    report += `- ${item.text} (Rating: ${item.weight}/5)\n`;
+                });
+                report += '\n';
+            }
+        };
+
+        renderSection('Purpose', passion.purpose);
+        renderSection('Power', passion.power);
+        renderSection('Proof', passion.proof);
+        renderSection('Problems', passion.problems);
+        renderSection('Possibilities', passion.possibilities);
+
+        if (passion.suggestedSolutions && passion.suggestedSolutions.length > 0) {
+            report += `### Suggested Solutions\n`;
+            passion.suggestedSolutions.forEach(solution => {
+                report += `- ${solution}\n`;
+            });
+            report += '\n';
+        }
+        report += "----------------------------------\n\n";
+    });
+
+    return report;
+  };
 
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
     try {
-        const reportPassionsInput = passions.map(p => ({
-          ...p,
-          purpose: filterRatedItems(p.purpose),
-          power: filterRatedItems(p.power),
-          proof: filterRatedItems(p.proof),
-          problems: filterRatedItems(p.problems),
-          possibilities: filterRatedItems(p.possibilities),
-        }));
+        let reportText = "";
+        if (isFallback) {
+            reportText = generateSimpleReport();
+        } else {
+            const reportPassionsInput = passions.map(p => ({
+              ...p,
+              purpose: filterRatedItems(p.purpose),
+              power: filterRatedItems(p.power),
+              proof: filterRatedItems(p.proof),
+              problems: filterRatedItems(p.problems),
+              possibilities: filterRatedItems(p.possibilities),
+            }));
+    
+            const input: GenerateDetailedReportInput = { passions: reportPassionsInput, language };
+            const { report } = await generateDetailedReport(input);
+            reportText = report;
+        }
 
-        const input: GenerateDetailedReportInput = { passions: reportPassionsInput, language };
-        const { report } = await generateDetailedReport(input);
-
-        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'Passion_Path_Report.txt';
@@ -270,13 +322,13 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
     setIsDownloadingCert(true);
     try {
-        // Translate passion name if needed
         const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
-        if (topPassion) {
+        
+        if (topPassion && !isFallback) {
           const { translatedText } = await translateText({ text: topPassion, targetLanguage: 'en' });
           setPassionInEnglish(translatedText);
         } else {
-            setPassionInEnglish("your passion");
+            setPassionInEnglish(topPassion || "your passion");
         }
 
         // Wait a tick for the state to update before rendering the canvas
@@ -443,7 +495,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             <h1 className="text-4xl font-headline font-bold text-primary">{isFallback ? c.fallback.title : c.title}</h1>
             <p className="text-lg text-muted-foreground">{isFallback ? c.fallback.subtitle : c.subtitle}</p>
             <div className="flex justify-center gap-4">
-                <Button onClick={() => setShowReportDialog(true)} variant="outline" disabled={isFallback}>
+                <Button onClick={() => setShowReportDialog(true)} variant="outline">
                     <FileText className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
                     {c.downloadReportButton}
                 </Button>
@@ -488,3 +540,5 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     </div>
   );
 }
+
+    
