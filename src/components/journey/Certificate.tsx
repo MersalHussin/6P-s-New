@@ -28,7 +28,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         <p 
             className="absolute top-1/2 text-gray-400 text-sm tracking-widest"
             style={{
-                left: '120px', // Moved to three-quarters left
+                left: '120px',
                 transform: 'translate(-50%, -50%) rotate(-90deg)',
                 transformOrigin: 'center center',
                 whiteSpace: 'nowrap'
@@ -38,19 +38,19 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         </p>
 
         {/* User Name */}
-        <p className="absolute top-[170px] w-full text-center text-black text-[80px] font-headline" style={{ fontWeight: 900 }}>
+        <p className="absolute top-[220px] w-full text-center text-black text-[80px] font-headline">
           {name}
         </p>
 
         {/* Encouraging Message */}
-        <div className="absolute top-[290px] w-full text-center px-[220px]">
+        <div className="absolute top-[340px] w-full text-center px-[220px]">
            <p className="text-[#002B7F] text-[22px] leading-snug">
             Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: {passion}. We are proud of your effort and wish you success in turning your passion into impact.
            </p>
         </div>
 
         {/* Date */}
-        <p className="absolute bottom-[173px] left-[240px] text-black text-[22px] font-semibold">
+        <p className="absolute bottom-[173px] left-[190px] text-black text-[22px] font-semibold">
           {dateStr}
         </p>
       </div>
