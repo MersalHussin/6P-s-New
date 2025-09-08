@@ -1,3 +1,4 @@
+
 import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb } from "lucide-react";
 
 export const content = {
@@ -110,8 +111,9 @@ export const content = {
             },
             nextPassionDialog: {
                 title: "أحسنت!",
-                description: (passionName: string) => `لقد أكملت استكشاف هذا الشغف. الآن، استعد لاستكشاف شغفك التالي: "${passionName}"`,
-                cta: "لنبدأ"
+                description: (passionName: string) => `لقد أكملت استكشاف شغفك بـ "${passionName}".`,
+                nextPassion: "والآن تستعد لاستكشاف:",
+                cta: "هيا بنا!"
             }
         },
         toasts: {
@@ -244,7 +246,7 @@ export const content = {
             aiSolutions: {
                 title: "AI Suggested Solutions",
             },
-aiHelper: {
+            aiHelper: {
                 tooltip: "Get help from AI",
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this item more deeply.",
@@ -252,8 +254,9 @@ aiHelper: {
             },
             nextPassionDialog: {
                 title: "Well Done!",
-                description: (passionName: string) => `You have completed exploring this passion. Now, get ready to explore your next passion: "${passionName}"`,
-                cta: "Let's Go"
+                description: (passionName: string) => `You've completed exploring your passion for "${passionName}".`,
+                nextPassion: "Now you're getting ready to explore:",
+                cta: "Let's Go!"
             }
         },
         toasts: {
@@ -286,5 +289,3 @@ aiHelper: {
         }
     }
 }
-
-    

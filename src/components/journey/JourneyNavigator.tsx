@@ -13,7 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight } from 'lucide-react';
+import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
@@ -214,7 +214,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
         type="button"
         variant="outline"
         className="w-full"
-        onClick={() => append({ text: '', weight: '' })}
+        onClick={() => append({ id: (fields.length + 1).toString(), text: '', weight: '' })}
       >
         <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
         {c.addMoreButton}
@@ -384,17 +384,26 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   return (
     <div className="w-full max-w-4xl mx-auto" ref={containerRef}>
          <Dialog open={showNextPassionDialog} onOpenChange={setShowNextPassionDialog}>
-            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'} className="text-center p-8">
                 <DialogHeader>
-                    <DialogTitle>{c.nextPassionDialog.title}</DialogTitle>
-                    <DialogDescription>
-                        {c.nextPassionDialog.description(initialPassions[currentPassionIndex + 1]?.name || "")}
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
+                        <CheckCircle className="h-10 w-10 text-green-600" />
+                    </div>
+                    <DialogTitle className="text-2xl font-bold">{c.nextPassionDialog.title}</DialogTitle>
+                    <DialogDescription className="text-muted-foreground text-base leading-relaxed mt-2">
+                        {c.nextPassionDialog.description(initialPassions[currentPassionIndex].name)}
                     </DialogDescription>
                 </DialogHeader>
+                <div className="my-6">
+                    <p className="text-sm text-muted-foreground mb-2">{c.nextPassionDialog.nextPassion}</p>
+                    <p className="text-3xl font-headline font-bold text-primary">
+                        {initialPassions[currentPassionIndex + 1]?.name || ""}
+                    </p>
+                </div>
                 <DialogClose asChild>
-                    <Button onClick={proceedToNextPassion} className="mt-4">
+                    <Button onClick={proceedToNextPassion} className="mt-4 w-full" size="lg">
                         {c.nextPassionDialog.cta}
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-5 w-5" />
                     </Button>
                 </DialogClose>
             </DialogContent>
