@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -19,6 +20,7 @@ import {
     DialogTrigger,
   } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -78,17 +80,22 @@ export default function Home() {
             <p className="text-center font-body max-w-2xl text-foreground/80">
               {c.description}
             </p>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="font-headline font-bold text-lg">
-                  {c.cta}
-                  <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                 <UserForm onUserCreated={handleUserFormSubmit} />
-              </DialogContent>
-            </Dialog>
+            <div className="flex flex-col items-center gap-4">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="lg" className="font-headline font-bold text-lg">
+                      {c.cta}
+                      <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                     <UserForm onUserCreated={handleUserFormSubmit} />
+                  </DialogContent>
+                </Dialog>
+                <Link href="/certificate/check" passHref>
+                    <Button variant="outline">{c.verifyCertificate}</Button>
+                </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
