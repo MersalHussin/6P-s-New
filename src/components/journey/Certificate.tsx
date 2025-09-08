@@ -26,7 +26,14 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
     >
       <div className="relative w-full h-full">
         {/* Certificate ID */}
-        <p className="absolute top-[65px] left-[88px] text-[#444444] text-[15px]">
+        <p 
+            className="absolute left-1/2 top-1/2 text-gray-400 text-sm tracking-widest"
+            style={{
+                transform: 'translate(-50%, -50%) rotate(-90deg)',
+                transformOrigin: 'center center',
+                whiteSpace: 'nowrap'
+            }}
+        >
           Certificate ID: {userId}
         </p>
 
