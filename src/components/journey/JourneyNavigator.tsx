@@ -523,8 +523,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Card key={`${currentPassionIndex}-${currentPIndex}`} className="mt-4 overflow-hidden">
-                    <CardHeader className="bg-muted/30 text-center">
-                        <div className="flex flex-col items-center gap-4">
+                    <CardHeader className="bg-muted/30">
+                        <div className="flex items-center gap-4">
                         <div className="bg-primary/10 text-primary p-3 rounded-full">
                             <CurrentStationIcon className="w-8 h-8" />
                         </div>
@@ -532,9 +532,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                             <CardTitle className="font-headline text-2xl">
                                 {c.progress.station} {currentPIndex + 1}: {station.name}
                             </CardTitle>
-                             {language === 'ar' && (
-                                <p className='text-lg font-body text-muted-foreground'>({station.id})</p>
-                             )}
                             <CardDescription className="mt-2">
                                 {station.description}
                             </CardDescription>
