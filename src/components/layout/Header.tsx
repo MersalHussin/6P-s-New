@@ -4,9 +4,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import type { UserData } from "@/lib/types";
@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Globe, LogOut, User as UserIcon, Loader2, MoveLeft } from "lucide-react";
+import { Globe, LogOut, User as UserIcon, Loader2, MoveLeft, RefreshCw, Home, ShieldQuestion } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { UserProfileDialog } from "@/components/journey/UserProfileDialog";
 
@@ -34,6 +34,7 @@ const content = {
     home: "الصفحة الرئيسية",
     signOut: "تسجيل الخروج",
     profile: "الملف الشخصي",
+    restartJourney: "إعادة الرحلة",
     startJourney: "ابدأ رحلتك",
     exitWarning: {
       title: "هل أنت متأكد من رغبتك في الخروج؟",
@@ -41,11 +42,22 @@ const content = {
       cancel: "إلغاء",
       confirm: "تأكيد الخروج",
     },
+    restartWarning: {
+        title: "هل أنت متأكد من إعادة الرحلة؟",
+        description: "سيتم حذف جميع بيانات رحلتك الحالية والبدء من جديد. لا يمكن التراجع عن هذا الإجراء.",
+        confirm: "نعم، أعد الرحلة",
+    },
+    logoClickWarning: {
+        title: "العودة إلى الصفحة الرئيسية",
+        description: "هل تريد الخروج من الرحلة الحالية؟ لا تقلق، تقدمك محفوظ ويمكنك المتابعة لاحقًا.",
+        confirm: "نعم، اخرج",
+    }
   },
   en: {
     home: "Home",
     signOut: "Sign Out",
     profile: "Profile",
+    restartJourney: "Restart Journey",
     startJourney: "Start Your Journey",
     exitWarning: {
       title: "Are you sure you want to sign out?",
@@ -53,8 +65,52 @@ const content = {
       cancel: "Cancel",
       confirm: "Confirm Sign Out",
     },
+    restartWarning: {
+        title: "Are you sure you want to restart?",
+        description: "All of your current journey data will be deleted and you will start over. This action cannot be undone.",
+        confirm: "Yes, restart",
+    },
+    logoClickWarning: {
+        title: "Return to Home Page",
+        description: "Are you sure you want to exit the current journey? Don't worry, your progress is saved and you can continue later.",
+        confirm: "Yes, exit",
+    }
   },
 };
+
+const LogoLink = ({ isJourneyPage, c }: { isJourneyPage: boolean, c: any }) => {
+    const router = useRouter();
+
+    if (isJourneyPage) {
+        return (
+             <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <div className="relative h-10 w-40 cursor-pointer">
+                        <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+                    </div>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir={c.logoClickWarning.title === "العودة إلى الصفحة الرئيسية" ? "rtl" : "ltr"}>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2"><ShieldQuestion/> {c.logoClickWarning.title}</AlertDialogTitle>
+                        <AlertDialogDescription>{c.logoClickWarning.description}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => router.push('/')}>{c.logoClickWarning.confirm}</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+             </AlertDialog>
+        );
+    }
+
+    return (
+        <Link href="/" passHref>
+            <div className="relative h-10 w-40 cursor-pointer">
+                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+            </div>
+        </Link>
+    );
+}
 
 export function AppHeader() {
   const [user, setUser] = useState<User | null>(null);
@@ -62,8 +118,11 @@ export function AppHeader() {
   const [loading, setLoading] = useState(true);
   const { language, setLanguage } = useLanguage();
   const router = useRouter();
+  const pathname = usePathname();
   const c = content[language];
   const ArrowIcon = language === 'ar' ? MoveLeft : MoveLeft;
+  
+  const isJourneyPage = pathname.startsWith('/journey');
 
 
   useEffect(() => {
@@ -87,6 +146,21 @@ export function AppHeader() {
     router.push('/');
   };
 
+  const handleRestartJourney = async () => {
+    if (!user) return;
+    try {
+        const userDocRef = doc(db, "users", user.uid);
+        await updateDoc(userDocRef, {
+            journeyData: [],
+            resultsData: null,
+            currentStation: 'passions'
+        });
+        router.push('/journey');
+    } catch (error) {
+        console.error("Error restarting journey: ", error);
+    }
+  }
+
   const handleStartJourney = () => {
     if (user) {
         router.push('/journey');
@@ -96,13 +170,11 @@ export function AppHeader() {
   };
 
   return (
-    <header className="py-4 border-b sticky top-0 z-50 bg-background/95 backdrop-blur-sm">
+    <header className="py-4 border-b sticky top-0 z-50 bg-background/95 backdrop-blur-sm" dir="ltr">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" passHref>
-            <div className="relative h-10 w-40 cursor-pointer">
-                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
-            </div>
-        </Link>
+        
+        <LogoLink isJourneyPage={isJourneyPage} c={c}/>
+        
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -144,6 +216,24 @@ export function AppHeader() {
                         <span>{c.profile}</span>
                    </DropdownMenuItem>
                 </UserProfileDialog>
+                 <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <RefreshCw className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
+                        <span>{c.restartJourney}</span>
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                      <AlertDialogHeader>
+                          <AlertDialogTitle>{c.restartWarning.title}</AlertDialogTitle>
+                          <AlertDialogDescription>{c.restartWarning.description}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                          <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleRestartJourney}>{c.restartWarning.confirm}</AlertDialogAction>
+                      </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <DropdownMenuSeparator />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
