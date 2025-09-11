@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useForm, FormProvider, useFieldArray, useFormContext } from 'react-hook-form';
 import type { PassionData, FieldItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -175,12 +175,12 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   const passionValues = watch(`passions.${passionIndex}.${fieldName}`);
 
   useEffect(() => {
-    if (passionValues && passionValues.length === 0) {
+    if (fields.length === 0) {
       append({ id: '1', text: '', weight: 0 });
       append({ id: '2', text: '', weight: 0 });
       append({ id: '3', text: '', weight: 0 });
     }
-  }, [passionValues, append]);
+  }, [fields, append]);
   
   const c = content[language].journey;
   const stationContent = content[language].stations[pIndex + 1];
@@ -356,18 +356,11 @@ const PossibilitiesForm = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 
 export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: { initialPassions: PassionData[], onComplete: (data: PassionData[]) => void, onDataChange: (data: PassionData[]) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
   const methods = useForm<{ passions: PassionData[] }>({
-    defaultValues: { passions: initialPassions.map(p => ({
-        ...p,
-        purpose: p.purpose && p.purpose.length > 0 ? p.purpose : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-        power: p.power && p.power.length > 0 ? p.power : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-        proof: p.proof && p.proof.length > 0 ? p.proof : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-        problems: p.problems && p.problems.length > 0 ? p.problems : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-        possibilities: p.possibilities && p.possibilities.length > 0 ? p.possibilities : [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-    })) }
+    defaultValues: { passions: initialPassions }
   });
   const { handleSubmit, watch, getValues } = methods;
+  const { toast } = useToast();
 
   const { language } = useLanguage();
   const c = content[language].journey;
@@ -467,7 +460,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     setShowConfirmDialog(true);
   };
   
-  const handleConfirmNext = async () => {
+  const handleConfirmNext = useCallback(async () => {
     setShowConfirmDialog(false);
     scrollToTop();
     if (currentPIndex < totalPStations - 1) {
@@ -477,7 +470,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     } else {
         await handleSubmit(onSubmit)();
     }
-  };
+  }, [currentPIndex, totalPStations, currentPassionIndex, totalPassions, handleSubmit]);
 
   const handleCancelNext = () => {
     setShowConfirmDialog(false);
@@ -634,3 +627,4 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     
 
     
+
