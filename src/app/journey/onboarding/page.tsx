@@ -202,7 +202,14 @@ export default function OnboardingPage() {
                                         name="countryCode"
                                         render={({ field }) => (
                                             <FormItem className="w-1/3">
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <Select
+                                                  onValueChange={(value) => {
+                                                    // Extract the dial_code which is after the #
+                                                    const dialCode = value.split('#')[1];
+                                                    field.onChange(dialCode);
+                                                  }}
+                                                  defaultValue={`${countries.find(c => c.dial_code === field.value)?.code || 'EG'}#${field.value}`}
+                                                >
                                                     <FormControl>
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Code" />
@@ -210,7 +217,7 @@ export default function OnboardingPage() {
                                                     </FormControl>
                                                     <SelectContent>
                                                         {countries.map(country => (
-                                                            <SelectItem key={country.code} value={country.dial_code}>
+                                                            <SelectItem key={country.code} value={`${country.code}#${country.dial_code}`}>
                                                                 {country.flag} {country.dial_code}
                                                             </SelectItem>
                                                         ))}
