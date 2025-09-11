@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useForm, FormProvider, useFieldArray, useFormContext } from 'react-hook-form';
-import type { PassionData } from '@/lib/types';
+import type { PassionData, FieldItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,6 +32,8 @@ import {
   } from "@/components/ui/dialog"
 import { content } from "@/lib/content";
 import * as z from "zod";
+import { ConfirmationDialog } from './ConfirmationDialog';
+
 
 const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, passionName: string, stationName: string }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -377,6 +379,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const [currentPassionIndex, setCurrentPassionIndex] = useState(0);
   const [currentPIndex, setCurrentPIndex] = useState(0);
   const [showNextPassionDialog, setShowNextPassionDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [confirmDialogData, setConfirmDialogData] = useState<FieldItem[]>([]);
 
   const totalPStations = P_STATIONS.length;
   const totalPassions = initialPassions.length;
@@ -402,10 +406,11 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     containerRef.current?.scrollTo(0, 0);
     window.scrollTo(0, 0);
   };
+
+  const currentFieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
   
   const isCurrentStepValid = () => {
-    const fieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
-    const stationData = getValues(`passions.${currentPassionIndex}.${fieldName}`) as PassionData['purpose'];
+    const stationData = getValues(`passions.${currentPassionIndex}.${currentFieldName}`) as PassionData['purpose'];
     
     if (!stationData) return false;
 
@@ -456,6 +461,14 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     if (!isCurrentStepValid()) {
       return;
     }
+
+    const stationData = getValues(`passions.${currentPassionIndex}.${currentFieldName}`);
+    setConfirmDialogData(stationData);
+    setShowConfirmDialog(true);
+  };
+  
+  const handleConfirmNext = async () => {
+    setShowConfirmDialog(false);
     scrollToTop();
     if (currentPIndex < totalPStations - 1) {
       setCurrentPIndex(currentPIndex + 1);
@@ -464,6 +477,10 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     } else {
         await handleSubmit(onSubmit)();
     }
+  };
+
+  const handleCancelNext = () => {
+    setShowConfirmDialog(false);
   };
 
   const proceedToNextPassion = () => {
@@ -485,7 +502,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const isLastStep = currentPassionIndex === totalPassions - 1 && currentPIndex === totalPStations - 1;
 
   const onSubmit = (data: { passions: PassionData[] }) => {
-    if(!isCurrentStepValid()) return;
+    // This is called on the final step
     onComplete(data.passions);
   };
   
@@ -496,7 +513,19 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
   return (
     <div className="w-full max-w-4xl mx-auto" ref={containerRef}>
-         <Dialog open={showNextPassionDialog} onOpenChange={setShowNextPassionDialog}>
+        <ConfirmationDialog
+            isOpen={showConfirmDialog}
+            onClose={handleCancelNext}
+            onConfirm={handleConfirmNext}
+            title={c.stationConfirm.title(station.name)}
+            description={c.stationConfirm.description}
+            confirmText={c.stationConfirm.continue}
+            cancelText={c.stationConfirm.edit}
+            duration={5}
+            data={confirmDialogData}
+        />
+        
+        <Dialog open={showNextPassionDialog} onOpenChange={setShowNextPassionDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'} className="p-8">
                 <DialogHeader className="text-center">
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
@@ -522,7 +551,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             </DialogContent>
         </Dialog>
 
-        <div className="sticky top-4 z-10 bg-background/80 backdrop-blur-sm rounded-lg p-4 mb-6 border shadow-sm">
+        <div className="sticky top-20 z-10 bg-background/80 backdrop-blur-sm rounded-lg p-4 mb-6 border shadow-sm">
             <div className="flex justify-between items-center">
                 <div className="space-y-2 flex-grow">
                     <Progress value={progress} className="w-full" />
@@ -550,7 +579,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         </div>
                         <div>
                             <CardTitle className="font-headline text-2xl">
-                                {language === 'ar' ? `محطة: ${station.name} (${station.id})` : station.name}
+                                {language === 'ar' ? `محطة: ${station.name}` : `Station: ${station.name}`}
                             </CardTitle>
                             <CardDescription className="mt-2">
                                 {station.description(currentPassionName)}
@@ -584,7 +613,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         </Button>
                         
                         {isLastStep ? (
-                            <Button type="submit">
+                             <Button type="button" onClick={handleNext}>
                                 <span className="mx-2">{c.nav.results}</span>
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>

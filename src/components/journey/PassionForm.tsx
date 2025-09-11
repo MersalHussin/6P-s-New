@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,11 +12,15 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { PlusCircle, Trash2, Flame } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 
 
 export function PassionForm({ onSubmit }: { onSubmit: (passions: { name: string }[]) => void; }) {
   const { language } = useLanguage();
   const c = content[language].passionForm;
+  const [submittedPassions, setSubmittedPassions] = useState<{ name: string }[] | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
+
 
   const passionFormSchema = z.object({
     passions: z.array(
@@ -41,74 +46,102 @@ export function PassionForm({ onSubmit }: { onSubmit: (passions: { name: string 
   });
 
   const handleFormSubmit = (data: PassionFormValues) => {
-    onSubmit(data.passions);
+    setSubmittedPassions(data.passions);
+    setIsConfirming(true);
+  };
+  
+  const handleConfirm = () => {
+    if (submittedPassions) {
+      onSubmit(submittedPassions);
+    }
+    setIsConfirming(false);
   };
 
-  return (
-    <Card className="w-full max-w-2xl mx-auto shadow-lg">
-      <CardHeader>
-        <div className="flex items-center gap-4">
-            <div className="bg-primary/10 text-primary p-3 rounded-full">
-                <Flame className="w-8 h-8" />
-            </div>
-            <div>
-                <CardTitle className="font-headline text-2xl">{c.title}</CardTitle>
-                <CardDescription>{c.description}</CardDescription>
-            </div>
-        </div>
-      </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-          <CardContent className="space-y-4">
-            {fields.map((field, index) => (
-              <FormField
-                key={field.id}
-                control={form.control}
-                name={`passions.${index}.name`}
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center gap-2">
-                      <Input placeholder={`${c.placeholder} ${index + 1}`} {...field} className="text-base"/>
-                      {fields.length > 3 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => remove(index)}
-                          aria-label="Remove passion"
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-             {form.formState.errors.passions && (
-                <p className="text-sm font-medium text-destructive">{form.formState.errors.passions.message}</p>
-             )}
+  const handleCancel = () => {
+    setIsConfirming(false);
+    setSubmittedPassions(null);
+  }
 
-            {fields.length < 6 && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => append({ name: "" })}
-                className="w-full"
-              >
-                <PlusCircle className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
-                {c.addMoreButton}
-              </Button>
-            )}
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" size="lg">
-              {c.cta}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
-    </Card>
+  return (
+    <>
+       {submittedPassions && (
+         <ConfirmationDialog
+            isOpen={isConfirming}
+            onClose={handleCancel}
+            onConfirm={handleConfirm}
+            title={c.confirmation.title}
+            description={c.confirmation.description}
+            confirmText={c.confirmation.continue}
+            cancelText={c.confirmation.edit}
+            duration={7}
+            data={submittedPassions.map(p => p.name)}
+        />
+       )}
+        <Card className="w-full max-w-2xl mx-auto shadow-lg">
+        <CardHeader>
+            <div className="flex items-center gap-4">
+                <div className="bg-primary/10 text-primary p-3 rounded-full">
+                    <Flame className="w-8 h-8" />
+                </div>
+                <div>
+                    <CardTitle className="font-headline text-2xl">{c.title}</CardTitle>
+                    <CardDescription>{c.description}</CardDescription>
+                </div>
+            </div>
+        </CardHeader>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleFormSubmit)}>
+            <CardContent className="space-y-4">
+                {fields.map((field, index) => (
+                <FormField
+                    key={field.id}
+                    control={form.control}
+                    name={`passions.${index}.name`}
+                    render={({ field }) => (
+                    <FormItem>
+                        <div className="flex items-center gap-2">
+                        <Input placeholder={`${c.placeholder} ${index + 1}`} {...field} className="text-base"/>
+                        {fields.length > 3 && (
+                            <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => remove(index)}
+                            aria-label="Remove passion"
+                            >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                        )}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                ))}
+                {form.formState.errors.passions && (
+                    <p className="text-sm font-medium text-destructive">{form.formState.errors.passions.message}</p>
+                )}
+
+                {fields.length < 6 && (
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => append({ name: "" })}
+                    className="w-full"
+                >
+                    <PlusCircle className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
+                    {c.addMoreButton}
+                </Button>
+                )}
+            </CardContent>
+            <CardFooter>
+                <Button type="submit" className="w-full" size="lg">
+                {c.cta}
+                </Button>
+            </CardFooter>
+            </form>
+        </Form>
+        </Card>
+    </>
   );
 }

@@ -73,7 +73,7 @@ export default function JourneyPage() {
             setResultsData(resultsData);
 
             // Logic to determine the correct step
-            if (currentStep === 'results' || (resultsData && resultsData.rankedPassions.length > 0)) {
+            if (currentStep === 'results' && resultsData && resultsData.rankedPassions.length > 0) {
                 setStep('results');
             } else if (currentStep === 'journey' && journeyData.length > 0) {
                 setStep('journey');

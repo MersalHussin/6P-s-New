@@ -25,7 +25,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Globe, LogOut, User as UserIcon, Loader2, MoveLeft, RefreshCw, Home, ShieldQuestion } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Globe, LogOut, User as UserIcon, Loader2, MoveLeft, RefreshCw, Home, ShieldQuestion, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { UserProfileDialog } from "@/components/journey/UserProfileDialog";
 
@@ -36,6 +37,8 @@ const content = {
     profile: "الملف الشخصي",
     restartJourney: "إعادة الرحلة",
     startJourney: "ابدأ رحلتك",
+    help: "مساعدة",
+    helpDialogTitle: "كيف تستخدم المنصة؟",
     exitWarning: {
       title: "هل أنت متأكد من رغبتك في الخروج؟",
       description: "سيتم تسجيل خروجك من حسابك.",
@@ -59,6 +62,8 @@ const content = {
     profile: "Profile",
     restartJourney: "Restart Journey",
     startJourney: "Start Your Journey",
+    help: "Help",
+    helpDialogTitle: "How to use the platform?",
     exitWarning: {
       title: "Are you sure you want to sign out?",
       description: "You will be logged out of your account.",
@@ -156,6 +161,8 @@ export function AppHeader() {
             currentStation: 'passions'
         });
         router.push('/journey');
+        // Optionally, reload to ensure state is fresh
+        router.refresh();
     } catch (error) {
         console.error("Error restarting journey: ", error);
     }
@@ -205,7 +212,7 @@ export function AppHeader() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              <DropdownMenuContent align="end" className="w-56 mr-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <DropdownMenuLabel>
                   <div className="font-normal text-sm text-muted-foreground">{user.email}</div>
                 </DropdownMenuLabel>
@@ -216,6 +223,29 @@ export function AppHeader() {
                         <span>{c.profile}</span>
                    </DropdownMenuItem>
                 </UserProfileDialog>
+                 <Dialog>
+                  <DialogTrigger asChild>
+                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <HelpCircle className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
+                        <span>{c.help}</span>
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl">
+                     <DialogHeader>
+                        <DialogTitle>{c.helpDialogTitle}</DialogTitle>
+                     </DialogHeader>
+                     <div className="aspect-video">
+                        <iframe 
+                            className="w-full h-full"
+                            src="https://www.youtube.com/embed/Fzzs5vrE5e0" 
+                            title="YouTube video player" 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowFullScreen>
+                        </iframe>
+                     </div>
+                  </DialogContent>
+                </Dialog>
                  <AlertDialog>
                   <AlertDialogTrigger asChild>
                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

@@ -25,18 +25,7 @@ export const content: {
             title: string;
             description: string;
         };
-        passionForm: {
-            title: string;
-            description: string;
-            placeholder: string;
-            addMoreButton: string;
-            cta: string;
-            validation: {
-                minLength: string;
-                minPassions: string;
-                maxPassions: string;
-            };
-        };
+        passionForm: any;
         stations: StationInfo[];
         journey: any;
         toasts: any;
@@ -59,7 +48,7 @@ export const content: {
             description: "رحلتك نحو اكتشاف الشغف تتكون من خطوات أساسية، كل خطوة مصممة لتكشف لك جانبًا جديدًا من نفسك ومن اهتماماتك."
         },
         passionForm: {
-            title: "محطة تحديد الشغف (Passion)",
+            title: "محطة تحديد الشغف",
             description: "أدخل من 3 إلى 6 اهتمامات أو مجالات شغف تود استكشافها.",
             placeholder: "الشغف",
             addMoreButton: "إضافة شغف آخر",
@@ -69,6 +58,12 @@ export const content: {
                 minPassions: "الرجاء إدخال 3 أنواع من الشغف على الأقل.",
                 maxPassions: "يمكنك إدخال 6 أنواع من الشغف كحد أقصى.",
             },
+             confirmation: {
+                title: "هل أنت مستعد لبدء الرحلة؟",
+                description: "لقد اخترت استكشاف الشغف التالي:",
+                continue: "استمر",
+                edit: "تعديل",
+            }
         },
         stations: [
             { 
@@ -78,7 +73,7 @@ export const content: {
             },
             { 
                 id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
-                description: (passionName) => `في المحطة دي، هتحدد الأهداف والدوافع العميقة ورا شغفك في "${passionName}"، وإيه القيمة اللي بيضيفها لحياتك.`,
+                description: (passionName) => `في هذه المحطة، ستحدد الأهداف والدوافع العميقة وراء شغفك بـ "${passionName}"، وما هي القيمة التي يضيفها إلى حياتك.`,
                 hints: [
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
                     'إيه القيمة الأساسية اللي الشغف ده بيخليك عايز تحققها؟ (مثال: الإبداع، الحرية المالية، التأثير الإيجابي)',
@@ -89,7 +84,7 @@ export const content: {
             },
             { 
                 id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
-                description: (passionName) => `هنا، هتكتشف نقط قوتك ومهاراتك الحالية اللي بتدعم شغفك في "${passionName}"، وازاي تقدر تستغلها لصالحك.`,
+                description: (passionName) => `هنا، ستكتشف نقاط قوتك ومهاراتك الحالية التي تدعم شغفك في "${passionName}"، وكيف يمكنك استغلالها لصالحك.`,
                 hints: [
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
                     'إيه نقط قوتك الشخصية اللي بتساعدك في المجال ده؟ (مثال: الصبر، الانضباط، الفضول)',
@@ -100,7 +95,7 @@ export const content: {
             },
             { 
                 id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
-                description: (passionName) => `في المحطة دي، هتجمع الأدلة والتجارب اللي بتثبت اهتمامك الفعلي بشغفك في "${passionName}".`,
+                description: (passionName) => `في هذه المحطة، ستجمع الأدلة والتجارب التي تثبت اهتمامك الفعلي بشغفك في "${passionName}".`,
                 hints: [
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
                     'هل فيه أي إنجازات أو شهادات أخدتها ليها علاقة بالشغف ده؟ (مثال: جايزة، شهادة كورس)',
@@ -111,7 +106,7 @@ export const content: {
             },
             { 
                 id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
-                description: (passionName) => `هنا، هتحدد العقبات والتحديات اللي ممكن تواجهك في شغفك بـ "${passionName}" عشان تكون واقعي ومستعد.`,
+                description: (passionName) => `هنا، ستحدد العقبات والتحديات التي قد تواجهك في شغفك بـ "${passionName}" لتكون واقعيًا ومستعدًا.`,
                 hints: [
                     'إيه العقبات أو التحديات اللي بتواجهك عشان تمارس الشغف ده؟ (مثال: نقص الوقت، نقص الموارد)',
                     'إيه المخاوف أو الشكوك اللي عندك في إنك تكمل في الشغف ده؟ (مثال: الخوف من الفشل، عدم اليقين)',
@@ -122,7 +117,7 @@ export const content: {
             },
             { 
                 id: 'possibilities', name: 'الإمكانيات', singular: 'الإمكانية', icon: Lightbulb,
-                description: (passionName) => `في المحطة الأخيرة، هتستكشف الفرص المستقبلية والإمكانيات اللي ممكن تطلع بيها من شغفك في "${passionName}".`,
+                description: (passionName) => `في المحطة الأخيرة، ستستكشف الفرص المستقبلية والإمكانيات التي يمكن أن تنبع من شغفك في "${passionName}".`,
                 hints: [
                     'إيه الفرص أو المشاريع المستقبلية اللي ممكن تعملها في المجال ده؟ (مثال: تبدأ بزنس، تعمل محتوى)',
                     'إزاي ممكن تطور الشغف ده عشان يبقى مصدر دخل أو كارير؟ (مثال: تقدم استشارات، تبيع منتجات)',
@@ -136,7 +131,6 @@ export const content: {
             progress: {
                 station: "المحطة",
                 passion: "الشغف",
-                exploring: "استكشاف",
                 overall: "التقدم الإجمالي",
             },
             nav: {
@@ -191,6 +185,12 @@ export const content: {
                 description: "الآن أنت تستعد لاستكشاف شغف جديد. استعد!",
                 nextPassion: "الشغف التالي:",
                 cta: "هيا بنا!"
+            },
+            stationConfirm: {
+                title: (stationName: string) => `ملخص محطة ${stationName}`,
+                description: "هذه هي مدخلاتك لهذه المحطة. هل تود المتابعة أم التعديل؟",
+                continue: "استمر",
+                edit: "تعديل",
             }
         },
         toasts: {
@@ -261,6 +261,12 @@ export const content: {
                 minPassions: "Please enter at least 3 passions.",
                 maxPassions: "You can enter a maximum of 6 passions.",
             },
+            confirmation: {
+                title: "Ready to Start the Journey?",
+                description: "You have chosen to explore the following passions:",
+                continue: "Continue",
+                edit: "Edit",
+            }
         },
         stations: [
             { 
@@ -328,7 +334,6 @@ export const content: {
             progress: {
                 station: "Station",
                 passion: "Passion",
-                exploring: "Exploring",
                 overall: "Overall Progress",
             },
             nav: {
@@ -383,6 +388,12 @@ export const content: {
                 description: "Now you're getting ready to explore a new passion. Get ready!",
                 nextPassion: "Next Passion:",
                 cta: "Let's Go!"
+            },
+            stationConfirm: {
+                title: (stationName: string) => `Summary for ${stationName}`,
+                description: "These are your entries for this station. Would you like to continue or edit?",
+                continue: "Continue",
+                edit: "Edit",
             }
         },
         toasts: {
@@ -429,5 +440,3 @@ export const content: {
         }
     }
 }
-
-    
