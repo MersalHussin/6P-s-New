@@ -8,49 +8,21 @@ import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { PassionForm } from "@/components/journey/PassionForm";
 import { JourneyNavigator } from "@/components/journey/JourneyNavigator";
 import { ResultsDisplay } from "@/components/journey/ResultsDisplay";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/language-context";
 import { db, auth } from "@/lib/firebase";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { Loader2, LogOut, User as UserIcon } from "lucide-react";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-  } from "@/components/ui/alert-dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserProfileDialog } from "@/components/journey/UserProfileDialog";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import { AppHeader } from "@/components/layout/Header";
 
 const loadingContent = {
     ar: {
         loading: "جاري تحميل رحلتك...",
         noUser: "لم تقم بتسجيل الدخول. سيتم توجيهك لصفحة التسجيل.",
-        exitWarning: {
-            title: "هل أنت متأكد من رغبتك في الخروج؟",
-            description: "إذا خرجت الآن، قد لا يتم حفظ تقدمك الحالي. هذه الرحلة مهمة لمستقبلك.",
-            cancel: "إلغاء",
-            confirm: "تأكيد الخروج"
-        }
     },
     en: {
         loading: "Loading your journey...",
         noUser: "You are not logged in. Redirecting to sign in page.",
-        exitWarning: {
-            title: "Are you sure you want to exit?",
-            description: "If you exit now, your current progress might not be saved. This journey is important for your future.",
-            cancel: "Cancel",
-            confirm: "Confirm Exit"
-        }
     }
 }
 
@@ -58,7 +30,6 @@ export default function JourneyPage() {
   const [step, setStep] = useState<"loading" | "passions" | "journey" | "results">("loading");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
   const [resultsData, setResultsData] = useState<RankPassionsOutput | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const { language } = useLanguage();
   const router = useRouter();
@@ -87,7 +58,6 @@ export default function JourneyPage() {
 
         if (userDoc.exists()) {
             const fetchedUserData = userDoc.data() as UserData;
-            setUserData(fetchedUserData);
             
             // Check if user has completed onboarding
             if (!fetchedUserData.name || !fetchedUserData.whatsapp) {
@@ -138,11 +108,11 @@ export default function JourneyPage() {
     const initialData: PassionData[] = passions.map((p, index) => ({
       id: `passion-${index}`,
       name: p.name,
-      purpose: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-      power: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-      proof: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-      problems: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
-      possibilities: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+      purpose: [],
+      power: [],
+      proof: [],
+      problems: [],
+      possibilities: [],
       suggestedSolutions: [],
     }));
     setPassionsData(initialData);
@@ -166,88 +136,9 @@ export default function JourneyPage() {
     updateFirestore({ resultsData: results });
   }
 
-  const handleSignOut = async () => {
-    await auth.signOut();
-    router.push('/');
-  };
-
-  const headerContent = {
-    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية", signOut: "تسجيل الخروج", profile: "الملف الشخصي" },
-    en: { title: "Passion Path", home: "Home", signOut: "Sign Out", profile: "Profile" }
-  }
-  const hc = headerContent[language];
-
-  const ExitWarningDialog = ({ children }: { children: React.ReactNode }) => (
-    <AlertDialog>
-        <AlertDialogTrigger asChild>
-            {children}
-        </AlertDialogTrigger>
-        <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            <AlertDialogHeader>
-                <AlertDialogTitle>{c.exitWarning.title}</AlertDialogTitle>
-                <AlertDialogDescription>{c.exitWarning.description}</AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="w-full aspect-video rounded-lg overflow-hidden border shadow-inner">
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/Fzzs5vrE5e0"
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <AlertDialogFooter>
-                <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
-                <AlertDialogAction onClick={() => router.push('/')}>
-                    {c.exitWarning.confirm}
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
-  );
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="py-4 border-b">
-        <div className="container mx-auto flex justify-between items-center">
-        <ExitWarningDialog>
-            <div className="relative h-10 w-40 cursor-pointer">
-              <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
-            </div>
-          </ExitWarningDialog>
-          <div className="flex items-center gap-4">
-             {user && userData && (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Avatar className="cursor-pointer h-9 w-9">
-                            <AvatarImage src={user.photoURL || undefined} />
-                            <AvatarFallback>
-                                {userData.name ? userData.name.charAt(0).toUpperCase() : <UserIcon/>}
-                            </AvatarFallback>
-                        </Avatar>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                        <DropdownMenuLabel>
-                            <div className="font-normal text-sm text-muted-foreground">{user.email}</div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <UserProfileDialog userData={userData}>
-                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <UserIcon className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
-                                <span>{hc.profile}</span>
-                           </DropdownMenuItem>
-                        </UserProfileDialog>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                            <LogOut className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
-                            <span>{hc.signOut}</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-             )}
-          </div>
-        </div>
-      </header>
+      <AppHeader />
       <main className="container mx-auto px-4 py-8">
         {step === "loading" && (
             <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">

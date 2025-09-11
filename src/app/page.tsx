@@ -4,28 +4,23 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, MoveLeft, MoveRight } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { MoveLeft, MoveRight } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
+import { AppHeader } from "@/components/layout/Header";
 
 
 export default function Home() {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const c = content[language];
   const ArrowIcon = language === 'ar' ? MoveLeft : MoveRight;
   const router = useRouter();
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,27 +43,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="absolute top-0 left-0 w-full p-4 z-10 bg-transparent">
-        <div className="container mx-auto flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Globe className="h-[1.2rem] w-[1.2rem]" />
-              <span className="sr-only">Change language</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setLanguage('ar')}>
-              العربية
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLanguage('en')}>
-              English
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        </div>
-      </header>
+      <AppHeader />
       
       <main className="flex-grow">
         {/* Hero Section */}
@@ -148,7 +123,7 @@ export default function Home() {
                                     <CardTitle className="font-headline text-2xl">{station.name}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-muted-foreground">{station.description('......')}</p>
+                                    <p className="text-muted-foreground">{station.description('')}</p>
                                 </CardContent>
                             </Card>
                         )
