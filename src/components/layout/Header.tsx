@@ -160,9 +160,7 @@ export function AppHeader() {
             resultsData: null,
             currentStation: 'passions'
         });
-        router.push('/journey');
-        // Optionally, reload to ensure state is fresh
-        router.refresh();
+        window.location.href = '/journey';
     } catch (error) {
         console.error("Error restarting journey: ", error);
     }

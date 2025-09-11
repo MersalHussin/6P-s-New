@@ -400,6 +400,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     window.scrollTo(0, 0);
   };
 
+  const currentPassionName = initialPassions[currentPassionIndex].name;
   const currentFieldName = P_STATIONS[currentPIndex].id as keyof Omit<PassionData, 'id' | 'name' | 'suggestedSolutions'>;
   
   const isCurrentStepValid = () => {
@@ -500,7 +501,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   };
   
   const CurrentStationIcon = P_STATIONS[currentPIndex].icon;
-  const currentPassionName = initialPassions[currentPassionIndex].name;
   const station = P_STATIONS[currentPIndex];
 
 
@@ -510,7 +510,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             isOpen={showConfirmDialog}
             onClose={handleCancelNext}
             onConfirm={handleConfirmNext}
-            title={c.stationConfirm.title(station.name)}
+            title={c.stationConfirm.title(station.name, currentPassionName)}
             description={c.stationConfirm.description}
             confirmText={c.stationConfirm.continue}
             cancelText={c.stationConfirm.edit}
@@ -554,7 +554,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     </div>
                 </div>
                 <div className={cn("flex-shrink-0", language === 'ar' ? "mr-4" : "ml-4")}>
-                    <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button variant="default">
                         {c.progress.passion}: {currentPassionName}
                     </Button>
                 </div>
@@ -627,4 +627,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     
 
     
+
 

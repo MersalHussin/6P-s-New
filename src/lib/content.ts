@@ -187,7 +187,7 @@ export const content: {
                 cta: "هيا بنا!"
             },
             stationConfirm: {
-                title: (stationName: string) => `ملخص محطة ${stationName}`,
+                title: (stationName: string, passionName: string) => `ملخص محطة ${stationName} لشغف "${passionName}"`,
                 description: "هذه هي مدخلاتك لهذه المحطة. هل تود المتابعة أم التعديل؟",
                 continue: "استمر",
                 edit: "تعديل",
@@ -390,7 +390,7 @@ export const content: {
                 cta: "Let's Go!"
             },
             stationConfirm: {
-                title: (stationName: string) => `Summary for ${stationName}`,
+                title: (stationName: string, passionName: string) => `Summary for ${stationName} of "${passionName}"`,
                 description: "These are your entries for this station. Would you like to continue or edit?",
                 continue: "Continue",
                 edit: "Edit",

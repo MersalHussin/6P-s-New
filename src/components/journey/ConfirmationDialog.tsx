@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { FieldItem } from "@/lib/types";
+import { useLanguage } from "@/context/language-context";
+import { cn } from "@/lib/utils";
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -38,6 +40,7 @@ export function ConfirmationDialog({
   data,
 }: ConfirmationDialogProps) {
   const [countdown, setCountdown] = useState(duration);
+  const { language } = useLanguage();
 
   const handleConfirm = useCallback(() => {
     onConfirm();
@@ -76,11 +79,11 @@ export function ConfirmationDialog({
     }
 
     return (
-        <ul className="space-y-2 text-sm text-left">
+        <ul className={cn("space-y-2", language === 'ar' ? "text-right" : "text-left")}>
             {(data as FieldItem[]).filter(item => item.text).map((item, index) => (
                 <li key={index} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
                     <span className="flex-1">{item.text}</span>
-                    <Badge variant="outline">Rating: {item.weight}</Badge>
+                    <Badge variant="outline" className="flex-shrink-0">Rating: {item.weight}</Badge>
                 </li>
             ))}
         </ul>
@@ -89,7 +92,7 @@ export function ConfirmationDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md text-center">
+      <DialogContent className="sm:max-w-md text-center" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
