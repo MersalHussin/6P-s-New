@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Globe, MoveLeft, MoveRight } from "lucide-react";
@@ -13,14 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/context/language-context";
 import { content } from "@/lib/content";
-import { UserForm } from "@/components/journey/UserForm";
-import {
-    Dialog,
-    DialogContent,
-    DialogTrigger,
-  } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { Loader2 } from "lucide-react";
 
 
 export default function Home() {
@@ -28,11 +25,24 @@ export default function Home() {
   const c = content[language];
   const ArrowIcon = language === 'ar' ? MoveLeft : MoveRight;
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [user, setUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleUserFormSubmit = (userId: string) => {
-    setIsDialogOpen(false);
-    router.push('/journey');
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+        setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleStartJourney = () => {
+    if (user) {
+        router.push('/journey');
+    } else {
+        router.push('/auth/signin');
+    }
   };
 
 
@@ -74,17 +84,14 @@ export default function Home() {
               {c.hero.subtitle}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button size="lg" className="font-headline font-bold text-lg shadow-lg shadow-primary/20">
+               <Button onClick={handleStartJourney} size="lg" className="font-headline font-bold text-lg shadow-lg shadow-primary/20" disabled={loading}>
+                {loading ? <Loader2 className="h-5 w-5 animate-spin"/> : (
+                  <>
                     {c.cta}
                     <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                   <UserForm onUserCreated={handleUserFormSubmit} />
-                </DialogContent>
-              </Dialog>
+                  </>
+                )}
+              </Button>
               <Link href="/certificate/check" passHref>
                   <Button variant="outline">{c.verifyCertificate}</Button>
               </Link>
@@ -93,8 +100,8 @@ export default function Home() {
         </section>
 
         {/* Video Section */}
-        <section className="py-12 md:py-20 bg-muted/30">
-            <div className="container px-4">
+        <section className="py-12 md:py-20 bg-muted ">
+            <div className="container px-4 m-auto">
                 <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-2xl shadow-primary/10 max-w-4xl mx-auto">
                     <CardHeader className="text-center">
                         <h2 className="text-3xl font-headline font-bold text-primary">
@@ -122,26 +129,26 @@ export default function Home() {
 
         {/* How it works Section */}
         <section className="py-16 md:py-24 bg-background">
-            <div className="container px-4 text-center">
+            <div className="container px-4 text-center m-auto">
                 <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">
                     {c.howItWorks.title}
                 </h2>
                 <p className="mt-4 max-w-3xl mx-auto text-muted-foreground md:text-lg">
                     {c.howItWorks.description}
                 </p>
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-items-center gap-8">
                     {c.stations.map((station) => {
                         const Icon = station.icon;
                         return (
-                            <Card key={station.id} className="text-center hover:shadow-lg hover:-translate-y-1 transition-transform duration-300">
+                            <Card key={station.id} className=" max-w-[400px] text-center hover:shadow-lg hover:-translate-y-1 transition-transform duration-300">
                                 <CardHeader>
                                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mb-4">
                                         <Icon className="h-6 w-6 text-primary"/>
                                     </div>
-                                    <CardTitle className="font-headline text-xl">{station.name}</CardTitle>
+                                    <CardTitle className="font-headline text-2xl">{station.name}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-muted-foreground">{station.description('')}</p>
+                                    <p className="text-muted-foreground">{station.description('......')}</p>
                                 </CardContent>
                             </Card>
                         )

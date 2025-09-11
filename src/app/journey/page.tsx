@@ -8,11 +8,11 @@ import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 import { PassionForm } from "@/components/journey/PassionForm";
 import { JourneyNavigator } from "@/components/journey/JourneyNavigator";
 import { ResultsDisplay } from "@/components/journey/ResultsDisplay";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/language-context";
-import { db } from "@/lib/firebase";
+import { db, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import {
     AlertDialog,
@@ -26,12 +26,10 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
 
-const USER_ID_KEY = "passionJourneyUserId_v2";
-
 const loadingContent = {
     ar: {
         loading: "جاري تحميل رحلتك...",
-        noUser: "لم نجد مستخدمًا. سيتم توجيهك للبداية.",
+        noUser: "لم تقم بتسجيل الدخول. سيتم توجيهك لصفحة التسجيل.",
         exitWarning: {
             title: "هل أنت متأكد من رغبتك في الخروج؟",
             description: "إذا خرجت الآن، قد لا يتم حفظ تقدمك الحالي. هذه الرحلة مهمة لمستقبلك.",
@@ -41,7 +39,7 @@ const loadingContent = {
     },
     en: {
         loading: "Loading your journey...",
-        noUser: "No user found. Redirecting to start.",
+        noUser: "You are not logged in. Redirecting to sign in page.",
         exitWarning: {
             title: "Are you sure you want to exit?",
             description: "If you exit now, your current progress might not be saved. This journey is important for your future.",
@@ -55,20 +53,22 @@ export default function JourneyPage() {
   const [step, setStep] = useState<"loading" | "passions" | "journey" | "results">("loading");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
   const [resultsData, setResultsData] = useState<RankPassionsOutput | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { language } = useLanguage();
   const router = useRouter();
   const c = loadingContent[language];
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem(USER_ID_KEY);
-    if (storedUserId) {
-        setUserId(storedUserId);
-        loadUserData(storedUserId);
-    } else {
-        console.warn(c.noUser);
-        router.push('/');
-    }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        if (currentUser) {
+            setUser(currentUser);
+            loadUserData(currentUser.uid);
+        } else {
+            console.warn(c.noUser);
+            router.push('/auth/signin');
+        }
+    });
+    return () => unsubscribe();
   }, [router, c.noUser]);
 
 
@@ -96,9 +96,9 @@ export default function JourneyPage() {
                 setStep('passions');
             }
         } else {
-            console.error("No user document found for ID:", currentUserId, "Redirecting home.");
-            localStorage.removeItem(USER_ID_KEY);
-            router.push('/');
+            // This case can happen for a newly signed up user.
+            // They will be in the 'passions' step by default.
+            setStep('passions');
         }
     } catch (error) {
         console.error("Failed to load data from Firestore", error);
@@ -108,11 +108,9 @@ export default function JourneyPage() {
   };
 
   const updateFirestore = async (data: Partial<UserData>) => {
-    if (!userId) return;
+    if (!user) return;
     try {
-        const userDocRef = doc(db, "users", userId);
-        // Use setDoc with merge to create the document if it doesn't exist,
-        // which can happen in some edge cases, although less likely now.
+        const userDocRef = doc(db, "users", user.uid);
         await setDoc(userDocRef, {
             ...data,
             lastUpdated: serverTimestamp()
@@ -154,9 +152,14 @@ export default function JourneyPage() {
     updateFirestore({ resultsData: results });
   }
 
+  const handleSignOut = async () => {
+    await auth.signOut();
+    router.push('/');
+  };
+
   const headerContent = {
-    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية" },
-    en: { title: "Passion Path", home: "Home" }
+    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية", signOut: "تسجيل الخروج" },
+    en: { title: "Passion Path", home: "Home", signOut: "Sign Out" }
   }
   const hc = headerContent[language];
 
@@ -199,9 +202,7 @@ export default function JourneyPage() {
             </h1>
           </ExitWarningDialog>
           <div className="flex items-center gap-2">
-            <ExitWarningDialog>
-                <Button variant="ghost">{hc.home}</Button>
-            </ExitWarningDialog>
+            <Button variant="ghost" onClick={handleSignOut}>{hc.signOut}</Button>
           </div>
         </div>
       </header>
@@ -222,12 +223,12 @@ export default function JourneyPage() {
             onDataChange={handleJourneyUpdate}
           />
         )}
-        {step === "results" && passionsData.length > 0 && userId && (
+        {step === "results" && passionsData.length > 0 && user && (
             <ResultsDisplay 
                 passions={passionsData}
                 initialResults={resultsData}
                 onResultsCalculated={handleResultsCalculated}
-                userId={userId}
+                userId={user.uid}
             />
         )}
       </main>
