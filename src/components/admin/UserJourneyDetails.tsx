@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { UserData, PassionData, FieldItem } from "@/lib/types";
@@ -14,10 +15,10 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Award } from "lucide-react";
+import { CheckCircle, Award, User, Briefcase, GraduationCap, School } from "lucide-react";
 
 export function UserJourneyDetails({ user }: { user: UserData }) {
-    const { name, whatsapp, email, journeyData, resultsData } = user;
+    const { name, whatsapp, email, journeyData, resultsData, educationStatus, school, job } = user;
 
     const renderFieldItems = (items: FieldItem[] | undefined) => {
         if (!items || items.length === 0 || items.every(i => !i.text)) {
@@ -46,6 +47,28 @@ export function UserJourneyDetails({ user }: { user: UserData }) {
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><User /> User Info</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                  <strong>Education:</strong>
+                  <span>{educationStatus || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <School className="h-4 w-4 text-muted-foreground" />
+                  <strong>School/Uni:</strong>
+                  <span>{school || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                  <strong>Job:</strong>
+                  <span>{job || 'N/A'}</span>
+                </div>
+              </CardContent>
+            </Card>
             
             {journeyData && journeyData.length > 0 ? (
                  <Accordion type="multiple" className="w-full">
@@ -119,3 +142,5 @@ export function UserJourneyDetails({ user }: { user: UserData }) {
       </>
     );
 }
+
+    

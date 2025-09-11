@@ -24,8 +24,9 @@ export interface UserData {
     name: string;
     whatsapp: string;
     email?: string;
-    educationStatus?: 'student' | 'graduate';
+    educationStatus?: string;
     school?: string;
+    job?: string;
     createdAt: Timestamp;
     lastUpdated: Timestamp;
     currentStation: 'user-data' | 'passions' | 'journey' | 'results';
@@ -33,3 +34,5 @@ export interface UserData {
     resultsData?: RankPassionsOutput | null;
     shortId?: string;
 }
+
+    

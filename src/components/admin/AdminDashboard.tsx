@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -54,8 +55,11 @@ export function AdminDashboard() {
       return {
         ID: user.id,
         Name: user.name,
-        WhatsApp: user.whatsapp,
         Email: user.email,
+        WhatsApp: user.whatsapp,
+        EducationStatus: user.educationStatus,
+        School: user.school,
+        Job: user.job,
         RegisteredOn: user.createdAt ? format(user.createdAt.toDate(), 'yyyy-MM-dd HH:mm') : '',
         CurrentStation: user.currentStation,
         ...passionsData?.reduce((acc, p, i) => ({
@@ -121,7 +125,7 @@ export function AdminDashboard() {
             </Card>
         </div>
       <Card>
-        <CardHeader className="flex justify-between items-center">
+        <CardHeader className="flex flex-row justify-between items-center">
           <CardTitle>User Journeys</CardTitle>
           <Button onClick={handleExport} variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4"/>
@@ -133,9 +137,10 @@ export function AdminDashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>WhatsApp</TableHead>
+                <TableHead className="hidden md:table-cell">WhatsApp</TableHead>
+                <TableHead className="hidden lg:table-cell">Education</TableHead>
                 <TableHead>Current Station</TableHead>
-                <TableHead>Registered On</TableHead>
+                <TableHead className="hidden lg:table-cell">Registered</TableHead>
                 <TableHead>Details</TableHead>
               </TableRow>
             </TableHeader>
@@ -143,9 +148,10 @@ export function AdminDashboard() {
               {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground"/>{user.name}</TableCell>
-                  <TableCell>{user.whatsapp}</TableCell>
+                  <TableCell className="hidden md:table-cell">{user.whatsapp}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{user.educationStatus}</TableCell>
                   <TableCell>{stationLabels[user.currentStation] || user.currentStation}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden lg:table-cell">
                     <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground"/>
                         {user.createdAt ? format(user.createdAt.toDate(), "PPP") : "N/A"}
@@ -172,3 +178,5 @@ export function AdminDashboard() {
     </div>
   );
 }
+
+    
