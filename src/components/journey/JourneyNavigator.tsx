@@ -161,26 +161,26 @@ const StarRating = ({ field, stationId }: { field: any, stationId: string }) => 
   
 
 const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: number; passionIndex: number, passionName: string }) => {
-  const { control, watch } = useFormContext();
+  const { control } = useFormContext();
   const { language } = useLanguage();
   const stations = content[language].stations;
   const station = stations[pIndex + 1];
   const fieldName = station.id as 'purpose' | 'power' | 'proof' | 'problems' | 'possibilities';
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: `passions.${passionIndex}.${fieldName}`,
   });
 
-  const passionValues = watch(`passions.${passionIndex}.${fieldName}`);
-
   useEffect(() => {
     if (fields.length === 0) {
-      append({ id: '1', text: '', weight: 0 });
-      append({ id: '2', text: '', weight: 0 });
-      append({ id: '3', text: '', weight: 0 });
+      replace([
+        { id: '1', text: '', weight: 0 },
+        { id: '2', text: '', weight: 0 },
+        { id: '3', text: '', weight: 0 },
+      ]);
     }
-  }, [fields, append]);
+  }, [fields, replace]);
   
   const c = content[language].journey;
   const stationContent = content[language].stations[pIndex + 1];
@@ -463,7 +463,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   
   const handleConfirmNext = useCallback(async () => {
     setShowConfirmDialog(false);
-    scrollToTop();
     if (currentPIndex < totalPStations - 1) {
       setCurrentPIndex(currentPIndex + 1);
     } else if (currentPassionIndex < totalPassions - 1) {
@@ -471,6 +470,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     } else {
         await handleSubmit(onSubmit)();
     }
+    scrollToTop();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPIndex, totalPStations, currentPassionIndex, totalPassions, handleSubmit]);
 
   const handleCancelNext = () => {
@@ -484,13 +485,13 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   }
 
   const handleBack = () => {
-    scrollToTop();
     if (currentPIndex > 0) {
       setCurrentPIndex(currentPIndex - 1);
     } else if (currentPassionIndex > 0) {
       setCurrentPassionIndex(currentPassionIndex - 1);
       setCurrentPIndex(totalPStations - 1);
     }
+    scrollToTop();
   };
 
   const isLastStep = currentPassionIndex === totalPassions - 1 && currentPIndex === totalPStations - 1;
@@ -629,3 +630,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     
 
 
+
+
+    
