@@ -41,7 +41,7 @@ export default function Home() {
     if (user) {
         router.push('/journey');
     } else {
-        router.push('/auth/signin');
+        router.push('/auth/user/signin');
     }
   };
 

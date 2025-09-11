@@ -65,10 +65,11 @@ export default function JourneyPage() {
             loadUserData(currentUser.uid);
         } else {
             console.warn(c.noUser);
-            router.push('/auth/signin');
+            router.push('/auth/user/signin?redirect=/journey');
         }
     });
     return () => unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, c.noUser]);
 
 
@@ -80,6 +81,13 @@ export default function JourneyPage() {
 
         if (userDoc.exists()) {
             const userData = userDoc.data() as UserData;
+            
+            // Check if user has completed onboarding
+            if (!userData.name || !userData.whatsapp) {
+                router.push('/journey/onboarding');
+                return;
+            }
+
             const journeyData = userData.journeyData || [];
             const resultsData = userData.resultsData || null;
             let currentStep = (userData.currentStation as "passions" | "journey" | "results") || "passions";
@@ -96,9 +104,8 @@ export default function JourneyPage() {
                 setStep('passions');
             }
         } else {
-            // This case can happen for a newly signed up user.
-            // They will be in the 'passions' step by default.
-            setStep('passions');
+            // New user, redirect to onboarding
+            router.push('/journey/onboarding');
         }
     } catch (error) {
         console.error("Failed to load data from Firestore", error);
