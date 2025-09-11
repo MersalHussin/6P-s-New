@@ -13,7 +13,7 @@ import { useLanguage } from "@/context/language-context";
 import { db, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut, User as UserIcon } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -25,6 +25,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserProfileDialog } from "@/components/journey/UserProfileDialog";
 
 const loadingContent = {
     ar: {
@@ -53,6 +56,7 @@ export default function JourneyPage() {
   const [step, setStep] = useState<"loading" | "passions" | "journey" | "results">("loading");
   const [passionsData, setPassionsData] = useState<PassionData[]>([]);
   const [resultsData, setResultsData] = useState<RankPassionsOutput | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const { language } = useLanguage();
   const router = useRouter();
@@ -80,17 +84,18 @@ export default function JourneyPage() {
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-            const userData = userDoc.data() as UserData;
+            const fetchedUserData = userDoc.data() as UserData;
+            setUserData(fetchedUserData);
             
             // Check if user has completed onboarding
-            if (!userData.name || !userData.whatsapp) {
+            if (!fetchedUserData.name || !fetchedUserData.whatsapp) {
                 router.push('/journey/onboarding');
                 return;
             }
 
-            const journeyData = userData.journeyData || [];
-            const resultsData = userData.resultsData || null;
-            let currentStep = (userData.currentStation as "passions" | "journey" | "results") || "passions";
+            const journeyData = fetchedUserData.journeyData || [];
+            const resultsData = fetchedUserData.resultsData || null;
+            let currentStep = (fetchedUserData.currentStation as "passions" | "journey" | "results") || "passions";
 
             setPassionsData(journeyData);
             setResultsData(resultsData);
@@ -165,8 +170,8 @@ export default function JourneyPage() {
   };
 
   const headerContent = {
-    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية", signOut: "تسجيل الخروج" },
-    en: { title: "Passion Path", home: "Home", signOut: "Sign Out" }
+    ar: { title: "مسار الشغف", home: "الصفحة الرئيسية", signOut: "تسجيل الخروج", profile: "الملف الشخصي" },
+    en: { title: "Passion Path", home: "Home", signOut: "Sign Out", profile: "Profile" }
   }
   const hc = headerContent[language];
 
@@ -208,8 +213,36 @@ export default function JourneyPage() {
               {hc.title}
             </h1>
           </ExitWarningDialog>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={handleSignOut}>{hc.signOut}</Button>
+          <div className="flex items-center gap-4">
+             {user && userData && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Avatar className="cursor-pointer h-9 w-9">
+                            <AvatarImage src={user.photoURL || undefined} />
+                            <AvatarFallback>
+                                {userData.name ? userData.name.charAt(0).toUpperCase() : <UserIcon/>}
+                            </AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                            <div className="font-normal text-sm text-muted-foreground">{user.email}</div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <UserProfileDialog userData={userData}>
+                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <UserIcon className="mr-2 h-4 w-4" />
+                                <span>{hc.profile}</span>
+                           </DropdownMenuItem>
+                        </UserProfileDialog>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                            <LogOut className="mr-2 h-4 w-4"/>
+                            <span>{hc.signOut}</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+             )}
           </div>
         </div>
       </header>
