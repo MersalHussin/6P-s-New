@@ -131,11 +131,11 @@ export default function JourneyPage() {
     const initialData: PassionData[] = passions.map((p, index) => ({
       id: `passion-${index}`,
       name: p.name,
-      purpose: [],
-      power: [],
-      proof: [],
-      problems: [],
-      possibilities: [],
+      purpose: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+      power: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+      proof: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+      problems: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
+      possibilities: [{id: '1', text: '', weight: 0}, {id: '2', text: '', weight: 0}, {id: '3', text: '', weight: 0}],
       suggestedSolutions: [],
     }));
     setPassionsData(initialData);

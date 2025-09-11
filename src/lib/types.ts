@@ -24,6 +24,8 @@ export interface UserData {
     name: string;
     whatsapp: string;
     email?: string;
+    educationStatus?: 'student' | 'graduate';
+    school?: string;
     createdAt: Timestamp;
     lastUpdated: Timestamp;
     currentStation: 'user-data' | 'passions' | 'journey' | 'results';
