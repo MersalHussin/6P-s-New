@@ -85,7 +85,7 @@ export function DeleteAccountDialog() {
       router.push('/'); // Redirect to home page
 
     } catch (error: any) {
-      if (error.code === 'auth/wrong-password') {
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
         toast({ title: c.toastError, description: c.toastReauthError, variant: "destructive" });
       } else {
         toast({ title: c.toastError, description: error.message, variant: "destructive" });
