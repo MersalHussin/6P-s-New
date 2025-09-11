@@ -50,7 +50,8 @@ export function ConfirmationDialog({
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            handleConfirm();
+            // Use queueMicrotask to avoid state update during render issues
+            queueMicrotask(() => handleConfirm());
             return 0;
           }
           return prev - 1;
