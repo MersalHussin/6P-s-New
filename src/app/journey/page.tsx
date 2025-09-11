@@ -28,6 +28,8 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfileDialog } from "@/components/journey/UserProfileDialog";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const loadingContent = {
     ar: {
@@ -209,9 +211,9 @@ export default function JourneyPage() {
       <header className="py-4 border-b">
         <div className="container mx-auto flex justify-between items-center">
         <ExitWarningDialog>
-            <h1 className="text-2xl font-headline font-bold text-primary cursor-pointer">
-              {hc.title}
-            </h1>
+            <div className="relative h-10 w-40 cursor-pointer">
+              <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+            </div>
           </ExitWarningDialog>
           <div className="flex items-center gap-4">
              {user && userData && (
@@ -224,20 +226,20 @@ export default function JourneyPage() {
                             </AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    <DropdownMenuContent align="end" className="w-56" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                        <DropdownMenuLabel>
                             <div className="font-normal text-sm text-muted-foreground">{user.email}</div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <UserProfileDialog userData={userData}>
                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <UserIcon className="mr-2 h-4 w-4" />
+                                <UserIcon className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
                                 <span>{hc.profile}</span>
                            </DropdownMenuItem>
                         </UserProfileDialog>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                            <LogOut className="mr-2 h-4 w-4"/>
+                            <LogOut className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
                             <span>{hc.signOut}</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
