@@ -165,17 +165,16 @@ const rankPassionsFlow = ai.defineFlow(
         score: calculateScore(p),
     }));
 
-    // 2. Generate reasoning for each passion in parallel
-    const reasoningPromises = passionsWithScores.map(async (p) => {
-        const { output } = await rankPassionsPrompt({ passion: p, language });
-        return {
-            passion: p.passion,
-            score: p.score,
-            reasoning: output!.reasoning,
-        };
-    });
-
-    const rankedPassions = await Promise.all(reasoningPromises);
+    // 2. Generate reasoning for each passion sequentially to avoid rate limiting
+    const rankedPassions = [];
+    for (const p of passionsWithScores) {
+      const { output } = await rankPassionsPrompt({ passion: p, language });
+      rankedPassions.push({
+        passion: p.passion,
+        score: p.score,
+        reasoning: output!.reasoning,
+      });
+    }
 
     // 3. Sort by score
     rankedPassions.sort((a, b) => b.score - a.score);
