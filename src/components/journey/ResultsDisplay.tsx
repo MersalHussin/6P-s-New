@@ -166,12 +166,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   useEffect(() => {
     const getRanking = async () => {
-      if (initialResults) {
-        setRankedPassions(initialResults);
-        setLoading(false);
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 4000);
-        return;
+      // Check if results are old format (missing "Next Steps" or "الخطوات القادمة")
+      const isOldFormat = initialResults &&
+          initialResults.rankedPassions.length > 0 &&
+          !initialResults.rankedPassions[0].reasoning.includes("Next Steps") &&
+          !initialResults.rankedPassions[0].reasoning.includes("الخطوات القادمة");
+
+      if (initialResults && !isOldFormat) {
+          setRankedPassions(initialResults);
+          setLoading(false);
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 4000);
+          return;
       }
       
       setLoading(true);
@@ -225,7 +231,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         getRanking();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passions, language, initialResults, onResultsCalculated]);
+  }, [passions, language, onResultsCalculated]);
 
   const generateSimpleReport = (reportPassionsData: PassionData[]) => {
     let report = `${c.reportTitle}\n\n`;
