@@ -80,7 +80,7 @@ The reasoning must NOT mention the exact score or points. Instead, it should be 
   2.  **Resource Suggestions:** Provide at least one specific, real, and relevant external resource (like a famous YouTube channel, a well-known website, or a platform). For example, for "Programming", suggest "Elzero Web School" for Arabic content or "freeCodeCamp" for English. Be creative and helpful. For "Graphic Design", suggest "Canva" or "Behance". For "Content Creation", suggest "YouTube Creator Academy".
 
 The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}.
-If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
+if the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
 
 Here is the passion with its score and details:
   Passion: {{passion.passion}}
