@@ -231,9 +231,9 @@ export const content: {
             },
         },
         footer: {
-            title: "منهجية الـ 6p's",
-            subtitle: "",
-            link: ""
+            title: "تم تطوير هذا التطبيق من خلال فريق قدرات شباب",
+            subtitle: "مُكتشف المنهجية: د. محمد حربي",
+            link: "https://www.linkedin.com/in/mohamedharby2020/"
         }
     },
     en: {
@@ -434,9 +434,9 @@ export const content: {
             },
         },
         footer: {
-            title: "The 6p's Methodology",
-            subtitle: "",
-            link: ""
+            title: "This app was developed by the Qudurat Youth team.",
+            subtitle: "Methodology Discoverer: Dr. Mohamed Harby",
+            link: "https://www.linkedin.com/in/mohamedharby2020/"
         }
     }
 }

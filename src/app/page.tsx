@@ -135,15 +135,14 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-primary text-primary-foreground py-8">
-          <div className="container mx-auto text-center">
+          <div className="container mx-auto text-center space-y-2">
               <p className="font-bold text-lg">{c.footer.title}</p>
-              {c.footer.subtitle && <p className="text-sm opacity-80 mt-2">{c.footer.subtitle}</p>}
-              {c.footer.link && (
-                <div className="mt-4">
-                    <Link href="/certificate/check" passHref>
-                        <Button variant="secondary" className="text-primary hover:bg-primary-foreground/20">{c.footer.link}</Button>
-                    </Link>
-                </div>
+              {c.footer.subtitle && c.footer.link ? (
+                <a href={c.footer.link} target="_blank" rel="noopener noreferrer" className="text-sm opacity-80 hover:opacity-100 hover:underline transition-opacity">
+                    {c.footer.subtitle}
+                </a>
+              ) : c.footer.subtitle && (
+                <p className="text-sm opacity-80 mt-2">{c.footer.subtitle}</p>
               )}
           </div>
       </footer>
