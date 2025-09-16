@@ -231,9 +231,9 @@ export const content: {
             },
         },
         footer: {
-            title: "مسار الشغف",
-            subtitle: "تم تصميمه لمساعدتك على إيجاد طريقك.",
-            link: "التحقق من الشهادة"
+            title: "منهجية الـ 6p's",
+            subtitle: "",
+            link: ""
         }
     },
     en: {
@@ -434,9 +434,9 @@ export const content: {
             },
         },
         footer: {
-            title: "Passion Path",
-            subtitle: "Designed to help you find your way.",
-            link: "Verify Certificate"
+            title: "The 6p's Methodology",
+            subtitle: "",
+            link: ""
         }
     }
 }
