@@ -120,8 +120,8 @@ export default function CheckCertificatePage() {
           <CardDescription>{c.description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleVerification} className="flex items-start gap-2">
-            <div className="w-full space-y-2">
+          <form onSubmit={handleVerification} className="flex flex-col items-center gap-4 sm:flex-row">
+            <div className="w-full sm:flex-grow space-y-2">
               <Label htmlFor="certificate-id" className="sr-only">{c.label}</Label>
               <Input
                 id="certificate-id"
@@ -131,13 +131,13 @@ export default function CheckCertificatePage() {
                 required
               />
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <Search className="h-5 w-5" />
               )}
-               <span className="hidden sm:inline ml-2">{c.button}</span>
+               <span className="sm:inline ml-2">{c.button}</span>
             </Button>
           </form>
 
