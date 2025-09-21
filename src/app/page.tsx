@@ -63,7 +63,6 @@ export default function Home() {
                 {loading ? <Loader2 className="h-5 w-5 animate-spin"/> : (
                   <>
                     {c.cta}
-                    <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
                   </>
                 )}
               </Button>
