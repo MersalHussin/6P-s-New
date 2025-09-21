@@ -129,8 +129,8 @@ export const content: {
         ],
         journey: {
             progress: {
-                station: "المحطة",
-                passion: "الشغف",
+                station: "المحطة الحالية",
+                passion: "الشغف الحالي",
                 overall: "التقدم الإجمالي",
             },
             nav: {
@@ -225,9 +225,9 @@ export const content: {
             reportTitle: "تقرير مسار الشغف",
             topPassion: "الشغف الموصى به",
             fallback: {
-                title: "النتائج الأولية لرحلتك",
-                subtitle: "واجهنا مشكلة في الاتصال بالذكاء الاصطناعي للحصول على تحليل تفصيلي. لكن لا تقلق، هذه هي النتائج الأولية بناءً على حساب النقاط.",
-                reasoning: "التحليل التفصيلي غير متاح حاليًا. حاول تحديث الصفحة أو العودة لاحقًا للحصول على تقرير كامل بالذكاء الاصطناعي.",
+                title: "التحليل المبدئي لرحلتك",
+                subtitle: "لقد قمنا بحساب النقاط بناءً على إجاباتك. للحصول على تحليل معمق وخطوات عملية، قد تحتاج للانتظار قليلاً أو المحاولة لاحقاً.",
+                reasoning: "للحصول على تحليل معمق وخطة عمل مفصلة، يرجى تحديث الصفحة أو العودة في وقت لاحق. حاليًا، الترتيب يعتمد على حساب النقاط الذي قمت به.",
             },
         },
         footer: {
@@ -332,8 +332,8 @@ export const content: {
         ],
         journey: {
             progress: {
-                station: "Station",
-                passion: "Passion",
+                station: "Current Station",
+                passion: "Current Passion",
                 overall: "Overall Progress",
             },
             nav: {
@@ -429,8 +429,8 @@ export const content: {
             topPassion: "Top Recommended Passion",
             fallback: {
                 title: "Your Preliminary Journey Results",
-                subtitle: "We had trouble connecting to the AI for a detailed analysis. But don't worry, here are the preliminary results based on point calculation.",
-                reasoning: "Detailed analysis is currently unavailable. Try refreshing the page or come back later for a full AI-powered report.",
+                subtitle: "We have calculated the scores based on your answers. For a detailed analysis and actionable steps, you might need to wait a bit or try again later.",
+                reasoning: "For a more in-depth analysis and a detailed action plan, please refresh the page or come back later. Currently, the ranking is based on the point calculation you completed.",
             },
         },
         footer: {
@@ -440,5 +440,3 @@ export const content: {
         }
     }
 }
-
-    

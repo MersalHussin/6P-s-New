@@ -378,13 +378,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const totalPStations = P_STATIONS.length;
   const totalPassions = initialPassions.length;
   
-  const progress = useMemo(() => {
-    const passionStep = 100 / totalPassions;
-    const pStep = passionStep / totalPStations;
-    const completedPassionsProgress = currentPassionIndex * passionStep;
-    const currentPassionProgress = currentPIndex * pStep;
-    return completedPassionsProgress + currentPassionProgress;
-  }, [currentPassionIndex, currentPIndex, totalPassions, totalPStations]);
+  const passionProgress = useMemo(() => {
+    return (currentPIndex / totalPStations) * 100;
+  }, [currentPIndex, totalPStations]);
 
   useEffect(() => {
     const subscription = watch((value) => {
@@ -545,19 +541,40 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             </DialogContent>
         </Dialog>
 
-        <div className="sticky top-20 z-10 bg-background/80 backdrop-blur-sm rounded-lg p-4 mb-6 border shadow-sm">
-            <div className="flex justify-between items-center">
-                <div className="space-y-2 flex-grow">
-                    <Progress value={progress} className="w-full" />
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{c.progress.station}: {P_STATIONS[currentPIndex].name}</span>
-                        <span>{c.progress.overall}: {Math.round(progress)}%</span>
+        <div className="sticky top-20 z-10 bg-background/80 backdrop-blur-sm rounded-lg p-4 mb-6 border shadow-sm space-y-4">
+            <div className="flex w-full items-center gap-2">
+                {initialPassions.map((passion, index) => (
+                    <div key={passion.id} className="flex-1 space-y-1 text-center">
+                         <div className="bg-muted rounded-full overflow-hidden w-full h-2.5 relative">
+                            <div 
+                                className={cn(
+                                    "h-full rounded-full transition-all duration-500",
+                                    index < currentPassionIndex ? 'bg-primary' : 'bg-transparent'
+                                )}
+                                style={{ width: '100%' }}
+                            />
+                             {index === currentPassionIndex && (
+                                <div 
+                                    className="absolute top-0 left-0 h-full bg-accent rounded-full transition-all duration-500"
+                                    style={{ width: `${passionProgress}%` }}
+                                />
+                             )}
+                         </div>
+                         <span className={cn(
+                             "text-xs font-medium",
+                             index === currentPassionIndex ? 'text-accent' : 'text-muted-foreground'
+                         )}>
+                             {passion.name}
+                         </span>
                     </div>
+                ))}
+            </div>
+             <div className="flex justify-between items-center">
+                <div className="text-sm text-muted-foreground">
+                    <span className="font-semibold">{c.progress.station}:</span> {P_STATIONS[currentPIndex].name}
                 </div>
-                <div className={cn("flex-shrink-0", language === 'ar' ? "mr-4" : "ml-4")}>
-                    <Button variant="default">
-                        {c.progress.passion}: {currentPassionName}
-                    </Button>
+                 <div className="text-sm text-muted-foreground">
+                    <span className="font-semibold">{c.progress.passion}:</span> {currentPassionName}
                 </div>
             </div>
         </div>
@@ -624,12 +641,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
-    
-
-    
-
-
-
-
-    
