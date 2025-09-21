@@ -176,127 +176,131 @@ export function AppHeader() {
 
   return (
     <header className="py-4 border-b sticky top-0 z-50 bg-background/95 backdrop-blur-sm" dir="ltr">
-      <div className="container mx-auto flex justify-center items-center px-4 md:px-6">
-        <div className="w-full flex justify-between items-center">
-            <LogoLink isJourneyPage={isJourneyPage} c={c}/>
-            
-            <div className="flex items-center gap-4">
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
-                    <Globe className="h-[1.2rem] w-[1.2rem]" />
-                    <span className="sr-only">Change language</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                    العربية
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLanguage('en')}>
-                    English
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-
-            {loading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-            ) : user && userData ? (
-                <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Avatar className="cursor-pointer h-9 w-9">
-                    <AvatarImage src={user.photoURL || undefined} />
-                    <AvatarFallback>
-                        {userData.name ? userData.name.charAt(0).toUpperCase() : <UserIcon/>}
-                    </AvatarFallback>
-                    </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 mr-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                    <DropdownMenuLabel>
-                    <div className="font-normal text-sm text-muted-foreground">{user.email}</div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <UserProfileDialog userData={userData}>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <UserIcon className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
-                            <span>{c.profile}</span>
-                    </DropdownMenuItem>
-                    </UserProfileDialog>
-                    <Dialog>
-                    <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <HelpCircle className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
-                            <span>{c.help}</span>
-                        </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                            <DialogTitle>{c.helpDialogTitle}</DialogTitle>
-                        </DialogHeader>
-                        <div className="aspect-video">
-                            <iframe 
-                                className="w-full h-full"
-                                src="https://www.youtube.com/embed/Fzzs5vrE5e0" 
-                                title="YouTube video player" 
-                                frameBorder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowFullScreen>
-                            </iframe>
-                        </div>
-                    </DialogContent>
-                    </Dialog>
-                    <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <RefreshCw className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
-                            <span>{c.restartJourney}</span>
-                        </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>{c.restartWarning.title}</AlertDialogTitle>
-                            <AlertDialogDescription>{c.restartWarning.description}</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleRestartJourney}>{c.restartWarning.confirm}</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                    </AlertDialog>
-                    <DropdownMenuSeparator />
-                    <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <DropdownMenuItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="text-destructive focus:text-destructive focus:bg-destructive/10"
-                        >
-                        <LogOut className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
-                        <span>{c.signOut}</span>
-                        </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                        <AlertDialogHeader>
-                        <AlertDialogTitle>{c.exitWarning.title}</AlertDialogTitle>
-                        <AlertDialogDescription>{c.exitWarning.description}</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                        <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleSignOut}>
-                            {c.exitWarning.confirm}
-                        </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                    </AlertDialog>
-                </DropdownMenuContent>
-                </DropdownMenu>
-            ) : (
-                <Button onClick={handleStartJourney}>
-                    {c.startJourney}
-                    <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
-                </Button>
-            )}
-            </div>
+      <div className="container mx-auto flex justify-between items-center px-4 md:px-6">
+        <div className="flex-1 justify-start">
+             {/* This space is intentionally left to balance the header */}
         </div>
-      </div>
+
+        <div className="flex justify-center">
+            <LogoLink isJourneyPage={isJourneyPage} c={c}/>
+        </div>
+        
+        <div className="flex flex-1 items-center justify-end gap-4">
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                <Globe className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">Change language</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                العربية
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('en')}>
+                English
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+
+        {loading ? (
+            <Loader2 className="h-6 w-6 animate-spin" />
+        ) : user && userData ? (
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Avatar className="cursor-pointer h-9 w-9">
+                <AvatarImage src={user.photoURL || undefined} />
+                <AvatarFallback>
+                    {userData.name ? userData.name.charAt(0).toUpperCase() : <UserIcon/>}
+                </AvatarFallback>
+                </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 mr-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <DropdownMenuLabel>
+                <div className="font-normal text-sm text-muted-foreground">{user.email}</div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <UserProfileDialog userData={userData}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <UserIcon className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
+                        <span>{c.profile}</span>
+                </DropdownMenuItem>
+                </UserProfileDialog>
+                <Dialog>
+                <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <HelpCircle className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
+                        <span>{c.help}</span>
+                    </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>{c.helpDialogTitle}</DialogTitle>
+                    </DialogHeader>
+                    <div className="aspect-video">
+                        <iframe 
+                            className="w-full h-full"
+                            src="https://www.youtube.com/embed/Fzzs5vrE5e0" 
+                            title="YouTube video player" 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowFullScreen>
+                        </iframe>
+                    </div>
+                </DialogContent>
+                </Dialog>
+                <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <RefreshCw className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
+                        <span>{c.restartJourney}</span>
+                    </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{c.restartWarning.title}</AlertDialogTitle>
+                        <AlertDialogDescription>{c.restartWarning.description}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleRestartJourney}>{c.restartWarning.confirm}</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialog>
+                <DropdownMenuSeparator />
+                <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                    >
+                    <LogOut className={cn("h-4 w-4", language === 'ar' ? "ml-2" : "mr-2")} />
+                    <span>{c.signOut}</span>
+                    </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>{c.exitWarning.title}</AlertDialogTitle>
+                    <AlertDialogDescription>{c.exitWarning.description}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>{c.exitWarning.cancel}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleSignOut}>
+                        {c.exitWarning.confirm}
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialog>
+            </DropdownMenuContent>
+            </DropdownMenu>
+        ) : (
+            <Button onClick={handleStartJourney}>
+                {c.startJourney}
+                <ArrowIcon className={language === 'ar' ? "mr-2 h-5 w-5" : "ml-2 h-5 w-5"} />
+            </Button>
+        )}
+        </div>
+    </div>
     </header>
   );
 }
