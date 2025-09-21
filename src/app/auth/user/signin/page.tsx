@@ -45,7 +45,7 @@ const content = {
     }
 }
 
-export default function UserSignInPage() {
+function UserSignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -137,3 +137,5 @@ export default function UserSignInPage() {
     </div>
   );
 }
+
+export default UserSignInPage;
