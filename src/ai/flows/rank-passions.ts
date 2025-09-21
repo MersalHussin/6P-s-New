@@ -77,7 +77,7 @@ const rankPassionsPrompt = ai.definePrompt({
 You will receive a list of passions with their details. Your task is to do the following for EACH passion:
 1.  Calculate a score. The formula is: (sum of weights for purpose, power, proof, possibilities) - (sum of weights for problems).
 2.  Provide a comprehensive "reasoning" for why it received this score. This is the most important part.
-3.  The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}. If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية).
+3.  The entire response, especially the reasoning and advice, MUST be in the specified language: {{language}}. If the language is 'ar', use colloquial Egyptian Arabic (اللهجة المصرية العامية). The tone should be respectful and professional, do not use overly casual phrases like 'يا جدع'.
 
 For each passion, generate the "reasoning" with the following structure:
 - The reasoning must NOT mention the exact score or points. Instead, it should be a qualitative, realistic analysis based on the user's input.

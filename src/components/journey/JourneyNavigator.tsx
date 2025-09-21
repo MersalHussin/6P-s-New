@@ -545,7 +545,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             <div className="flex w-full items-center gap-2">
                 {initialPassions.map((passion, index) => (
                     <div key={passion.id} className="flex-1 space-y-1 text-center">
-                         <div className="bg-muted rounded-full overflow-hidden w-full h-2.5 relative">
+                         <div className="bg-muted rounded-full overflow-hidden w-full h-2.5 relative" dir="ltr">
                             <div 
                                 className={cn(
                                     "h-full rounded-full transition-all duration-500",
@@ -555,7 +555,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                             />
                              {index === currentPassionIndex && (
                                 <div 
-                                    className="absolute top-0 left-0 h-full bg-accent rounded-full transition-all duration-500"
+                                    className={cn("absolute top-0 h-full bg-accent rounded-full transition-all duration-500", language === 'ar' ? 'right-0' : 'left-0')}
                                     style={{ width: `${passionProgress}%` }}
                                 />
                              )}
@@ -569,12 +569,12 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     </div>
                 ))}
             </div>
-             <div className="flex justify-between items-center">
-                <div className="text-sm text-muted-foreground">
-                    <span className="font-semibold">{c.progress.station}:</span> {P_STATIONS[currentPIndex].name}
+             <div className="flex justify-between items-center text-center">
+                <div className="text-sm text-primary font-bold bg-primary/10 px-3 py-1 rounded-full">
+                    <span>{c.progress.passion}:</span> {currentPassionName}
                 </div>
-                 <div className="text-sm text-muted-foreground">
-                    <span className="font-semibold">{c.progress.passion}:</span> {currentPassionName}
+                <div className="text-sm text-accent font-bold bg-accent/10 px-3 py-1 rounded-full">
+                    <span>{c.progress.station}:</span> {P_STATIONS[currentPIndex].name}
                 </div>
             </div>
         </div>
@@ -641,3 +641,4 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
