@@ -177,8 +177,23 @@ export function AppHeader() {
   return (
     <header className="py-4 border-b sticky top-0 z-50 bg-background/95 backdrop-blur-sm" dir="ltr">
       <div className="container mx-auto flex justify-between items-center px-4 md:px-6">
-        <div className="flex-1 justify-start">
-             {/* This space is intentionally left to balance the header */}
+        <div className="flex flex-1 items-center justify-start gap-4">
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                    <Globe className="h-[1.2rem] w-[1.2rem]" />
+                    <span className="sr-only">Change language</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                    <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                    العربية
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage('en')}>
+                    English
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
 
         <div className="flex justify-center">
@@ -186,23 +201,6 @@ export function AppHeader() {
         </div>
         
         <div className="flex flex-1 items-center justify-end gap-4">
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                <Globe className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">Change language</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                العربية
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('en')}>
-                English
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-
         {loading ? (
             <Loader2 className="h-6 w-6 animate-spin" />
         ) : user && userData ? (
@@ -304,3 +302,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
