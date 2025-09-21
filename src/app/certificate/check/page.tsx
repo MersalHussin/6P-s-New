@@ -32,7 +32,7 @@ const content = {
             passion: "الشغف الموصى به",
         },
         error: "حدث خطأ أثناء التحقق. يرجى المحاولة مرة أخرى.",
-        home: "الصفحة الرئيسية",
+        home: "الرئيسية",
     },
     en: {
         title: "Certificate Verification",
