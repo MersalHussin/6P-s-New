@@ -641,4 +641,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
