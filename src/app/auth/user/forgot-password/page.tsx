@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -10,38 +11,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Home } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-
-const content = {
-    ar: {
-        title: "إعادة تعيين كلمة المرور",
-        description: "أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة مرورك.",
-        emailLabel: "البريد الإلكتروني",
-        sendButton: "إرسال رابط إعادة التعيين",
-        backToSignIn: "العودة لتسجيل الدخول",
-        toastSuccessTitle: "تم إرسال الرابط بنجاح!",
-        toastSuccessDescription: "يرجى التحقق من بريدك الإلكتروني.",
-        toastErrorTitle: "فشل الإرسال",
-    },
-    en: {
-        title: "Reset Your Password",
-        description: "Enter your email and we'll send you a link to reset your password.",
-        emailLabel: "Email",
-        sendButton: "Send Reset Link",
-        backToSignIn: "Back to Sign In",
-        toastSuccessTitle: "Link Sent Successfully!",
-        toastSuccessDescription: "Please check your email inbox.",
-        toastErrorTitle: "Failed to Send",
-    }
-}
+import { content as allContent } from '@/lib/content';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
-  const c = content[language];
+  const c = allContent[language].auth;
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowLeft;
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -65,11 +44,23 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="absolute top-4 left-4" dir="ltr">
+            <Link href="/" passHref>
+                <Button variant="outline"><Home className="mr-2 h-4 w-4" /> {c.backToHome}</Button>
+            </Link>
+        </div>
+        
+        <Link href="/" passHref className="mb-8">
+             <div className="relative h-12 w-48">
+                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+            </div>
+        </Link>
+        
       <Card className="w-full max-w-sm mx-4">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-headline">{c.title}</CardTitle>
-          <CardDescription>{c.description}</CardDescription>
+          <CardTitle className="text-2xl font-headline">{c.forgotPasswordTitle}</CardTitle>
+          <CardDescription>{c.forgotPasswordDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePasswordReset} className="space-y-4">

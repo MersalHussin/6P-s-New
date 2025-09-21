@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -11,39 +12,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Home } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
+import { content as allContent } from '@/lib/content';
 
-const content = {
-    ar: {
-        title: "أنشئ حسابًا جديدًا",
-        description: "ابدأ رحلتك نحو اكتشاف شغفك اليوم.",
-        emailLabel: "البريد الإلكتروني",
-        passwordLabel: "كلمة المرور",
-        confirmPasswordLabel: "تأكيد كلمة المرور",
-        signUpButton: "إنشاء حساب",
-        hasAccount: "لديك حساب بالفعل؟",
-        signIn: "سجل دخولك",
-        toastErrorTitle: "فشل إنشاء الحساب",
-        toastPasswordMismatch: "كلمتا المرور غير متطابقتين.",
-        toastSuccessTitle: "تم إنشاء الحساب بنجاح!",
-        toastSuccessDescription: "سيتم توجيهك الآن...",
-    },
-    en: {
-        title: "Create a New Account",
-        description: "Start your journey to discovering your passion today.",
-        emailLabel: "Email",
-        passwordLabel: "Password",
-        confirmPasswordLabel: "Confirm Password",
-        signUpButton: "Create Account",
-        hasAccount: "Already have an account?",
-        signIn: "Sign in",
-        toastErrorTitle: "Sign Up Failed",
-        toastPasswordMismatch: "The passwords do not match.",
-        toastSuccessTitle: "Account Created Successfully!",
-        toastSuccessDescription: "Redirecting you now...",
-    }
-}
 
 export default function UserSignUpPage() {
   const [email, setEmail] = useState('');
@@ -53,7 +25,7 @@ export default function UserSignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { language } = useLanguage();
-  const c = content[language];
+  const c = allContent[language].auth;
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,11 +57,22 @@ export default function UserSignUpPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="absolute top-4 left-4" dir="ltr">
+            <Link href="/" passHref>
+                <Button variant="outline"><Home className="mr-2 h-4 w-4" /> {c.backToHome}</Button>
+            </Link>
+        </div>
+
+        <Link href="/" passHref className="mb-8">
+             <div className="relative h-12 w-48">
+                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+            </div>
+        </Link>
       <Card className="w-full max-w-sm mx-4">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-headline">{c.title}</CardTitle>
-          <CardDescription>{c.description}</CardDescription>
+          <CardTitle className="text-2xl font-headline">{c.signUpTitle}</CardTitle>
+          <CardDescription>{c.signUpDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp} className="space-y-4">

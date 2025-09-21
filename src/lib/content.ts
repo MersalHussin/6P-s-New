@@ -31,6 +31,7 @@ export const content: {
         toasts: any;
         results: any;
         footer: any;
+        auth: any;
     }
 } = {
     ar: {
@@ -234,6 +235,38 @@ export const content: {
             title: "تم تطوير هذا التطبيق من خلال فريق قدرات شباب",
             subtitle: "مُكتشف المنهجية: د. محمد حربي",
             link: "https://www.linkedin.com/in/mohamedharby2020/"
+        },
+        auth: {
+            backToHome: "الرئيسية",
+            signInTitle: "أهلاً بعودتك!",
+            signInDescription: "سجّل دخولك لمتابعة رحلتك في اكتشاف الشغف.",
+            emailLabel: "البريد الإلكتروني",
+            passwordLabel: "كلمة المرور",
+            forgotPassword: "هل نسيت كلمة المرور؟",
+            signInButton: "تسجيل الدخول",
+            noAccount: "ليس لديك حساب؟",
+            signUp: "أنشئ حسابًا جديدًا",
+            toastErrorTitle: "فشل تسجيل الدخول",
+            toastErrorDescription: "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+            toastSuccessTitle: "تم تسجيل الدخول بنجاح",
+            toastSuccessDescription: "جاري توجيهك الآن...",
+            signUpTitle: "أنشئ حسابًا جديدًا",
+            signUpDescription: "ابدأ رحلتك نحو اكتشاف شغفك اليوم.",
+            confirmPasswordLabel: "تأكيد كلمة المرور",
+            signUpButton: "إنشاء حساب",
+            hasAccount: "لديك حساب بالفعل؟",
+            signIn: "سجل دخولك",
+            toastSignUpErrorTitle: "فشل إنشاء الحساب",
+            toastPasswordMismatch: "كلمتا المرور غير متطابقتين.",
+            toastSignUpSuccessTitle: "تم إنشاء الحساب بنجاح!",
+            toastSignUpSuccessDescription: "سيتم توجيهك الآن...",
+            forgotPasswordTitle: "إعادة تعيين كلمة المرور",
+            forgotPasswordDescription: "أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة مرورك.",
+            sendButton: "إرسال رابط إعادة التعيين",
+            backToSignIn: "العودة لتسجيل الدخول",
+            toastResetSuccessTitle: "تم إرسال الرابط بنجاح!",
+            toastResetSuccessDescription: "يرجى التحقق من بريدك الإلكتروني.",
+            toastResetErrorTitle: "فشل الإرسال",
         }
     },
     en: {
@@ -437,6 +470,38 @@ export const content: {
             title: "This app was developed by the Qudurat Youth team.",
             subtitle: "Methodology Discoverer: Dr. Mohamed Harby",
             link: "https://www.linkedin.com/in/mohamedharby2020/"
+        },
+        auth: {
+            backToHome: "Home",
+            signInTitle: "Welcome Back!",
+            signInDescription: "Sign in to continue your passion discovery journey.",
+            emailLabel: "Email",
+            passwordLabel: "Password",
+            forgotPassword: "Forgot your password?",
+            signInButton: "Sign In",
+            noAccount: "Don't have an account?",
+            signUp: "Create a new account",
+            toastErrorTitle: "Sign In Failed",
+            toastErrorDescription: "Incorrect email or password. Please try again.",
+            toastSuccessTitle: "Signed In Successfully",
+            toastSuccessDescription: "Redirecting you now...",
+            signUpTitle: "Create a New Account",
+            signUpDescription: "Start your journey to discovering your passion today.",
+            confirmPasswordLabel: "Confirm Password",
+            signUpButton: "Create Account",
+            hasAccount: "Already have an account?",
+            signIn: "Sign in",
+            toastSignUpErrorTitle: "Sign Up Failed",
+            toastPasswordMismatch: "The passwords do not match.",
+            toastSignUpSuccessTitle: "Account Created Successfully!",
+            toastSignUpSuccessDescription: "Redirecting you now...",
+            forgotPasswordTitle: "Reset Your Password",
+            forgotPasswordDescription: "Enter your email and we'll send you a link to reset your password.",
+            sendButton: "Send Reset Link",
+            backToSignIn: "Back to Sign In",
+            toastResetSuccessTitle: "Link Sent Successfully!",
+            toastResetSuccessDescription: "Please check your email inbox.",
+            toastResetErrorTitle: "Failed to Send",
         }
     }
 }

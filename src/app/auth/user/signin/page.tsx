@@ -1,9 +1,10 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -11,41 +12,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Home } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
+import { content as allContent } from '@/lib/content';
 
-const content = {
-    ar: {
-        title: "أهلاً بعودتك!",
-        description: "سجّل دخولك لمتابعة رحلتك في اكتشاف الشغف.",
-        emailLabel: "البريد الإلكتروني",
-        passwordLabel: "كلمة المرور",
-        forgotPassword: "هل نسيت كلمة المرور؟",
-        signInButton: "تسجيل الدخول",
-        noAccount: "ليس لديك حساب؟",
-        signUp: "أنشئ حسابًا جديدًا",
-        toastErrorTitle: "فشل تسجيل الدخول",
-        toastErrorDescription: "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.",
-        toastSuccessTitle: "تم تسجيل الدخول بنجاح",
-        toastSuccessDescription: "جاري توجيهك الآن...",
-    },
-    en: {
-        title: "Welcome Back!",
-        description: "Sign in to continue your passion discovery journey.",
-        emailLabel: "Email",
-        passwordLabel: "Password",
-        forgotPassword: "Forgot your password?",
-        signInButton: "Sign In",
-        noAccount: "Don't have an account?",
-        signUp: "Create a new account",
-        toastErrorTitle: "Sign In Failed",
-        toastErrorDescription: "Incorrect email or password. Please try again.",
-        toastSuccessTitle: "Signed In Successfully",
-        toastSuccessDescription: "Redirecting you now...",
-    }
-}
-
-function UserSignInPage() {
+function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,7 +24,7 @@ function UserSignInPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { language } = useLanguage();
-  const c = content[language];
+  const c = allContent[language].auth;
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,11 +48,23 @@ function UserSignInPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="absolute top-4 left-4" dir="ltr">
+            <Link href="/" passHref>
+                <Button variant="outline"><Home className="mr-2 h-4 w-4" /> {c.backToHome}</Button>
+            </Link>
+        </div>
+        
+        <Link href="/" passHref className="mb-8">
+             <div className="relative h-12 w-48">
+                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+            </div>
+        </Link>
+        
       <Card className="w-full max-w-sm mx-4">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-headline">{c.title}</CardTitle>
-          <CardDescription>{c.description}</CardDescription>
+          <CardTitle className="text-2xl font-headline">{c.signInTitle}</CardTitle>
+          <CardDescription>{c.signInDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignIn} className="space-y-4">
@@ -138,4 +121,11 @@ function UserSignInPage() {
   );
 }
 
-export default UserSignInPage;
+
+export default function UserSignInPage() {
+    return (
+        <Suspense>
+            <SignInForm />
+        </Suspense>
+    );
+}
