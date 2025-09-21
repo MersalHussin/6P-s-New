@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Search, Award, User, Sparkles } from "lucide-react";
+import { Loader2, Search, Award, User, Sparkles, Home } from "lucide-react";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { UserData } from "@/lib/types";
@@ -105,10 +105,10 @@ export default function CheckCertificatePage() {
   const topPassion = result !== 'not-found' && result?.resultsData?.rankedPassions[0]?.passion;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-       <div className="absolute top-4 left-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+       <div className="absolute top-4 left-4" dir="ltr">
             <Link href="/" passHref>
-                <Button variant="outline">{c.home}</Button>
+                <Button variant="outline"><Home className="mr-2 h-4 w-4" /> {c.home}</Button>
             </Link>
         </div>
       <Card className="w-full max-w-lg shadow-xl">
