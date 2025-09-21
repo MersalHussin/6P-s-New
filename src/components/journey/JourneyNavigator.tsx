@@ -172,6 +172,9 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
     name: `passions.${passionIndex}.${fieldName}`,
   });
 
+  const [hintOpen, setHintOpen] = useState(false);
+  const [currentHint, setCurrentHint] = useState("");
+
   useEffect(() => {
     if (fields.length === 0) {
       replace([
@@ -186,95 +189,103 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   const stationContent = content[language].stations[pIndex + 1];
 
   return (
-    <div className="space-y-6">
-      {fields.map((item, index) => (
-        <div key={item.id} className="flex items-start gap-3 p-4 border rounded-lg bg-background/50 relative">
-          <div className="w-full space-y-4">
-            <FormField
-              control={control}
-              name={`passions.${passionIndex}.${fieldName}.${index}.text`}
-              render={({ field }) => (
-                <FormItem>
-                    <div className="flex items-center justify-between">
-                        <FormLabel className="font-semibold text-md flex items-center gap-2">
-                           {stationContent.singular} {index + 1}
-                           <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button type="button" className="cursor-help text-muted-foreground hover:text-accent">
-                                        <Lightbulb className="h-5 w-5" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent className="bg-accent text-accent-foreground border-accent-foreground/20" side="top" align="center">
-                                    <p className="max-w-xs">{stationContent.hints[index % stationContent.hints.length]}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                        <AIHelperButton 
-                            hint={stationContent.hints[index % stationContent.hints.length]}
-                            passionName={passionName}
-                            stationName={stationContent.name}
-                        />
-                        </FormLabel>
-                    </div>
-                  <FormControl>
-                    <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={control}
-              name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-semibold text-center block mb-2">{c.weightLabels[station.id] || c.weightLabels.default}</FormLabel>
-                  <FormControl>
-                    <StarRating field={field} stationId={station.id} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <>
+      <Dialog open={hintOpen} onOpenChange={setHintOpen}>
+        <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+          <DialogHeader>
+            <DialogTitle>Hint</DialogTitle>
+          </DialogHeader>
+          <p className="py-4">{currentHint}</p>
+        </DialogContent>
+      </Dialog>
+      <div className="space-y-6">
+        {fields.map((item, index) => (
+          <div key={item.id} className="flex items-start gap-3 p-4 border rounded-lg bg-background/50 relative">
+            <div className="w-full space-y-4">
+              <FormField
+                control={control}
+                name={`passions.${passionIndex}.${fieldName}.${index}.text`}
+                render={({ field }) => (
+                  <FormItem>
+                      <div className="flex items-center justify-between">
+                          <FormLabel className="font-semibold text-md flex items-center gap-2">
+                             {stationContent.singular} {index + 1}
+                             <button
+                                type="button"
+                                className="cursor-help text-muted-foreground hover:text-accent"
+                                onClick={() => {
+                                  setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                  setHintOpen(true);
+                                }}
+                              >
+                                  <Lightbulb className="h-5 w-5" />
+                              </button>
+                          </FormLabel>
+                          <AIHelperButton 
+                              hint={stationContent.hints[index % stationContent.hints.length]}
+                              passionName={passionName}
+                              stationName={stationContent.name}
+                          />
+                      </div>
+                    <FormControl>
+                      <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={control}
+                name={`passions.${passionIndex}.${fieldName}.${index}.weight`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold text-center block mb-2">{c.weightLabels[station.id] || c.weightLabels.default}</FormLabel>
+                    <FormControl>
+                      <StarRating field={field} stationId={station.id} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {index >= 3 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="mt-8 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{c.removeButton}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
-          {index >= 3 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="mt-8 text-destructive hover:bg-destructive/10 flex-shrink-0"
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{c.removeButton}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      ))}
-      {fields.length < 6 && (
-        <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={() => append({ id: `${fields.length + 1}`, text: '', weight: 0 })}
-        >
-            <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
-            {c.addMoreButton}
-        </Button>
-      )}
+        ))}
+        {fields.length < 6 && (
+          <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => append({ id: `${fields.length + 1}`, text: '', weight: 0 })}
+          >
+              <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              {c.addMoreButton}
+          </Button>
+        )}
 
-       {station.id === 'problems' && <SuggestSolutionsButton passionIndex={passionIndex} />}
-    </div>
+         {station.id === 'problems' && <SuggestSolutionsButton passionIndex={passionIndex} />}
+      </div>
+    </>
   );
 };
 
