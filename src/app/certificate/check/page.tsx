@@ -131,7 +131,7 @@ export default function CheckCertificatePage() {
                 required
               />
             </div>
-            <Button type="submit" disabled={loading} className="w-full max-w-xs">
+            <Button type="submit" disabled={loading} className="w-full">
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
