@@ -218,11 +218,13 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                              {stationContent.singular} {index + 1}
                           </FormLabel>
                            <div className="flex items-center gap-1">
-                                <AIHelperButton
-                                    hints={stationContent.hints}
-                                    passionName={passionName}
-                                    stationName={stationContent.name}
-                                />
+                                {index === 0 && (
+                                    <AIHelperButton
+                                        hints={stationContent.hints}
+                                        passionName={passionName}
+                                        stationName={stationContent.name}
+                                    />
+                                )}
                                 <button
                                     type="button"
                                     className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
@@ -350,11 +352,11 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
                         <DialogDescription>{c.solutionsDialog.description}</DialogDescription>
                     </DialogHeader>
                     <div className="py-4 max-h-[60vh] overflow-y-auto">
-                        <ul className="space-y-3 list-disc pl-5">
+                        <ol className="space-y-3 list-decimal pr-5 rtl:pl-5 rtl:pr-0">
                             {solutions.map((solution, index) => (
-                                <li key={index} className="text-md">{solution}</li>
+                                <li key={index} className="text-md pl-2">{solution}</li>
                             ))}
-                        </ul>
+                        </ol>
                     </div>
                      <DialogClose asChild>
                         <Button variant="outline">{c.solutionsDialog.closeButton}</Button>
