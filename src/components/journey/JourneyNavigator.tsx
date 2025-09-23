@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
@@ -557,7 +558,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   
         const validationSchema = z.array(z.object({
         text: z.string().min(1, { message: "Text cannot be empty." }),
-        weight: z.number().min(1, { message: "Weight must be selected." }),
+        weight: z.number().min(1, { message: "Text must be selected." }),
         id: z.string()
         })).min(3);
     
@@ -791,3 +792,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
+    
