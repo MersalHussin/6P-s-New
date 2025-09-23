@@ -72,16 +72,6 @@ const AIHelperButton = ({ hints, passionName, stationName }: { hints: string[], 
   
     return (
       <>
-        <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-accent hover:bg-accent/10"
-            onClick={handleAIClick}
-            >
-            <Wand2 className="h-5 w-5" />
-        </Button>
-
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <DialogHeader>
@@ -102,8 +92,22 @@ const AIHelperButton = ({ hints, passionName, stationName }: { hints: string[], 
                 </div>
               )}
             </div>
+             <DialogClose asChild>
+                <Button variant="outline">{c.aiHelper.closeButton}</Button>
+            </DialogClose>
           </DialogContent>
         </Dialog>
+        
+        <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleAIClick}
+            >
+            <Wand2 className="h-5 w-5 text-accent" />
+            <span>{c.aiHelper.buttonTitle}</span>
+        </Button>
       </>
     );
   };
@@ -114,7 +118,13 @@ const StarRating = ({ field, stationId }: { field: any, stationId: string }) => 
     const ratingContent = content[language].journey.ratings[stationId] || content[language].journey.ratings.default;
 
     const isProblemStation = stationId === 'problems';
-    const activeColor = isProblemStation ? "text-red-500" : "text-yellow-400";
+    const isPossibilitiesStation = stationId === 'possibilities';
+    
+    const activeColor = isProblemStation 
+      ? "text-red-500" 
+      : isPossibilitiesStation 
+      ? "text-green-500"
+      : "text-yellow-400";
   
     return (
       <div className="space-y-2">
@@ -284,7 +294,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   );
 };
 
-const SuggestSolutionsButton = ({ passionIndex, onSolutionsSuggested }: { passionIndex: number, onSolutionsSuggested: () => void }) => {
+const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const { getValues, setValue } = useFormContext();
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
@@ -308,12 +318,20 @@ const SuggestSolutionsButton = ({ passionIndex, onSolutionsSuggested }: { passio
         setLoading(true);
         try {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
-          setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
+          
+          const possibilities = getValues(`passions.${passionIndex}.possibilities`) as FieldItem[];
+          const newPossibilities = possibilities.map((possibility, index) => {
+              return {
+                  ...possibility,
+                  text: result.solutions[index] || possibility.text || ''
+              }
+          });
+          setValue(`passions.${passionIndex}.possibilities`, newPossibilities, { shouldValidate: true });
+
           toast({
             title: toastContent.suggestionsSuccess.title,
             description: toastContent.suggestionsSuccess.description,
           });
-          onSolutionsSuggested();
         } catch (error) {
             toast({
               title: toastContent.error.title,
@@ -336,50 +354,48 @@ const SuggestSolutionsButton = ({ passionIndex, onSolutionsSuggested }: { passio
 
 
 const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number; passionName: string }) => {
-    const { control, watch, setValue } = useFormContext();
+    const { control, watch } = useFormContext();
     const { language } = useLanguage();
     const c = content[language].journey;
-    const stationContent = content[language].stations.find(s => s.id === 'possibilities')!;
     
-    // Use `fields` from useFieldArray to manage the dynamic list of possibilities.
-    // This ensures that we are properly registered with react-hook-form.
     const { fields: possibilityFields, replace: replacePossibilities } = useFieldArray({
         control,
         name: `passions.${passionIndex}.possibilities`,
     });
     
-    // Watch the problems from the previous station
     const problems = watch(`passions.${passionIndex}.problems`) as FieldItem[];
     const validProblems = useMemo(() => problems.filter(p => p.text.trim() !== ''), [problems]);
 
-    // This effect synchronizes the `possibilities` array with the `problems` array.
-    // For each problem, there should be a corresponding possibility.
     useEffect(() => {
-        // Get the current state of possibilities to preserve existing data.
-        const currentPossibilities = watch(`passions.${passionIndex}.possibilities`);
-        const suggestedSolutions = watch(`passions.${passionIndex}.suggestedSolutions`) || [];
-        
+        const currentPossibilities = watch(`passions.${passionIndex}.possibilities`) || [];
         const newPossibilities = validProblems.map((problem, index) => {
-            // If a possibility already exists for this index, keep its text.
-            // Otherwise, check if there's an AI suggested solution.
-            const existingText = currentPossibilities?.[index]?.text || '';
-            const aiSolution = suggestedSolutions[index] || '';
-
             return {
                  id: problem.id, 
-                 text: existingText || aiSolution, 
+                 text: currentPossibilities?.[index]?.text || '', 
                  weight: currentPossibilities?.[index]?.weight || 0 
             };
         });
         
-        replacePossibilities(newPossibilities);
+        if (JSON.stringify(newPossibilities) !== JSON.stringify(currentPossibilities.slice(0, newPossibilities.length))) {
+            replacePossibilities(newPossibilities);
+        }
     }, [validProblems, replacePossibilities, watch, passionIndex]);
     
     return (
         <div className="space-y-6">
+            <SuggestSolutionsButton passionIndex={passionIndex} />
+            <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">{c.orLabel}</span>
+                </div>
+            </div>
+
             {possibilityFields.map((item, index) => {
                 const problem = validProblems[index];
-                if (!problem) return null; // Should not happen due to the useEffect sync
+                if (!problem) return null;
 
                 return (
                     <div key={item.id} className="p-4 border rounded-lg bg-background/50 space-y-4">
@@ -719,12 +735,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         ) : (
                             <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
                         )}
-                         {station.id === 'problems' && (
-                            <SuggestSolutionsButton 
-                                passionIndex={currentPassionIndex} 
-                                onSolutionsSuggested={handleNext}
-                            />
-                        )}
                     </CardContent>
                     </Card>
                     <div className="flex justify-between items-center mt-6">
@@ -733,7 +743,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                             <span className="mx-2">{c.nav.back}</span>
                         </Button>
                         
-                        {station.id !== 'problems' && (
+                        {
                             isLastStep ? (
                                 <Button type="button" onClick={handleNext}>
                                     <span className="mx-2">{c.nav.results}</span>
@@ -745,7 +755,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                                     <ArrowLeft className="h-4 w-4" />
                                 </Button>
                             )
-                        )}
+                        }
                     </div>
                 </form>
             </FormProvider>
@@ -753,3 +763,4 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+

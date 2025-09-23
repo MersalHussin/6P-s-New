@@ -79,9 +79,6 @@ export const content: {
                     'فكر في الصورة الكبيرة: لماذا هذا الشغف مهم بالنسبة لك؟ ما الذي تأمل في تحقيقه من خلاله على المدى الطويل؟',
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
                     'إيه القيمة الأساسية اللي الشغف ده بيخليك عايز تحققها؟ (مثال: الإبداع، الحرية المالية، التأثير الإيجابي)',
-                    'إزاي الشغف ده بيخدم رؤيتك لحياتك في المستقبل؟ (مثال: أبني كارير، أطور مهارات جديدة)',
-                    'إيه الأثر اللي عايز تسيبه في الدنيا من خلال الشغف ده؟',
-                    'اوصف إحساسك وإنت بتمارس الشغف ده. إيه معناه بالنسبالك؟'
                 ] 
             },
             { 
@@ -91,9 +88,6 @@ export const content: {
                     'فكر في مهاراتك الطبيعية والمكتسبة. ما الذي تجيده ويميزك في هذا المجال؟',
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
                     'إيه نقط قوتك الشخصية اللي بتساعدك في المجال ده؟ (مثال: الصبر، الانضباط، الفضول)',
-                    'الناس بتقول عليك شاطر في إيه ليه علاقة بالشغف ده؟ (مثال: حل المشاكل، حس فني)',
-                    'إيه المعلومات اللي عندك في المجال ده؟',
-                    'إيه الموارد المتاحة ليك اللي ممكن تستغلها (علاقات، أدوات)؟'
                 ] 
             },
             { 
@@ -103,9 +97,6 @@ export const content: {
                     'ابحث في ماضيك عن أي دليل ملموس يثبت أنك بالفعل مهتم بهذا الشغف. كلما كان الدليل أقوى، زادت مصداقية شغفك.',
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
                     'هل فيه أي إنجازات أو شهادات أخدتها ليها علاقة بالشغف ده؟ (مثال: جايزة، شهادة كورس)',
-                    'احكي عن مواقف معينة حسيت فيها بحماس وانبساط وإنت بتمارس الشغف ده.',
-                    'بتقضي وقت قد إيه في الشغف ده أو بتتعلم عنه؟',
-                    'هل استثمرت فلوس في الشغف ده؟ (كورسات، كتب، معدات)'
                 ] 
             },
             { 
@@ -115,9 +106,6 @@ export const content: {
                     'كن واقعيًا وصريحًا مع نفسك. ما هي أكبر العقبات التي تمنعك من المضي قدمًا في هذا الشغف؟',
                     'إيه العقبات أو التحديات اللي بتواجهك عشان تمارس الشغف ده؟ (مثال: نقص الوقت، نقص الموارد)',
                     'إيه المخاوف أو الشكوك اللي عندك في إنك تكمل في الشغف ده؟ (مثال: الخوف من الفشل، عدم اليقين)',
-                    'هل فيه مهارات أو معلومات ناقصاك ومعطلاك في المجال ده؟ (مثال: خبرة قليلة في التسويق)',
-                    'إيه أكبر نقطة ضعف عندك في المجال ده؟',
-                    'إيه أسوأ السيناريوهات اللي ممكن تحصل لو كملت في الشغف ده؟'
                 ] 
             },
             { 
@@ -127,9 +115,6 @@ export const content: {
                     'حول كل مشكلة إلى فرصة. كيف يمكنك تحويل هذا التحدي إلى خطوة للأمام؟',
                     'إيه الفرص أو المشاريع المستقبلية اللي ممكن تعملها في المجال ده؟ (مثال: تبدأ بزنس، تعمل محتوى)',
                     'إزاي ممكن تطور الشغف ده عشان يبقى مصدر دخل أو كارير؟ (مثال: تقدم استشارات، تبيع منتجات)',
-                    'مين الناس أو الجهات اللي ممكن تتعاون معاها عشان تكبر الشغف ده؟ (مثال: تنضم لمجتمع، تلاقي مرشد)',
-                    'إيه التريندات الجديدة في المجال ده اللي ممكن تستغلها؟',
-                    'لو مفيش أي عوائق، إيه هو طموحك الأقصى للشغف ده؟'
                 ] 
             },
         ],
@@ -148,6 +133,7 @@ export const content: {
             fieldPlaceholder: "اكتب هنا...",
             problemLabel: "المشكلة",
             possibilityLabel: "الحل المقترح أو الخطوة التالية",
+            orLabel: "أو",
             weightLabels: {
                 purpose: "ما مدى أهمية هذا الهدف بالنسبة لك؟",
                 power: "ما مدى قوة هذه المهارة لديك؟",
@@ -178,20 +164,14 @@ export const content: {
             },
             addMoreButton: "إضافة عنصر آخر",
             removeButton: "إزالة العنصر",
-            suggestSolutionsButton: "اقترح حلولاً",
-            aiSolutions: {
-                title: "حلول مقترحة بواسطة الذكاء الاصطناعي",
-            },
-            solutionHelper: {
-                prompt: "هل تحتاج إلى مساعدة لاقتراح حل؟",
-                buttonText: "اقترح حلاً"
-            },
+            suggestSolutionsButton: "اقترح حلولاً للمشاكل",
             aiHelper: {
                 tooltip: "احصل على مساعدة من الذكاء الاصطناعي",
                 buttonTitle: "مساعدة من الذكاء الإصطناعي",
                 title: "مساعد الشغف",
                 description: "إليك شرح مفصل لمساعدتك على التفكير في هذه المحطة بشكل أعمق.",
                 loading: "أفكر في أفضل طريقة لمساعدتك...",
+                closeButton: "إغلاق",
             },
             nextPassionDialog: {
                 title: (passionName: string) => `أحسنت! لقد أكملت "${passionName}"`,
@@ -209,7 +189,7 @@ export const content: {
         toasts: {
             noProblems: {
                 title: "لم يتم إدخال مشاكل",
-                description: "الرجاء كتابة المشاكل التي تواجهها أولاً.",
+                description: "الرجاء كتابة المشاكل التي تواجهها في المحطة السابقة أولاً.",
             },
              noProblemSingle: {
                 title: "لم يتم تحديد مشكلة",
@@ -217,7 +197,7 @@ export const content: {
             },
             suggestionsSuccess: {
                 title: "تم إنشاء الاقتراحات بنجاح!",
-                description: "يمكنك رؤية الحلول المقترحة في محطة الحلول الممكنة التالية.",
+                description: "تم ملء حقول الحلول المقترحة. يمكنك تعديلها أو قبولها.",
             },
             error: {
                 title: "حدث خطأ",
@@ -330,9 +310,6 @@ export const content: {
                     'Think about the big picture: Why is this passion important to you? What do you hope to achieve through it in the long run?',
                     'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression)',
                     'What core value does this passion drive you to fulfill? (e.g., creativity, financial freedom, positive impact)',
-                    'How does this passion contribute to your vision for your future life? (e.g., building a career, developing new skills)',
-                    'What impact do you want to leave on the world through this passion?',
-                    'Describe how you feel when you practice this passion. What does it mean to you?'
                 ] 
             },
             { 
@@ -342,9 +319,6 @@ export const content: {
                     'Think about your natural and acquired skills. What are you good at that sets you apart in this field?',
                     'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)',
                     'What are your personal strengths that help you in this area? (e.g., patience, self-discipline, curiosity)',
-                    'What do others say you are good at that relates to this passion? (e.g., problem-solving ability, artistic sense)',
-                    'What knowledge do you already have in this field?',
-                    'What resources (connections, tools) can you leverage?'
                 ] 
             },
             { 
@@ -354,9 +328,6 @@ export const content: {
                     'Look into your past for tangible evidence that proves you are genuinely interested in this passion. The stronger the evidence, the more credible your passion becomes.',
                     'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project)',
                     'Are there any achievements or certificates you have received related to this passion? (e.g., an award, course completion certificate)',
-                    'Describe specific situations where you felt enthusiastic and satisfied while pursuing this passion.',
-                    'How much time do you spend practicing this passion or learning about it?',
-                    'Have you invested money in this passion? (courses, books, equipment)'
                 ] 
             },
             { 
@@ -366,9 +337,6 @@ export const content: {
                     'Be realistic and honest with yourself. What are the biggest obstacles preventing you from moving forward with this passion?',
                     'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources)',
                     'What fears or doubts do you have about moving forward with this passion? (e.g., fear of failure, uncertainty)',
-                    'Are there skills or knowledge you lack that hinder your progress in this area? (e.g., inexperience in marketing)',
-                    'What is your biggest weakness in this area?',
-                    'What are the worst-case scenarios that could happen if you follow this passion?'
                 ] 
             },
             { 
@@ -378,9 +346,6 @@ export const content: {
                     'Turn every problem into an opportunity. How can you turn this challenge into a step forward?',
                     'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content)',
                     'How can you develop this passion into a source of income or a career path? (e.g., offering consultations, selling products)',
-                    'Who are the people or organizations you could collaborate with to grow this passion? (e.g., joining a community, finding a mentor)',
-                    'What are the new trends in this field that you can take advantage of?',
-                    'If there were no obstacles, what is your ultimate ambition for this passion?'
                 ] 
             },
         ],
@@ -399,6 +364,7 @@ export const content: {
             fieldPlaceholder: "Type here...",
             problemLabel: "The Problem",
             possibilityLabel: "The Proposed Solution or Next Step",
+            orLabel: "OR",
             weightLabels: {
                 purpose: "How important is this goal to you?",
                 power: "How strong is this skill of yours?",
@@ -429,20 +395,14 @@ export const content: {
             },
             addMoreButton: "Add Another Item",
             removeButton: "Remove Item",
-            suggestSolutionsButton: "Suggest Solutions",
-            aiSolutions: {
-                title: "AI Suggested Solutions",
-            },
-            solutionHelper: {
-                prompt: "Need help suggesting a solution?",
-                buttonText: "Suggest Solution"
-            },
+            suggestSolutionsButton: "Suggest Solutions for Problems",
             aiHelper: {
                 tooltip: "Get help from AI",
                 buttonTitle: "AI Assistant",
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this station more deeply.",
                 loading: "Thinking of the best way to help you...",
+                closeButton: "Close",
             },
             nextPassionDialog: {
                 title: (passionName: string) => `Well Done! You've completed "${passionName}"`,
@@ -460,7 +420,7 @@ export const content: {
         toasts: {
             noProblems: {
                 title: "No Problems Entered",
-                description: "Please write down the problems you are facing first.",
+                description: "Please write down the problems you are facing in the previous station first.",
             },
             noProblemSingle: {
                 title: "No Problem Specified",
@@ -468,7 +428,7 @@ export const content: {
             },
             suggestionsSuccess: {
                 title: "Suggestions Generated Successfully!",
-                description: "You can see the suggested solutions in the next Solutions station.",
+                description: "The suggested solutions have been filled in. You can edit or accept them.",
             },
             error: {
                 title: "An Error Occurred",
