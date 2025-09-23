@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
-import { suggestOneSolution } from '@/ai/flows/suggest-one-solution';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight, CheckCircle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -37,7 +36,7 @@ import * as z from "zod";
 import { ConfirmationDialog } from './ConfirmationDialog';
 
 
-const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, passionName: string, stationName: string }) => {
+const AIHelperButton = ({ hints, passionName, stationName }: { hints: string[], passionName: string, stationName: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [explanation, setExplanation] = useState("");
@@ -54,7 +53,7 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
       try {
         const result = await explainHint({
           passionName,
-          hint,
+          hints,
           stationName,
           language,
         });
@@ -75,13 +74,12 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
       <>
         <Button
             type="button"
-            variant="outline"
-            size="sm"
-            className="text-accent hover:bg-accent/10 hover:text-accent border-accent/50"
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-accent hover:bg-accent/10"
             onClick={handleAIClick}
             >
-            <Wand2 className="h-4 w-4" />
-            <span className={language === 'ar' ? 'mr-2' : 'ml-2'}>{c.aiHelper.buttonTitle}</span>
+            <Wand2 className="h-5 w-5" />
         </Button>
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -100,9 +98,6 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
                 </div>
               ) : (
                 <div className="space-y-4 text-sm whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
-                    <blockquote className="border-r-4 border-accent pr-4 italic bg-accent/10 p-2 rounded">
-                       "{hint}"
-                    </blockquote>
                     <p>{explanation}</p>
                 </div>
               )}
@@ -210,17 +205,24 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                       <div className="flex items-center justify-between">
                           <FormLabel className="font-semibold text-md flex items-center gap-2">
                              {stationContent.singular} {index + 1}
-                             <button
-                                type="button"
-                                className="cursor-help text-muted-foreground hover:text-accent"
-                                onClick={() => {
-                                  setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
-                                  setHintOpen(true);
-                                }}
-                              >
-                                  <Lightbulb className="h-5 w-5" />
-                              </button>
                           </FormLabel>
+                           <div className="flex items-center gap-1">
+                                <AIHelperButton
+                                    hints={stationContent.hints}
+                                    passionName={passionName}
+                                    stationName={stationContent.name}
+                                />
+                                <button
+                                    type="button"
+                                    className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
+                                    onClick={() => {
+                                    setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                    setHintOpen(true);
+                                    }}
+                                >
+                                    <Lightbulb className="h-5 w-5" />
+                                </button>
+                            </div>
                       </div>
                     <FormControl>
                       <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
@@ -277,14 +279,12 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
               {c.addMoreButton}
           </Button>
         )}
-
-         {station.id === 'problems' && <SuggestSolutionsButton passionIndex={passionIndex} />}
       </div>
     </>
   );
 };
 
-const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
+const SuggestSolutionsButton = ({ passionIndex, onSolutionsSuggested }: { passionIndex: number, onSolutionsSuggested: () => void }) => {
     const { getValues, setValue } = useFormContext();
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
@@ -313,6 +313,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
             title: toastContent.suggestionsSuccess.title,
             description: toastContent.suggestionsSuccess.description,
           });
+          onSolutionsSuggested();
         } catch (error) {
             toast({
               title: toastContent.error.title,
@@ -325,49 +326,10 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
       };
 
     return (
-        <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
+        <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="w-full mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <Sparkles className="mr-2 h-4 w-4"/>
             {c.suggestSolutionsButton}
-        </Button>
-    )
-}
-
-const SuggestSolutionHelper = ({ problem, passionName, onSolutionSuggested }: { problem: string; passionName: string, onSolutionSuggested: (solution: string) => void }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const { language } = useLanguage();
-    const c = content[language].journey.solutionHelper;
-    const { toast } = useToast();
-    const toastContent = content[language].toasts;
-
-    const handleSuggest = async () => {
-        if (!problem) {
-            toast({
-              title: toastContent.noProblemSingle.title,
-              description: toastContent.noProblemSingle.description,
-              variant: "destructive",
-            });
-            return;
-        }
-        setIsLoading(true);
-        try {
-            const result = await suggestOneSolution({ problem, passionName, language });
-            onSolutionSuggested(result.solution);
-        } catch (error) {
-            toast({
-                title: toastContent.error.title,
-                description: toastContent.error.description,
-                variant: "destructive",
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    return (
-        <Button type="button" variant="outline" size="sm" onClick={handleSuggest} disabled={isLoading}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            <span className={language === 'ar' ? "mr-2" : "ml-2"}>{c.buttonText}</span>
         </Button>
     )
 }
@@ -377,6 +339,7 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
     const { control, watch, setValue } = useFormContext();
     const { language } = useLanguage();
     const c = content[language].journey;
+    const stationContent = content[language].stations.find(s => s.id === 'possibilities')!;
     
     // Use `fields` from useFieldArray to manage the dynamic list of possibilities.
     // This ensures that we are properly registered with react-hook-form.
@@ -394,22 +357,24 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
     useEffect(() => {
         // Get the current state of possibilities to preserve existing data.
         const currentPossibilities = watch(`passions.${passionIndex}.possibilities`);
+        const suggestedSolutions = watch(`passions.${passionIndex}.suggestedSolutions`) || [];
         
         const newPossibilities = validProblems.map((problem, index) => {
-            // If a possibility already exists for this index, keep it.
-            // Otherwise, create a new one, linking it to the problem's ID.
-            return currentPossibilities?.[index] || { id: problem.id, text: '', weight: 0 };
+            // If a possibility already exists for this index, keep its text.
+            // Otherwise, check if there's an AI suggested solution.
+            const existingText = currentPossibilities?.[index]?.text || '';
+            const aiSolution = suggestedSolutions[index] || '';
+
+            return {
+                 id: problem.id, 
+                 text: existingText || aiSolution, 
+                 weight: currentPossibilities?.[index]?.weight || 0 
+            };
         });
         
-        // `replace` is a function from `useFieldArray` that updates the entire array.
-        // This is the correct way to manage the array's state.
         replacePossibilities(newPossibilities);
     }, [validProblems, replacePossibilities, watch, passionIndex]);
     
-    const handleSolutionSuggested = (solution: string, index: number) => {
-        setValue(`passions.${passionIndex}.possibilities.${index}.text`, solution);
-    };
-
     return (
         <div className="space-y-6">
             {possibilityFields.map((item, index) => {
@@ -426,34 +391,17 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                              <p className="p-3 bg-muted rounded-md text-foreground font-medium">{problem.text}</p>
                         </div>
                         
-                        {/* AI Helper for this specific problem */}
-                        <div className="flex items-center gap-2">
-                            <p className="text-sm text-muted-foreground">{c.solutionHelper.prompt}</p>
-                            <SuggestSolutionHelper 
-                                problem={problem.text}
-                                passionName={passionName}
-                                onSolutionSuggested={(solution) => handleSolutionSuggested(solution, index)}
-                            />
-                        </div>
-
                         {/* Input for the solution/possibility */}
                         <FormField
                             control={control}
                             name={`passions.${passionIndex}.possibilities.${index}.text`}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="font-semibold text-md flex items-center gap-2">
-                                        {c.possibilityLabel}
-                                        <button
-                                            type="button"
-                                            className="cursor-help text-muted-foreground hover:text-accent"
-                                            onClick={() => {
-                                                // This could show a static hint for the possibilities station
-                                            }}
-                                            >
-                                            <Lightbulb className="h-5 w-5" />
-                                        </button>
-                                    </FormLabel>
+                                     <div className="flex items-center justify-between">
+                                        <FormLabel className="font-semibold text-md flex items-center gap-2">
+                                            {c.possibilityLabel}
+                                        </FormLabel>
+                                    </div>
                                     <FormControl>
                                         <Input {...field} className="text-base" placeholder={c.fieldPlaceholder} />
                                     </FormControl>
@@ -751,13 +699,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                                     </CardDescription>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-end">
-                                <AIHelperButton
-                                    hint={station.hints[0]}
-                                    passionName={currentPassionName}
-                                    stationName={station.name}
-                                />
-                            </div>
                         </div>
 
                         <div className="flex items-center gap-2 mt-4">
@@ -774,9 +715,15 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     </CardHeader>
                     <CardContent className="p-4 md:p-6">
                         {station.id === 'possibilities' ? (
-                        <PossibilitiesForm passionIndex={currentPassionIndex} passionName={currentPassionName} />
+                            <PossibilitiesForm passionIndex={currentPassionIndex} passionName={currentPassionName} />
                         ) : (
-                        <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
+                            <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
+                        )}
+                         {station.id === 'problems' && (
+                            <SuggestSolutionsButton 
+                                passionIndex={currentPassionIndex} 
+                                onSolutionsSuggested={handleNext}
+                            />
                         )}
                     </CardContent>
                     </Card>
@@ -786,16 +733,18 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                             <span className="mx-2">{c.nav.back}</span>
                         </Button>
                         
-                        {isLastStep ? (
-                             <Button type="button" onClick={handleNext}>
-                                <span className="mx-2">{c.nav.results}</span>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Button>
-                        ) : (
-                            <Button type="button" onClick={handleNext}>
-                                <span className="mx-2">{c.nav.next}</span>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Button>
+                        {station.id !== 'problems' && (
+                            isLastStep ? (
+                                <Button type="button" onClick={handleNext}>
+                                    <span className="mx-2">{c.nav.results}</span>
+                                    <ArrowLeft className="h-4 w-4" />
+                                </Button>
+                            ) : (
+                                <Button type="button" onClick={handleNext}>
+                                    <span className="mx-2">{c.nav.next}</span>
+                                    <ArrowLeft className="h-4 w-4" />
+                                </Button>
+                            )
                         )}
                     </div>
                 </form>
@@ -804,5 +753,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
-    

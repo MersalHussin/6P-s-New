@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 const ExplainHintInputSchema = z.object({
   passionName: z.string().describe('The name of the passion the user is currently exploring.'),
-  hint: z.string().describe('The hint text that needs explanation.'),
+  hints: z.array(z.string()).describe('A list of hint texts that need explanation.'),
   stationName: z.string().describe('The name of the station (e.g., Purpose, Power).'),
   language: z.enum(['ar', 'en']).describe('The language for the explanation.'),
 });
@@ -41,18 +41,23 @@ const explainPrompt = ai.definePrompt({
 
   The user is currently in the "{{stationName}}" station of their passion discovery journey.
   Their current passion is: "{{passionName}}".
-  The hint they need help with is: "{{hint}}".
 
-  Your task is to provide a clear, detailed, and inspiring explanation of the hint in the context of their specific passion.
-  Break down the hint and give them concrete examples or thought-provoking questions related to their passion "{{passionName}}".
+  The core ideas they need help with are encapsulated in these hints:
+  {{#each hints}}
+  - "{{this}}"
+  {{/each}}
+
+  Your task is to provide a clear, simple, and inspiring explanation that combines the ideas from ALL the hints provided, in the context of their specific passion.
+  Do not just list the hints. Synthesize them into a single, cohesive piece of advice.
+  Give them concrete examples or thought-provoking questions related to their passion "{{passionName}}" that stem from the combined meaning of the hints.
   
   The response must be in the language code: {{language}}.
   If the language is 'ar', you MUST respond in colloquial Egyptian Arabic (اللهجة المصرية العامية) to be more relatable to a younger audience.
 
-  Example structure for your response:
-  1.  Start by re-stating the hint's core idea in a simple way.
+  Example structure for your response (if the hints are about finding purpose):
+  1.  Start by summarizing the core idea in a simple way (e.g., "The idea here is to connect your passion with a bigger goal...").
   2.  Connect this idea directly to their passion, "{{passionName}}".
-  3.  Provide 2-3 specific, actionable questions or examples to get them thinking.
+  3.  Provide 2-3 specific, actionable questions or examples to get them thinking. (e.g., "Ask yourself, how can my love for '{{passionName}}' help someone else? Or what problem in the world can it solve?").
   4.  End with an encouraging sentence.
 
   Keep the tone positive and empowering.
