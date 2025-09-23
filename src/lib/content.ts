@@ -76,6 +76,7 @@ export const content: {
                 id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
                 description: (passionName) => `ما هي الأهداف والدوافع العميقة التي تحرك شغفك بمجال "${passionName}"؟ وما هي القيمة التي يضيفها هذا الشغف لحياتك؟`,
                 hints: [
+                    'فكر في الصورة الكبيرة: لماذا هذا الشغف مهم بالنسبة لك؟ ما الذي تأمل في تحقيقه من خلاله على المدى الطويل؟',
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
                     'إيه القيمة الأساسية اللي الشغف ده بيخليك عايز تحققها؟ (مثال: الإبداع، الحرية المالية، التأثير الإيجابي)',
                     'إزاي الشغف ده بيخدم رؤيتك لحياتك في المستقبل؟ (مثال: أبني كارير، أطور مهارات جديدة)',
@@ -87,6 +88,7 @@ export const content: {
                 id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
                 description: (passionName) => `ما هي نقاط قوتك ومهاراتك الحالية التي تدعم شغفك في "${passionName}"، وكيف يمكنك استغلالها لصالحك؟`,
                 hints: [
+                    'فكر في مهاراتك الطبيعية والمكتسبة. ما الذي تجيده ويميزك في هذا المجال؟',
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
                     'إيه نقط قوتك الشخصية اللي بتساعدك في المجال ده؟ (مثال: الصبر، الانضباط، الفضول)',
                     'الناس بتقول عليك شاطر في إيه ليه علاقة بالشغف ده؟ (مثال: حل المشاكل، حس فني)',
@@ -98,6 +100,7 @@ export const content: {
                 id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
                 description: (passionName) => `ما هي الأدلة والتجارب العملية التي تثبت اهتمامك الحقيقي بشغفك في "${passionName}"؟`,
                 hints: [
+                    'ابحث في ماضيك عن أي دليل ملموس يثبت أنك بالفعل مهتم بهذا الشغف. كلما كان الدليل أقوى، زادت مصداقية شغفك.',
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
                     'هل فيه أي إنجازات أو شهادات أخدتها ليها علاقة بالشغف ده؟ (مثال: جايزة، شهادة كورس)',
                     'احكي عن مواقف معينة حسيت فيها بحماس وانبساط وإنت بتمارس الشغف ده.',
@@ -109,6 +112,7 @@ export const content: {
                 id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
                 description: (passionName) => `ما هي العقبات والتحديات الواقعية التي قد تواجهك وأنت تسعى وراء شغفك في "${passionName}"؟`,
                 hints: [
+                    'كن واقعيًا وصريحًا مع نفسك. ما هي أكبر العقبات التي تمنعك من المضي قدمًا في هذا الشغف؟',
                     'إيه العقبات أو التحديات اللي بتواجهك عشان تمارس الشغف ده؟ (مثال: نقص الوقت، نقص الموارد)',
                     'إيه المخاوف أو الشكوك اللي عندك في إنك تكمل في الشغف ده؟ (مثال: الخوف من الفشل، عدم اليقين)',
                     'هل فيه مهارات أو معلومات ناقصاك ومعطلاك في المجال ده؟ (مثال: خبرة قليلة في التسويق)',
@@ -119,7 +123,8 @@ export const content: {
             { 
                 id: 'possibilities', name: 'الحلول الممكنة', singular: 'الحل الممكن', icon: Lightbulb,
                 description: (passionName) => `لكل مشكلة حل! بناءً على التحديات التي حددتها لشغفك في "${passionName}"، فكر في خطوات عملية ومبتكرة لتجاوزها.`,
-                hints: [ // These are not used in the new design, but kept for safety.
+                hints: [ 
+                    'حول كل مشكلة إلى فرصة. كيف يمكنك تحويل هذا التحدي إلى خطوة للأمام؟',
                     'إيه الفرص أو المشاريع المستقبلية اللي ممكن تعملها في المجال ده؟ (مثال: تبدأ بزنس، تعمل محتوى)',
                     'إزاي ممكن تطور الشغف ده عشان يبقى مصدر دخل أو كارير؟ (مثال: تقدم استشارات، تبيع منتجات)',
                     'مين الناس أو الجهات اللي ممكن تتعاون معاها عشان تكبر الشغف ده؟ (مثال: تنضم لمجتمع، تلاقي مرشد)',
@@ -183,8 +188,9 @@ export const content: {
             },
             aiHelper: {
                 tooltip: "احصل على مساعدة من الذكاء الاصطناعي",
+                buttonTitle: "مساعدة من الذكاء الإصطناعي",
                 title: "مساعد الشغف",
-                description: "إليك شرح مفصل لمساعدتك على التفكير في هذا العنصر بشكل أعمق.",
+                description: "إليك شرح مفصل لمساعدتك على التفكير في هذه المحطة بشكل أعمق.",
                 loading: "أفكر في أفضل طريقة لمساعدتك...",
             },
             nextPassionDialog: {
@@ -321,6 +327,7 @@ export const content: {
                 id: 'purpose', name: 'Purpose', singular: 'Purpose', icon: Goal,
                 description: (passionName) => `What are the deep goals and motivations behind your passion for "${passionName}", and what value does it add to your life?`,
                 hints: [
+                    'Think about the big picture: Why is this passion important to you? What do you hope to achieve through it in the long run?',
                     'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression)',
                     'What core value does this passion drive you to fulfill? (e.g., creativity, financial freedom, positive impact)',
                     'How does this passion contribute to your vision for your future life? (e.g., building a career, developing new skills)',
@@ -332,6 +339,7 @@ export const content: {
                 id: 'power', name: 'Power', singular: 'Power', icon: Zap,
                 description: (passionName) => `What are your current strengths and skills that support your passion for "${passionName}", and how can you leverage them?`,
                 hints: [
+                    'Think about your natural and acquired skills. What are you good at that sets you apart in this field?',
                     'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)',
                     'What are your personal strengths that help you in this area? (e.g., patience, self-discipline, curiosity)',
                     'What do others say you are good at that relates to this passion? (e.g., problem-solving ability, artistic sense)',
@@ -343,6 +351,7 @@ export const content: {
                 id: 'proof', name: 'Proof', singular: 'Proof', icon: FileCheck,
                 description: (passionName) => `What are the evidence and practical experiences that prove your genuine interest in your passion for "${passionName}"?`,
                 hints: [
+                    'Look into your past for tangible evidence that proves you are genuinely interested in this passion. The stronger the evidence, the more credible your passion becomes.',
                     'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project)',
                     'Are there any achievements or certificates you have received related to this passion? (e.g., an award, course completion certificate)',
                     'Describe specific situations where you felt enthusiastic and satisfied while pursuing this passion.',
@@ -354,6 +363,7 @@ export const content: {
                 id: 'problems', name: 'Problems', singular: 'Problem', icon: AlertTriangle,
                 description: (passionName) => `What are the realistic obstacles and challenges you might face while pursuing your passion for "${passionName}"?`,
                 hints: [
+                    'Be realistic and honest with yourself. What are the biggest obstacles preventing you from moving forward with this passion?',
                     'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources)',
                     'What fears or doubts do you have about moving forward with this passion? (e.g., fear of failure, uncertainty)',
                     'Are there skills or knowledge you lack that hinder your progress in this area? (e.g., inexperience in marketing)',
@@ -364,7 +374,8 @@ export const content: {
             { 
                 id: 'possibilities', name: 'Solutions', singular: 'Solution', icon: Lightbulb,
                 description: (passionName) => `For every problem, there's a solution! Based on the challenges you've identified for your passion in "${passionName}", think of practical and innovative steps to overcome them.`,
-                hints: [ // These are not used in the new design, but kept for safety.
+                hints: [
+                    'Turn every problem into an opportunity. How can you turn this challenge into a step forward?',
                     'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content)',
                     'How can you develop this passion into a source of income or a career path? (e.g., offering consultations, selling products)',
                     'Who are the people or organizations you could collaborate with to grow this passion? (e.g., joining a community, finding a mentor)',
@@ -426,10 +437,11 @@ export const content: {
                 prompt: "Need help suggesting a solution?",
                 buttonText: "Suggest Solution"
             },
-aiHelper: {
+            aiHelper: {
                 tooltip: "Get help from AI",
+                buttonTitle: "AI Assistant",
                 title: "Passion Helper",
-                description: "Here is a detailed explanation to help you think about this item more deeply.",
+                description: "Here is a detailed explanation to help you think about this station more deeply.",
                 loading: "Thinking of the best way to help you...",
             },
             nextPassionDialog: {

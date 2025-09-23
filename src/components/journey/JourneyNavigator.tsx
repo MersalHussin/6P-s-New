@@ -43,8 +43,8 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
     const [explanation, setExplanation] = useState("");
     const { language } = useLanguage();
     const c = content[language].journey;
-    const { toast } = useToast();
     const toastContent = content[language].toasts;
+    const { toast } = useToast();
   
     const handleAIClick = async () => {
       setIsOpen(true);
@@ -73,18 +73,16 @@ const AIHelperButton = ({ hint, passionName, stationName }: { hint: string, pass
   
     return (
       <>
-        <TooltipProvider delayDuration={0}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-accent hover:bg-accent/10" onClick={handleAIClick}>
-                        <Wand2 className="h-5 w-5" />
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
-                    <p>{c.aiHelper.tooltip}</p>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="text-accent hover:bg-accent/10 hover:text-accent border-accent/50"
+            onClick={handleAIClick}
+            >
+            <Wand2 className="h-4 w-4" />
+            <span className={language === 'ar' ? 'mr-2' : 'ml-2'}>{c.aiHelper.buttonTitle}</span>
+        </Button>
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -223,11 +221,6 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                                   <Lightbulb className="h-5 w-5" />
                               </button>
                           </FormLabel>
-                          <AIHelperButton 
-                              hint={stationContent.hints[index % stationContent.hints.length]}
-                              passionName={passionName}
-                              stationName={stationContent.name}
-                          />
                       </div>
                     <FormControl>
                       <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
@@ -449,8 +442,17 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                             name={`passions.${passionIndex}.possibilities.${index}.text`}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="font-semibold text-md">
+                                    <FormLabel className="font-semibold text-md flex items-center gap-2">
                                         {c.possibilityLabel}
+                                        <button
+                                            type="button"
+                                            className="cursor-help text-muted-foreground hover:text-accent"
+                                            onClick={() => {
+                                                // This could show a static hint for the possibilities station
+                                            }}
+                                            >
+                                            <Lightbulb className="h-5 w-5" />
+                                        </button>
                                     </FormLabel>
                                     <FormControl>
                                         <Input {...field} className="text-base" placeholder={c.fieldPlaceholder} />
@@ -735,19 +737,29 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Card key={`${currentPassionIndex}-${currentPIndex}`} className="mt-4 overflow-hidden">
                     <CardHeader className="bg-muted/30">
-                        <div className="flex items-center gap-4">
-                        <div className="bg-primary/10 text-primary p-3 rounded-full">
-                            <CurrentStationIcon className="w-8 h-8" />
+                        <div className="flex flex-col gap-4">
+                            <div className='flex items-center gap-4'>
+                                <div className="bg-primary/10 text-primary p-3 rounded-full">
+                                    <CurrentStationIcon className="w-8 h-8" />
+                                </div>
+                                <div>
+                                    <CardTitle className="font-headline text-2xl">
+                                        {language === 'ar' ? `محطة ${station.name}` : `Station: ${station.name}`}
+                                    </CardTitle>
+                                    <CardDescription className="mt-2 text-base">
+                                        {station.description(currentPassionName)}
+                                    </CardDescription>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-end">
+                                <AIHelperButton
+                                    hint={station.hints[0]}
+                                    passionName={currentPassionName}
+                                    stationName={station.name}
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <CardTitle className="font-headline text-2xl">
-                                {language === 'ar' ? `محطة ${station.name}` : `Station: ${station.name}`}
-                            </CardTitle>
-                            <CardDescription className="mt-2 text-base">
-                                {station.description(currentPassionName)}
-                            </CardDescription>
-                        </div>
-                        </div>
+
                         <div className="flex items-center gap-2 mt-4">
                             {P_STATIONS.map((step, index) => (
                             <div
