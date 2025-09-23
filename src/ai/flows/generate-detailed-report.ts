@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -25,7 +26,7 @@ const PassionDataSchema = z.object({
   proof: z.array(FieldItemSchema),
   problems: z.array(FieldItemSchema),
   possibilities: z.array(FieldItemSchema),
-  suggestedSolutions: z.array(z.string()).optional(),
+  suggestedSolutions: z.array(z.array(z.string())).optional(),
 });
 
 const GenerateDetailedReportInputSchema = z.object({
@@ -91,7 +92,10 @@ const reportPrompt = ai.definePrompt({
   **5. Suggested Solutions for Problems:**
   {{#if this.suggestedSolutions}}
     {{#each this.suggestedSolutions}}
+    **Attempt {{add @index 1}}:**
+    {{#each this}}
     - {{{this}}}
+    {{/each}}
     {{/each}}
   {{else}}
     No solutions were generated.
@@ -120,3 +124,5 @@ const generateDetailedReportFlow = ai.defineFlow(
         return output!;
     }
 );
+
+    

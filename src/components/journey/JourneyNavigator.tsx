@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
@@ -298,7 +297,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const { getValues, setValue, watch } = useFormContext();
     const [loading, setLoading] = useState(false);
-    const [solutions, setSolutions] = useState<string[]>([]);
+    const [solutions, setSolutions] = useState<string[][]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { toast } = useToast();
     const { language } = useLanguage();
@@ -310,7 +309,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const attemptsLeft = MAX_ATTEMPTS - attempts;
 
     const handleSuggestSolutions = async () => {
-        if (attemptsLeft <= 0) {
+        if (attemptsLeft <= 0 && (!watch(`passions.${passionIndex}.suggestedSolutions`) || watch(`passions.${passionIndex}.suggestedSolutions`).length === 0)) {
             toast({
                 title: c.attempts.noneLeftTitle,
                 description: c.attempts.noneLeftDescription,
@@ -330,12 +329,25 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
             });
             return;
         }
+
+        // If solutions already exist, just show them.
+        const existingSolutions = watch(`passions.${passionIndex}.suggestedSolutions`);
+        if (existingSolutions && existingSolutions.length > 0 && attemptsLeft <= 0) {
+            setSolutions(existingSolutions);
+            setIsDialogOpen(true);
+            return;
+        }
+
         setLoading(true);
         try {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
-          setSolutions(result.solutions);
-          setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
-          setValue(`passions.${passionIndex}.solutionGenerationAttempts`, attempts + 1);
+          
+          const newSolutions = result.solutions;
+          const updatedSolutions = existingSolutions ? [...existingSolutions, newSolutions] : [newSolutions];
+
+          setValue(`passions.${passionIndex}.suggestedSolutions`, updatedSolutions);
+          setValue(`passions.${passionIndex}.solutionGenerationAttempts`, (attempts || 0) + 1);
+          setSolutions(updatedSolutions);
           setIsDialogOpen(true);
           toast({
             title: toastContent.suggestionsSuccess.title,
@@ -364,11 +376,16 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
                         <DialogDescription>{c.solutionsDialog.description}</DialogDescription>
                     </DialogHeader>
                     <div className="py-4 max-h-[60vh] overflow-y-auto">
-                        <ol className="space-y-3 list-decimal pr-5 rtl:pl-5 rtl:pr-0">
-                            {solutions.map((solution, index) => (
-                                <li key={index} className="text-md pl-2">{solution}</li>
-                            ))}
-                        </ol>
+                        {solutions.map((attempt, attemptIndex) => (
+                           <div key={attemptIndex} className="mb-4">
+                               <h3 className="font-bold mb-2">{c.solutionsDialog.attempt} {attemptIndex + 1}</h3>
+                               <ol className="space-y-3 list-decimal pr-5 rtl:pl-5 rtl:pr-0">
+                                   {attempt.map((solution, index) => (
+                                       <li key={index} className="text-md pl-2">{solution}</li>
+                                   ))}
+                               </ol>
+                           </div>
+                        ))}
                     </div>
                      <DialogClose asChild>
                         <Button variant="outline">{c.solutionsDialog.closeButton}</Button>
@@ -449,9 +466,9 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                     <div key={item.id} className="p-4 border rounded-lg bg-background/50 space-y-4">
                         {/* Display the problem */}
                         <div className="space-y-2">
-                             <Label className="font-semibold text-md text-muted-foreground">
+                             <FormLabel className="font-semibold text-md text-muted-foreground">
                                 {c.problemLabel} {index + 1}
-                             </Label>
+                             </FormLabel>
                              <p className="p-3 bg-muted rounded-md text-foreground font-medium">{problem.text}</p>
                         </div>
                         
@@ -675,6 +692,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   
   const CurrentStationIcon = P_STATIONS[currentPIndex].icon;
   const station = P_STATIONS[currentPIndex];
+  const englishStationName = content.en.stations.find(s => s.id === station.id)?.name;
 
 
   return (
@@ -766,8 +784,11 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                                     <CurrentStationIcon className="w-8 h-8" />
                                 </div>
                                 <div>
-                                    <CardTitle className="font-headline text-2xl">
+                                    <CardTitle className="font-headline text-2xl flex items-baseline gap-2">
                                         {language === 'ar' ? `محطة ${station.name}` : `Station: ${station.name}`}
+                                        {language === 'ar' && englishStationName && (
+                                            <span className="text-lg font-body text-muted-foreground">({englishStationName})</span>
+                                        )}
                                     </CardTitle>
                                     <CardDescription className="mt-2 text-base">
                                         {station.description(currentPassionName)}
@@ -826,5 +847,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
 
   
+
+    
 
     

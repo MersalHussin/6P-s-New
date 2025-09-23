@@ -16,7 +16,7 @@ export interface PassionData {
   proof: FieldItem[];
   problems: FieldItem[];
   possibilities: FieldItem[];
-  suggestedSolutions?: string[];
+  suggestedSolutions?: string[][];
   solutionGenerationAttempts?: number;
 }
 
@@ -35,5 +35,7 @@ export interface UserData {
     resultsData?: RankPassionsOutput | null;
     shortId?: string;
 }
+
+    
 
     

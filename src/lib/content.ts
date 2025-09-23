@@ -178,6 +178,7 @@ export const content: {
                 title: "حلول مقترحة",
                 description: "إليك بعض الحلول التي تم إنشاؤها بواسطة الذكاء الاصطناعي لمساعدتك على البدء. يمكنك استخدامها أو كتابة حلولك الخاصة.",
                 closeButton: "إغلاق",
+                attempt: "المحاولة"
             },
             nextPassionDialog: {
                 title: (passionName: string) => `أحسنت! لقد أكملت "${passionName}"`,
@@ -419,6 +420,7 @@ export const content: {
                 title: "Suggested Solutions",
                 description: "Here are some AI-generated solutions to get you started. You can use them or write your own.",
                 closeButton: "Close",
+                attempt: "Attempt"
             },
             nextPassionDialog: {
                 title: (passionName: string) => `Well Done! You've completed "${passionName}"`,
@@ -520,3 +522,5 @@ export const content: {
 }
 
   
+
+    
