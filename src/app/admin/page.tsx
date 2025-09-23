@@ -15,25 +15,27 @@ export default function AdminPage() {
     const router = useRouter();
 
     useEffect(() => {
-        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+        const adminEmailsEnv = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
-        if (!adminEmail) {
-            console.error("Admin email is not configured in environment variables.");
+        if (!adminEmailsEnv) {
+            console.error("Admin email(s) are not configured in environment variables.");
             router.push('/');
             return;
         }
 
+        const adminEmails = adminEmailsEnv.split(',').map(email => email.trim());
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                if (currentUser.email === adminEmail) {
+            if (currentUser && currentUser.email) {
+                if (adminEmails.includes(currentUser.email)) {
                     setUser(currentUser);
                 } else {
                     // User is logged in but not an admin, redirect to home
                     router.push('/');
                 }
             } else {
-                // No user logged in, redirect to sign in
-                router.push('/auth/signin');
+                // No user logged in, or user has no email, redirect to sign in
+                router.push('/auth/user/signin');
             }
             setLoading(false);
         });
