@@ -216,26 +216,24 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                       <div className="flex items-center justify-between">
                           <FormLabel className="font-semibold text-md flex items-center gap-2">
                              {stationContent.singular} {index + 1}
+                            <button
+                                type="button"
+                                className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
+                                onClick={() => {
+                                setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                setHintOpen(true);
+                                }}
+                            >
+                                <Lightbulb className="h-5 w-5" />
+                            </button>
                           </FormLabel>
-                           <div className="flex items-center gap-1">
-                                {index === 0 && (
-                                    <AIHelperButton
-                                        hints={stationContent.hints}
-                                        passionName={passionName}
-                                        stationName={stationContent.name}
-                                    />
-                                )}
-                                <button
-                                    type="button"
-                                    className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
-                                    onClick={() => {
-                                    setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
-                                    setHintOpen(true);
-                                    }}
-                                >
-                                    <Lightbulb className="h-5 w-5" />
-                                </button>
-                            </div>
+                          {index === 0 && (
+                            <AIHelperButton
+                                hints={stationContent.hints}
+                                passionName={passionName}
+                                stationName={stationContent.name}
+                            />
+                          )}
                       </div>
                     <FormControl>
                       <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
@@ -387,6 +385,9 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
     const { control, watch } = useFormContext();
     const { language } = useLanguage();
     const c = content[language].journey;
+    const [hintOpen, setHintOpen] = useState(false);
+    const [currentHint, setCurrentHint] = useState("");
+    const stationContent = content[language].stations.find(s => s.id === 'possibilities')!;
     
     const { fields: possibilityFields, replace: replacePossibilities } = useFieldArray({
         control,
@@ -412,6 +413,15 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
     }, [validProblems, replacePossibilities, watch, passionIndex]);
     
     return (
+        <>
+        <Dialog open={hintOpen} onOpenChange={setHintOpen}>
+            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <DialogHeader>
+                <DialogTitle>Hint</DialogTitle>
+            </DialogHeader>
+            <p className="py-4">{currentHint}</p>
+            </DialogContent>
+        </Dialog>
         <div className="space-y-6">
             <SuggestSolutionsButton passionIndex={passionIndex} />
             <div className="relative my-4">
@@ -443,22 +453,20 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                             name={`passions.${passionIndex}.possibilities.${index}.text`}
                             render={({ field }) => (
                                 <FormItem>
-                                     <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between">
                                         <FormLabel className="font-semibold text-md flex items-center gap-2">
                                             {c.possibilityLabel}
-                                        </FormLabel>
-                                         <div className="flex items-center gap-1">
                                             <button
                                                 type="button"
                                                 className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
                                                 onClick={() => {
-                                                // setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
-                                                // setHintOpen(true);
+                                                    setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                                    setHintOpen(true);
                                                 }}
-                                            >
+                                                >
                                                 <Lightbulb className="h-5 w-5" />
                                             </button>
-                                        </div>
+                                        </FormLabel>
                                     </div>
                                     <FormControl>
                                         <Input {...field} className="text-base" placeholder={c.fieldPlaceholder} />
@@ -488,6 +496,7 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                 );
             })}
         </div>
+        </>
     );
 };
 
