@@ -309,12 +309,18 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const attemptsLeft = MAX_ATTEMPTS - attempts;
 
     const handleSuggestSolutions = async () => {
-        if (attemptsLeft <= 0 && (!watch(`passions.${passionIndex}.suggestedSolutions`) || watch(`passions.${passionIndex}.suggestedSolutions`).length === 0)) {
-            toast({
-                title: c.attempts.noneLeftTitle,
-                description: c.attempts.noneLeftDescription,
-                variant: "destructive",
-            });
+        const existingSolutions = watch(`passions.${passionIndex}.suggestedSolutions`) || [];
+        setSolutions(existingSolutions);
+        setIsDialogOpen(true);
+
+        if (attemptsLeft <= 0) {
+            if (existingSolutions.length === 0) {
+                toast({
+                    title: c.attempts.noneLeftTitle,
+                    description: c.attempts.noneLeftDescription,
+                    variant: "destructive",
+                });
+            }
             return;
         }
 
@@ -327,14 +333,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
               description: toastContent.noProblems.description,
               variant: "destructive",
             });
-            return;
-        }
-
-        // If solutions already exist, just show them.
-        const existingSolutions = watch(`passions.${passionIndex}.suggestedSolutions`);
-        if (existingSolutions && existingSolutions.length > 0 && attemptsLeft <= 0) {
-            setSolutions(existingSolutions);
-            setIsDialogOpen(true);
+            setIsDialogOpen(false);
             return;
         }
 
@@ -343,12 +342,11 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
           
           const newSolutions = result.solutions;
-          const updatedSolutions = existingSolutions ? [...existingSolutions, newSolutions] : [newSolutions];
+          const updatedSolutions = [...existingSolutions, newSolutions];
 
           setValue(`passions.${passionIndex}.suggestedSolutions`, updatedSolutions);
           setValue(`passions.${passionIndex}.solutionGenerationAttempts`, (attempts || 0) + 1);
           setSolutions(updatedSolutions);
-          setIsDialogOpen(true);
           toast({
             title: toastContent.suggestionsSuccess.title,
             description: toastContent.suggestionsSuccess.description,
@@ -359,6 +357,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
               description: toastContent.error.description,
               variant: "destructive",
             });
+            setIsDialogOpen(false); // Close dialog on error
         } finally {
           setLoading(false);
         }
@@ -377,7 +376,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
                     </DialogHeader>
                     <div className="py-4 max-h-[60vh] overflow-y-auto">
                         {solutions.map((attempt, attemptIndex) => (
-                           <div key={attemptIndex} className="mb-4">
+                           <div key={attemptIndex} className="mb-4 p-3 bg-muted/50 rounded-lg">
                                <h3 className="font-bold mb-2">{c.solutionsDialog.attempt} {attemptIndex + 1}</h3>
                                <ol className="space-y-3 list-decimal pr-5 rtl:pl-5 rtl:pr-0">
                                    {attempt.map((solution, index) => (
@@ -386,6 +385,12 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
                                </ol>
                            </div>
                         ))}
+                         {loading && (
+                            <div className="flex items-center justify-center gap-2">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <p>{c.aiHelper.loading}</p>
+                            </div>
+                        )}
                     </div>
                      <DialogClose asChild>
                         <Button variant="outline">{c.solutionsDialog.closeButton}</Button>
@@ -847,6 +852,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
 
   
+
+    
 
     
 
