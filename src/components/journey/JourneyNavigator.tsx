@@ -297,7 +297,6 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const { getValues, setValue, watch } = useFormContext();
     const [loading, setLoading] = useState(false);
-    const [solutions, setSolutions] = useState<string[][]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { toast } = useToast();
     const { language } = useLanguage();
@@ -307,20 +306,12 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     
     const attempts = watch(`passions.${passionIndex}.solutionGenerationAttempts`) || 0;
     const attemptsLeft = MAX_ATTEMPTS - attempts;
+    const existingSolutions = watch(`passions.${passionIndex}.suggestedSolutions`) || [];
 
     const handleSuggestSolutions = async () => {
-        const existingSolutions = watch(`passions.${passionIndex}.suggestedSolutions`) || [];
-        setSolutions(existingSolutions);
         setIsDialogOpen(true);
 
         if (attemptsLeft <= 0) {
-            if (existingSolutions.length === 0) {
-                toast({
-                    title: c.attempts.noneLeftTitle,
-                    description: c.attempts.noneLeftDescription,
-                    variant: "destructive",
-                });
-            }
             return;
         }
 
@@ -341,12 +332,15 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
         try {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
           
-          const newSolutions = result.solutions;
+          const newSolutions = {
+            attempt: (attempts || 0) + 1,
+            solutions: result.solutions
+          };
           const updatedSolutions = [...existingSolutions, newSolutions];
 
           setValue(`passions.${passionIndex}.suggestedSolutions`, updatedSolutions);
           setValue(`passions.${passionIndex}.solutionGenerationAttempts`, (attempts || 0) + 1);
-          setSolutions(updatedSolutions);
+          
           toast({
             title: toastContent.suggestionsSuccess.title,
             description: toastContent.suggestionsSuccess.description,
@@ -375,11 +369,11 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
                         <DialogDescription>{c.solutionsDialog.description}</DialogDescription>
                     </DialogHeader>
                     <div className="py-4 max-h-[60vh] overflow-y-auto">
-                        {solutions.map((attempt, attemptIndex) => (
+                        {existingSolutions.map((attempt: {attempt: number, solutions: string[]}, attemptIndex: number) => (
                            <div key={attemptIndex} className="mb-4 p-3 bg-muted/50 rounded-lg">
-                               <h3 className="font-bold mb-2">{c.solutionsDialog.attempt} {attemptIndex + 1}</h3>
+                               <h3 className="font-bold mb-2">{c.solutionsDialog.attempt} {attempt.attempt}</h3>
                                <ol className="space-y-3 list-decimal pr-5 rtl:pl-5 rtl:pr-0">
-                                   {attempt.map((solution, index) => (
+                                   {attempt.solutions.map((solution, index) => (
                                        <li key={index} className="text-md pl-2">{solution}</li>
                                    ))}
                                </ol>
@@ -848,13 +842,3 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
-
-
-
-  
-
-    
-
-    
-
-    

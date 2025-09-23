@@ -18,6 +18,11 @@ const FieldItemSchema = z.object({
     weight: z.number(),
 });
 
+const SolutionAttemptSchema = z.object({
+    attempt: z.number(),
+    solutions: z.array(z.string()),
+});
+
 const PassionDataSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -26,7 +31,7 @@ const PassionDataSchema = z.object({
   proof: z.array(FieldItemSchema),
   problems: z.array(FieldItemSchema),
   possibilities: z.array(FieldItemSchema),
-  suggestedSolutions: z.array(z.array(z.string())).optional(),
+  suggestedSolutions: z.array(SolutionAttemptSchema).optional(),
 });
 
 const GenerateDetailedReportInputSchema = z.object({
@@ -92,8 +97,8 @@ const reportPrompt = ai.definePrompt({
   **5. Suggested Solutions for Problems:**
   {{#if this.suggestedSolutions}}
     {{#each this.suggestedSolutions}}
-    **Attempt {{add @index 1}}:**
-    {{#each this}}
+    **Attempt {{this.attempt}}:**
+    {{#each this.solutions}}
     - {{{this}}}
     {{/each}}
     {{/each}}
@@ -124,5 +129,3 @@ const generateDetailedReportFlow = ai.defineFlow(
         return output!;
     }
 );
-
-    

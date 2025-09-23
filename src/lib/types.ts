@@ -8,6 +8,11 @@ export interface FieldItem {
   weight: number; // Changed from 'high' | 'medium' | 'low' | '' to number
 }
 
+export interface SolutionAttempt {
+    attempt: number;
+    solutions: string[];
+}
+
 export interface PassionData {
   id: string;
   name: string;
@@ -16,7 +21,7 @@ export interface PassionData {
   proof: FieldItem[];
   problems: FieldItem[];
   possibilities: FieldItem[];
-  suggestedSolutions?: string[][];
+  suggestedSolutions?: SolutionAttempt[];
   solutionGenerationAttempts?: number;
 }
 
@@ -35,7 +40,3 @@ export interface UserData {
     resultsData?: RankPassionsOutput | null;
     shortId?: string;
 }
-
-    
-
-    
