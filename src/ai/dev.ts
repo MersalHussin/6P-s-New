@@ -6,3 +6,4 @@ import '@/ai/flows/suggest-solutions-for-problems.ts';
 import '@/ai/flows/generate-detailed-report.ts';
 import '@/ai/flows/explain-hint.ts';
 import '@/ai/flows/translate-text.ts';
+import '@/ai/flows/suggest-one-solution.ts';

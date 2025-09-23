@@ -74,7 +74,7 @@ export const content: {
             },
             { 
                 id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
-                description: (passionName) => `في هذه المحطة، ستحدد الأهداف والدوافع العميقة وراء شغفك بـ "${passionName}"، وما هي القيمة التي يضيفها إلى حياتك.`,
+                description: (passionName) => `ما هي الأهداف والدوافع العميقة التي تحرك شغفك بمجال "${passionName}"؟ وما هي القيمة التي يضيفها هذا الشغف لحياتك؟`,
                 hints: [
                     'إيه اللي نفسك تحققه أو تحس بيه من خلال الشغف ده؟ (مثال: أساعد الناس، أعبر عن نفسي)', 
                     'إيه القيمة الأساسية اللي الشغف ده بيخليك عايز تحققها؟ (مثال: الإبداع، الحرية المالية، التأثير الإيجابي)',
@@ -85,7 +85,7 @@ export const content: {
             },
             { 
                 id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
-                description: (passionName) => `هنا، ستكتشف نقاط قوتك ومهاراتك الحالية التي تدعم شغفك في "${passionName}"، وكيف يمكنك استغلالها لصالحك.`,
+                description: (passionName) => `ما هي نقاط قوتك ومهاراتك الحالية التي تدعم شغفك في "${passionName}"، وكيف يمكنك استغلالها لصالحك؟`,
                 hints: [
                     'إيه المهارات والمواهب اللي عندك ليها علاقة بالشغف ده؟ (مثال: التصميم، الكتابة، الكلام قدام الناس)',
                     'إيه نقط قوتك الشخصية اللي بتساعدك في المجال ده؟ (مثال: الصبر، الانضباط، الفضول)',
@@ -96,7 +96,7 @@ export const content: {
             },
             { 
                 id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
-                description: (passionName) => `في هذه المحطة، ستجمع الأدلة والتجارب التي تثبت اهتمامك الفعلي بشغفك في "${passionName}".`,
+                description: (passionName) => `ما هي الأدلة والتجارب العملية التي تثبت اهتمامك الحقيقي بشغفك في "${passionName}"؟`,
                 hints: [
                     'إيه المشاريع أو التجارب اللي عملتها قبل كده وبتبين شغفك في المجال ده؟ (مثال: كورس، مشروع شخصي)',
                     'هل فيه أي إنجازات أو شهادات أخدتها ليها علاقة بالشغف ده؟ (مثال: جايزة، شهادة كورس)',
@@ -107,7 +107,7 @@ export const content: {
             },
             { 
                 id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
-                description: (passionName) => `هنا، ستحدد العقبات والتحديات التي قد تواجهك في شغفك بـ "${passionName}" لتكون واقعيًا ومستعدًا.`,
+                description: (passionName) => `ما هي العقبات والتحديات الواقعية التي قد تواجهك وأنت تسعى وراء شغفك في "${passionName}"؟`,
                 hints: [
                     'إيه العقبات أو التحديات اللي بتواجهك عشان تمارس الشغف ده؟ (مثال: نقص الوقت، نقص الموارد)',
                     'إيه المخاوف أو الشكوك اللي عندك في إنك تكمل في الشغف ده؟ (مثال: الخوف من الفشل، عدم اليقين)',
@@ -117,9 +117,9 @@ export const content: {
                 ] 
             },
             { 
-                id: 'possibilities', name: 'الخطوات الممكنة', singular: 'الخطوة الممكنة', icon: Lightbulb,
-                description: (passionName) => `في المحطة الأخيرة، ستستكشف الفرص والخطوات المستقبلية التي يمكن أن تنبع من شغفك في "${passionName}".`,
-                hints: [
+                id: 'possibilities', name: 'الحلول الممكنة', singular: 'الحل الممكن', icon: Lightbulb,
+                description: (passionName) => `لكل مشكلة حل! بناءً على التحديات التي حددتها لشغفك في "${passionName}"، فكر في خطوات عملية ومبتكرة لتجاوزها.`,
+                hints: [ // These are not used in the new design, but kept for safety.
                     'إيه الفرص أو المشاريع المستقبلية اللي ممكن تعملها في المجال ده؟ (مثال: تبدأ بزنس، تعمل محتوى)',
                     'إزاي ممكن تطور الشغف ده عشان يبقى مصدر دخل أو كارير؟ (مثال: تقدم استشارات، تبيع منتجات)',
                     'مين الناس أو الجهات اللي ممكن تتعاون معاها عشان تكبر الشغف ده؟ (مثال: تنضم لمجتمع، تلاقي مرشد)',
@@ -141,12 +141,14 @@ export const content: {
             },
             fieldLabel: "العنصر",
             fieldPlaceholder: "اكتب هنا...",
+            problemLabel: "المشكلة",
+            possibilityLabel: "الحل المقترح أو الخطوة التالية",
             weightLabels: {
                 purpose: "ما مدى أهمية هذا الهدف بالنسبة لك؟",
                 power: "ما مدى قوة هذه المهارة لديك؟",
                 proof: "ما مدى قوة هذا الإثبات؟",
                 problems: "ما مدى تأثير هذه المشكلة؟",
-                possibilities: "ما مدى حماسك لهذه الخطوة؟",
+                possibilities: "ما مدى حماسك وقناعتك بهذا الحل؟",
                 default: "تقييمك"
             },
             ratings: {
@@ -175,6 +177,10 @@ export const content: {
             aiSolutions: {
                 title: "حلول مقترحة بواسطة الذكاء الاصطناعي",
             },
+            solutionHelper: {
+                prompt: "هل تحتاج إلى مساعدة لاقتراح حل؟",
+                buttonText: "اقترح حلاً"
+            },
             aiHelper: {
                 tooltip: "احصل على مساعدة من الذكاء الاصطناعي",
                 title: "مساعد الشغف",
@@ -199,9 +205,13 @@ export const content: {
                 title: "لم يتم إدخال مشاكل",
                 description: "الرجاء كتابة المشاكل التي تواجهها أولاً.",
             },
+             noProblemSingle: {
+                title: "لم يتم تحديد مشكلة",
+                description: "هذا الحقل فارغ. يرجى كتابة المشكلة أولاً.",
+            },
             suggestionsSuccess: {
                 title: "تم إنشاء الاقتراحات بنجاح!",
-                description: "يمكنك رؤية الحلول المقترحة في محطة الخطوات الممكنة التالية.",
+                description: "يمكنك رؤية الحلول المقترحة في محطة الحلول الممكنة التالية.",
             },
             error: {
                 title: "حدث خطأ",
@@ -309,7 +319,7 @@ export const content: {
             },
             { 
                 id: 'purpose', name: 'Purpose', singular: 'Purpose', icon: Goal,
-                description: (passionName) => `In this station, you will define the deep goals and motivations behind your passion for "${passionName}", and what value it adds to your life.`,
+                description: (passionName) => `What are the deep goals and motivations behind your passion for "${passionName}", and what value does it add to your life?`,
                 hints: [
                     'What do you hope to achieve or feel through this passion? (e.g., helping others, self-expression)',
                     'What core value does this passion drive you to fulfill? (e.g., creativity, financial freedom, positive impact)',
@@ -320,7 +330,7 @@ export const content: {
             },
             { 
                 id: 'power', name: 'Power', singular: 'Power', icon: Zap,
-                description: (passionName) => `Here, you will discover your current strengths and skills that support your passion for "${passionName}", and how you can leverage them.`,
+                description: (passionName) => `What are your current strengths and skills that support your passion for "${passionName}", and how can you leverage them?`,
                 hints: [
                     'What skills and talents do you have related to this passion? (e.g., design, writing, public speaking)',
                     'What are your personal strengths that help you in this area? (e.g., patience, self-discipline, curiosity)',
@@ -331,7 +341,7 @@ export const content: {
             },
             { 
                 id: 'proof', name: 'Proof', singular: 'Proof', icon: FileCheck,
-                description: (passionName) => `In this station, you will gather evidence and experiences that prove your actual interest in your passion for "${passionName}".`,
+                description: (passionName) => `What are the evidence and practical experiences that prove your genuine interest in your passion for "${passionName}"?`,
                 hints: [
                     'What past projects or experiences demonstrate your passion in this area? (e.g., a course, a personal project)',
                     'Are there any achievements or certificates you have received related to this passion? (e.g., an award, course completion certificate)',
@@ -342,7 +352,7 @@ export const content: {
             },
             { 
                 id: 'problems', name: 'Problems', singular: 'Problem', icon: AlertTriangle,
-                description: (passionName) => `Here, you will identify the obstacles and challenges you might face in your passion for "${passionName}" to be realistic and prepared.`,
+                description: (passionName) => `What are the realistic obstacles and challenges you might face while pursuing your passion for "${passionName}"?`,
                 hints: [
                     'What obstacles or challenges do you face in pursuing this passion? (e.g., lack of time, lack of resources)',
                     'What fears or doubts do you have about moving forward with this passion? (e.g., fear of failure, uncertainty)',
@@ -352,9 +362,9 @@ export const content: {
                 ] 
             },
             { 
-                id: 'possibilities', name: 'Possibilities', singular: 'Possibility', icon: Lightbulb,
-                description: (passionName) => `In the final station, you will explore the future opportunities and potential that can emerge from your passion for "${passionName}".`,
-                hints: [
+                id: 'possibilities', name: 'Solutions', singular: 'Solution', icon: Lightbulb,
+                description: (passionName) => `For every problem, there's a solution! Based on the challenges you've identified for your passion in "${passionName}", think of practical and innovative steps to overcome them.`,
+                hints: [ // These are not used in the new design, but kept for safety.
                     'What future opportunities or projects can you undertake in this field? (e.g., starting a business, creating content)',
                     'How can you develop this passion into a source of income or a career path? (e.g., offering consultations, selling products)',
                     'Who are the people or organizations you could collaborate with to grow this passion? (e.g., joining a community, finding a mentor)',
@@ -376,12 +386,14 @@ export const content: {
             },
             fieldLabel: "Item",
             fieldPlaceholder: "Type here...",
+            problemLabel: "The Problem",
+            possibilityLabel: "The Proposed Solution or Next Step",
             weightLabels: {
                 purpose: "How important is this goal to you?",
                 power: "How strong is this skill of yours?",
                 proof: "How strong is this proof?",
                 problems: "How impactful is this problem?",
-                possibilities: "How excited are you about this possibility?",
+                possibilities: "How excited and confident are you about this solution?",
                 default: "Your Rating"
             },
             ratings: {
@@ -398,7 +410,7 @@ export const content: {
                     "No Problems", "Minor Problems", "Moderate Problems", "Significant Problems", "Insurmountable Problems"
                 ],
                 possibilities: [
-                    "No Opportunities", "Limited Opportunities", "Good Opportunities", "Great Opportunities", "Endless Possibilities"
+                    "Not Excited", "Slightly Hesitant", "Excited", "Very Excited", "Extremely Excited"
                 ],
                 default: [
                     "1", "2", "3", "4", "5"
@@ -410,7 +422,11 @@ export const content: {
             aiSolutions: {
                 title: "AI Suggested Solutions",
             },
-            aiHelper: {
+            solutionHelper: {
+                prompt: "Need help suggesting a solution?",
+                buttonText: "Suggest Solution"
+            },
+aiHelper: {
                 tooltip: "Get help from AI",
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this item more deeply.",
@@ -434,9 +450,13 @@ export const content: {
                 title: "No Problems Entered",
                 description: "Please write down the problems you are facing first.",
             },
+            noProblemSingle: {
+                title: "No Problem Specified",
+                description: "This field is empty. Please write the problem first.",
+            },
             suggestionsSuccess: {
                 title: "Suggestions Generated Successfully!",
-                description: "You can see the suggested solutions in the next Possibilities station.",
+                description: "You can see the suggested solutions in the next Solutions station.",
             },
             error: {
                 title: "An Error Occurred",

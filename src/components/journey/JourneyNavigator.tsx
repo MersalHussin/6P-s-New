@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
 import { explainHint } from '@/ai/flows/explain-hint';
+import { suggestOneSolution } from '@/ai/flows/suggest-one-solution';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight, CheckCircle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -338,29 +339,146 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     )
 }
 
-const PossibilitiesForm = ({ pIndex, passionIndex, passionName }: { pIndex: number; passionIndex: number; passionName: string }) => {
-    const { watch } = useFormContext();
-    const suggestedSolutions = watch(`passions.${passionIndex}.suggestedSolutions`);
+const SuggestSolutionHelper = ({ problem, passionName, onSolutionSuggested }: { problem: string; passionName: string, onSolutionSuggested: (solution: string) => void }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const { language } = useLanguage();
+    const c = content[language].journey.solutionHelper;
+    const { toast } = useToast();
+    const toastContent = content[language].toasts;
+
+    const handleSuggest = async () => {
+        if (!problem) {
+            toast({
+              title: toastContent.noProblemSingle.title,
+              description: toastContent.noProblemSingle.description,
+              variant: "destructive",
+            });
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const result = await suggestOneSolution({ problem, passionName, language });
+            onSolutionSuggested(result.solution);
+        } catch (error) {
+            toast({
+                title: toastContent.error.title,
+                description: toastContent.error.description,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    return (
+        <Button type="button" variant="outline" size="sm" onClick={handleSuggest} disabled={isLoading}>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            <span className={language === 'ar' ? "mr-2" : "ml-2"}>{c.buttonText}</span>
+        </Button>
+    )
+}
+
+
+const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number; passionName: string }) => {
+    const { control, watch, setValue } = useFormContext();
     const { language } = useLanguage();
     const c = content[language].journey;
-  
+    
+    // Use `fields` from useFieldArray to manage the dynamic list of possibilities.
+    // This ensures that we are properly registered with react-hook-form.
+    const { fields: possibilityFields, replace: replacePossibilities } = useFieldArray({
+        control,
+        name: `passions.${passionIndex}.possibilities`,
+    });
+    
+    // Watch the problems from the previous station
+    const problems = watch(`passions.${passionIndex}.problems`) as FieldItem[];
+    const validProblems = useMemo(() => problems.filter(p => p.text.trim() !== ''), [problems]);
+
+    // This effect synchronizes the `possibilities` array with the `problems` array.
+    // For each problem, there should be a corresponding possibility.
+    useEffect(() => {
+        // Get the current state of possibilities to preserve existing data.
+        const currentPossibilities = watch(`passions.${passionIndex}.possibilities`);
+        
+        const newPossibilities = validProblems.map((problem, index) => {
+            // If a possibility already exists for this index, keep it.
+            // Otherwise, create a new one, linking it to the problem's ID.
+            return currentPossibilities?.[index] || { id: problem.id, text: '', weight: 0 };
+        });
+        
+        // `replace` is a function from `useFieldArray` that updates the entire array.
+        // This is the correct way to manage the array's state.
+        replacePossibilities(newPossibilities);
+    }, [validProblems, replacePossibilities, watch, passionIndex]);
+    
+    const handleSolutionSuggested = (solution: string, index: number) => {
+        setValue(`passions.${passionIndex}.possibilities.${index}.text`, solution);
+    };
+
     return (
-      <div className="space-y-4">
-        {suggestedSolutions && suggestedSolutions.length > 0 && (
-          <Alert className="bg-accent/10 border-accent/30">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <AlertTitle className="text-accent font-bold">{c.aiSolutions.title}</AlertTitle>
-            <AlertDescription>
-              <ul className="list-disc pr-5 mt-2 space-y-1">
-                {suggestedSolutions.map((solution: string, index: number) => (
-                  <li key={index}>{solution}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
-        <DynamicFieldArray pIndex={pIndex} passionIndex={passionIndex} passionName={passionName} />
-      </div>
+        <div className="space-y-6">
+            {possibilityFields.map((item, index) => {
+                const problem = validProblems[index];
+                if (!problem) return null; // Should not happen due to the useEffect sync
+
+                return (
+                    <div key={item.id} className="p-4 border rounded-lg bg-background/50 space-y-4">
+                        {/* Display the problem */}
+                        <div className="space-y-2">
+                             <Label className="font-semibold text-md text-muted-foreground">
+                                {c.problemLabel} {index + 1}
+                             </Label>
+                             <p className="p-3 bg-muted rounded-md text-foreground font-medium">{problem.text}</p>
+                        </div>
+                        
+                        {/* AI Helper for this specific problem */}
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm text-muted-foreground">{c.solutionHelper.prompt}</p>
+                            <SuggestSolutionHelper 
+                                problem={problem.text}
+                                passionName={passionName}
+                                onSolutionSuggested={(solution) => handleSolutionSuggested(solution, index)}
+                            />
+                        </div>
+
+                        {/* Input for the solution/possibility */}
+                        <FormField
+                            control={control}
+                            name={`passions.${passionIndex}.possibilities.${index}.text`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="font-semibold text-md">
+                                        {c.possibilityLabel}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="text-base" placeholder={c.fieldPlaceholder} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        
+                        {/* Rating for the possibility */}
+                        <FormField
+                            control={control}
+                            name={`passions.${passionIndex}.possibilities.${index}.weight`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="font-semibold text-center block mb-2">
+                                        {c.weightLabels.possibilities}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <StarRating field={field} stationId="possibilities" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                );
+            })}
+        </div>
     );
 };
 
@@ -415,44 +533,65 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     
     if (!stationData) return false;
 
-    const firstThreeItems = stationData.slice(0, 3);
+    // For the possibilities station, we check based on the number of problems
+    if (currentFieldName === 'possibilities') {
+        const problems = getValues(`passions.${currentPassionIndex}.problems`).filter((p: FieldItem) => p.text.trim() !== '');
+        // Validate that each possibility corresponding to a problem has text and weight
+         const validationSchema = z.array(z.object({
+            text: z.string().min(1, { message: "Text cannot be empty." }),
+            weight: z.number().min(1, { message: "Weight must be selected." }),
+            id: z.string()
+        })).min(problems.length);
+        const result = validationSchema.safeParse(stationData.slice(0, problems.length));
+         if (!result.success) {
+            toast({
+                title: t.validationError.title,
+                description: language === 'ar' ? 'الرجاء كتابة حل وتقييم لكل مشكلة.' : 'Please write and rate a solution for each problem.',
+                variant: "destructive",
+            });
+            return false;
+         }
+
+    } else {
+         const firstThreeItems = stationData.slice(0, 3);
   
-    const validationSchema = z.array(z.object({
-      text: z.string().min(1, { message: "Text cannot be empty." }),
-      weight: z.number().min(1, { message: "Weight must be selected." }),
-      id: z.string()
-    })).min(3);
-  
-    const result = validationSchema.safeParse(firstThreeItems);
-  
-    if (!result.success) {
-      let specificMessage = t.validationError.description;
-  
-      if (result.error.errors[0]) {
-        const firstError = result.error.errors[0];
-        const fieldIndex = parseInt(firstError.path[0] as string, 10);
-        const fieldType = firstError.path[1];
-        if (language === 'ar') {
-          if (fieldType === 'text') {
-              specificMessage = `يرجاء ملء الحقل رقم ${fieldIndex + 1}.`;
-          } else if (fieldType === 'weight') {
-              specificMessage = `يرجاء اختيار تقييم للحقل رقم ${fieldIndex + 1}.`;
-          }
-        } else {
+        const validationSchema = z.array(z.object({
+        text: z.string().min(1, { message: "Text cannot be empty." }),
+        weight: z.number().min(1, { message: "Weight must be selected." }),
+        id: z.string()
+        })).min(3);
+    
+        const result = validationSchema.safeParse(firstThreeItems);
+    
+        if (!result.success) {
+        let specificMessage = t.validationError.description;
+    
+        if (result.error.errors[0]) {
+            const firstError = result.error.errors[0];
+            const fieldIndex = parseInt(firstError.path[0] as string, 10);
+            const fieldType = firstError.path[1];
+            if (language === 'ar') {
             if (fieldType === 'text') {
-                specificMessage = `Please fill out item #${fieldIndex + 1}.`;
+                specificMessage = `يرجاء ملء الحقل رقم ${fieldIndex + 1}.`;
             } else if (fieldType === 'weight') {
-                specificMessage = `Please select a rating for item #${fieldIndex + 1}.`;
+                specificMessage = `يرجاء اختيار تقييم للحقل رقم ${fieldIndex + 1}.`;
+            }
+            } else {
+                if (fieldType === 'text') {
+                    specificMessage = `Please fill out item #${fieldIndex + 1}.`;
+                } else if (fieldType === 'weight') {
+                    specificMessage = `Please select a rating for item #${fieldIndex + 1}.`;
+                }
             }
         }
-      }
 
-      toast({
-        title: t.validationError.title,
-        description: specificMessage,
-        variant: "destructive",
-      });
-      return false;
+        toast({
+            title: t.validationError.title,
+            description: specificMessage,
+            variant: "destructive",
+        });
+        return false;
+        }
     }
   
     return true;
@@ -601,9 +740,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                         </div>
                         <div>
                             <CardTitle className="font-headline text-2xl">
-                                {language === 'ar' ? `محطة: ${station.name}` : `Station: ${station.name}`}
+                                {language === 'ar' ? `محطة ${station.name}` : `Station: ${station.name}`}
                             </CardTitle>
-                            <CardDescription className="mt-2">
+                            <CardDescription className="mt-2 text-base">
                                 {station.description(currentPassionName)}
                             </CardDescription>
                         </div>
@@ -622,7 +761,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     </CardHeader>
                     <CardContent className="p-4 md:p-6">
                         {station.id === 'possibilities' ? (
-                        <PossibilitiesForm pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
+                        <PossibilitiesForm passionIndex={currentPassionIndex} passionName={currentPassionName} />
                         ) : (
                         <DynamicFieldArray pIndex={currentPIndex} passionIndex={currentPassionIndex} passionName={currentPassionName} />
                         )}
