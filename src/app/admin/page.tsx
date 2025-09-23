@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { Button } from "@/components/ui/button";
@@ -10,15 +10,29 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
 export default function AdminPage() {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+        if (!adminEmail) {
+            console.error("Admin email is not configured in environment variables.");
+            router.push('/');
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
-                setUser(currentUser);
+                if (currentUser.email === adminEmail) {
+                    setUser(currentUser);
+                } else {
+                    // User is logged in but not an admin, redirect to home
+                    router.push('/');
+                }
             } else {
+                // No user logged in, redirect to sign in
                 router.push('/auth/signin');
             }
             setLoading(false);
@@ -41,7 +55,8 @@ export default function AdminPage() {
     }
     
     if (!user) {
-        return null; // or a redirect component
+        // This state can be reached briefly during redirects, so return null.
+        return null;
     }
 
     return (
