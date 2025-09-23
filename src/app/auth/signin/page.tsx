@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -24,8 +25,10 @@ export default function SignInPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      // NOTE: This now only signs in to Firebase for the main app, not admin.
+      // Admin access is handled by /admin/signin
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/admin');
+      router.push('/journey');
     } catch (error: any) {
       toast({
         title: 'Sign In Failed',
@@ -41,8 +44,8 @@ export default function SignInPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Admin Sign In</CardTitle>
-          <CardDescription>Enter your credentials to access the dashboard.</CardDescription>
+          <CardTitle className="text-2xl">Sign In</CardTitle>
+          <CardDescription>Enter your credentials to access your journey.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignIn} className="space-y-4">
@@ -51,7 +54,7 @@ export default function SignInPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -81,6 +84,11 @@ export default function SignInPage() {
               Sign In
             </Button>
           </form>
+          <Button variant="link" asChild className="w-full mt-2">
+             <Link href="/admin/signin">
+                Admin Access
+             </Link>
+          </Button>
         </CardContent>
       </Card>
     </div>
