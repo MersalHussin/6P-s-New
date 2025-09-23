@@ -1,4 +1,5 @@
 
+
 import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb, Flame, type LucideIcon } from "lucide-react";
 
 interface StationInfo {
@@ -173,6 +174,11 @@ export const content: {
                 loading: "أفكر في أفضل طريقة لمساعدتك...",
                 closeButton: "إغلاق",
             },
+            solutionsDialog: {
+                title: "حلول مقترحة",
+                description: "إليك بعض الحلول التي تم إنشاؤها بواسطة الذكاء الاصطناعي لمساعدتك على البدء. يمكنك استخدامها أو كتابة حلولك الخاصة.",
+                closeButton: "إغلاق",
+            },
             nextPassionDialog: {
                 title: (passionName: string) => `أحسنت! لقد أكملت "${passionName}"`,
                 description: "الآن أنت تستعد لاستكشاف شغف جديد. استعد!",
@@ -197,7 +203,7 @@ export const content: {
             },
             suggestionsSuccess: {
                 title: "تم إنشاء الاقتراحات بنجاح!",
-                description: "تم ملء حقول الحلول المقترحة. يمكنك تعديلها أو قبولها.",
+                description: "تم عرض الحلول المقترحة في نافذة منبثقة.",
             },
             error: {
                 title: "حدث خطأ",
@@ -404,6 +410,11 @@ export const content: {
                 loading: "Thinking of the best way to help you...",
                 closeButton: "Close",
             },
+            solutionsDialog: {
+                title: "Suggested Solutions",
+                description: "Here are some AI-generated solutions to get you started. You can use them or write your own.",
+                closeButton: "Close",
+            },
             nextPassionDialog: {
                 title: (passionName: string) => `Well Done! You've completed "${passionName}"`,
                 description: "Now you're getting ready to explore a new passion. Get ready!",
@@ -428,7 +439,7 @@ export const content: {
             },
             suggestionsSuccess: {
                 title: "Suggestions Generated Successfully!",
-                description: "The suggested solutions have been filled in. You can edit or accept them.",
+                description: "The suggested solutions are displayed in a popup.",
             },
             error: {
                 title: "An Error Occurred",
@@ -497,3 +508,5 @@ export const content: {
         }
     }
 }
+
+  

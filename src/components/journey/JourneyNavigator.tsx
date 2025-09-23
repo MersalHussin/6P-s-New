@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
@@ -297,6 +298,8 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const { getValues, setValue } = useFormContext();
     const [loading, setLoading] = useState(false);
+    const [solutions, setSolutions] = useState<string[]>([]);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { toast } = useToast();
     const { language } = useLanguage();
     const c = content[language].journey;
@@ -318,16 +321,8 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
         setLoading(true);
         try {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
-          
-          const possibilities = getValues(`passions.${passionIndex}.possibilities`) as FieldItem[];
-          const newPossibilities = possibilities.map((possibility, index) => {
-              return {
-                  ...possibility,
-                  text: result.solutions[index] || possibility.text || ''
-              }
-          });
-          setValue(`passions.${passionIndex}.possibilities`, newPossibilities, { shouldValidate: true });
-
+          setSolutions(result.solutions);
+          setIsDialogOpen(true);
           toast({
             title: toastContent.suggestionsSuccess.title,
             description: toastContent.suggestionsSuccess.description,
@@ -344,11 +339,35 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
       };
 
     return (
-        <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="w-full mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <Sparkles className="mr-2 h-4 w-4"/>
-            {c.suggestSolutionsButton}
-        </Button>
+        <>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Lightbulb className="text-accent"/>
+                            {c.solutionsDialog.title}
+                        </DialogTitle>
+                        <DialogDescription>{c.solutionsDialog.description}</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 max-h-[60vh] overflow-y-auto">
+                        <ul className="space-y-3 list-disc pl-5">
+                            {solutions.map((solution, index) => (
+                                <li key={index} className="text-md">{solution}</li>
+                            ))}
+                        </ul>
+                    </div>
+                     <DialogClose asChild>
+                        <Button variant="outline">{c.solutionsDialog.closeButton}</Button>
+                    </DialogClose>
+                </DialogContent>
+            </Dialog>
+
+            <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="w-full mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Sparkles className="mr-2 h-4 w-4"/>
+                {c.suggestSolutionsButton}
+            </Button>
+        </>
     )
 }
 
@@ -764,3 +783,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   );
 }
 
+
+
+  
