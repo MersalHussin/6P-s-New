@@ -17,6 +17,7 @@ export interface PassionData {
   problems: FieldItem[];
   possibilities: FieldItem[];
   suggestedSolutions?: string[];
+  solutionGenerationAttempts?: number;
 }
 
 export interface UserData {

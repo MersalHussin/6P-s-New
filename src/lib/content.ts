@@ -190,6 +190,11 @@ export const content: {
                 description: "هذه هي مدخلاتك لهذه المحطة. هل تود المتابعة أم التعديل؟",
                 continue: "استمر",
                 edit: "تعديل",
+            },
+            attempts: {
+                attemptsLeft: (count: number) => `لديك ${count} محاولات متبقية.`,
+                noneLeftTitle: "لا توجد محاولات متبقية",
+                noneLeftDescription: "لقد استنفدت جميع محاولاتك لتوليد الحلول.",
             }
         },
         toasts: {
@@ -426,6 +431,11 @@ export const content: {
                 description: "These are your entries for this station. Would you like to continue or edit?",
                 continue: "Continue",
                 edit: "Edit",
+            },
+            attempts: {
+                attemptsLeft: (count: number) => `You have ${count} attempts left.`,
+                noneLeftTitle: "No Attempts Left",
+                noneLeftDescription: "You have used all your attempts to generate solutions.",
             }
         },
         toasts: {

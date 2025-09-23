@@ -151,7 +151,7 @@ const StarRating = ({ field, stationId }: { field: any, stationId: string }) => 
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>{ratingValue}: {ratingContent[ratingValue-1]}</p>
+                            <p>{ratingContent[ratingValue-1]}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -286,7 +286,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
               className="w-full"
               onClick={() => append({ id: `${fields.length + 1}`, text: '', weight: 0 })}
           >
-              <PlusCircle className={language === 'ar' ? 'ml-2 h-4 w-4' : 'mr-2 h-4 w-4'} />
+              <PlusCircle className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
               {c.addMoreButton}
           </Button>
         )}
@@ -296,7 +296,7 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
 };
 
 const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
-    const { getValues, setValue } = useFormContext();
+    const { getValues, setValue, watch } = useFormContext();
     const [loading, setLoading] = useState(false);
     const [solutions, setSolutions] = useState<string[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -304,14 +304,18 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
     const { language } = useLanguage();
     const c = content[language].journey;
     const toastContent = content[language].toasts;
-
+    const MAX_ATTEMPTS = 2;
+    
+    const attempts = watch(`passions.${passionIndex}.solutionGenerationAttempts`) || 0;
+    const attemptsLeft = MAX_ATTEMPTS - attempts;
 
     const handleSuggestSolutions = async () => {
-        const existingSolutions = getValues(`passions.${passionIndex}.suggestedSolutions`);
-
-        if (existingSolutions && existingSolutions.length > 0) {
-            setSolutions(existingSolutions);
-            setIsDialogOpen(true);
+        if (attemptsLeft <= 0) {
+            toast({
+                title: c.attempts.noneLeftTitle,
+                description: c.attempts.noneLeftDescription,
+                variant: "destructive",
+            });
             return;
         }
 
@@ -331,6 +335,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
           setSolutions(result.solutions);
           setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
+          setValue(`passions.${passionIndex}.solutionGenerationAttempts`, attempts + 1);
           setIsDialogOpen(true);
           toast({
             title: toastContent.suggestionsSuccess.title,
@@ -348,7 +353,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
       };
 
     return (
-        <>
+        <div className="text-center">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                     <DialogHeader>
@@ -371,18 +376,21 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
                 </DialogContent>
             </Dialog>
 
-            <Button onClick={handleSuggestSolutions} disabled={loading} type="button" className="w-full mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button onClick={handleSuggestSolutions} disabled={loading || attemptsLeft <= 0} type="button" className="w-full mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <Sparkles className="mr-2 h-4 w-4"/>
                 {c.suggestSolutionsButton}
             </Button>
-        </>
+            <p className="text-sm text-muted-foreground mt-2">
+                {attemptsLeft > 0 ? c.attempts.attemptsLeft(attemptsLeft) : c.attempts.noneLeftDescription}
+            </p>
+        </div>
     )
 }
 
 
 const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number; passionName: string }) => {
-    const { control, watch } = useFormContext();
+    const { control, watch, setValue } = useFormContext();
     const { language } = useLanguage();
     const c = content[language].journey;
     const [hintOpen, setHintOpen] = useState(false);
