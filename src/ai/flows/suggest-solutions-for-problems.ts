@@ -21,7 +21,7 @@ const SuggestSolutionsForProblemsInputSchema = z.object({
     .describe('A list of problems the user is facing with their passion.'),
 });
 export type SuggestSolutionsForProblemsInput = z.infer<
-  typeof SuggestSolutionsForProblemsInputSchema
+  typeof SuggestSolutionsForproblemsInputSchema
 >;
 
 const SuggestSolutionsForProblemsOutputSchema = z.object({
@@ -46,6 +46,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI assistant helping users overcome problems related to their passions.
 
   Given the following list of problems, suggest practical solutions for each.
+  You must respond in Arabic.
 
   Problems:
   {{#each problems}}- {{{this}}}
