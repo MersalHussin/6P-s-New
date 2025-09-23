@@ -309,6 +309,14 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
 
 
     const handleSuggestSolutions = async () => {
+        const existingSolutions = getValues(`passions.${passionIndex}.suggestedSolutions`);
+
+        if (existingSolutions && existingSolutions.length > 0) {
+            setSolutions(existingSolutions);
+            setIsDialogOpen(true);
+            return;
+        }
+
         const problemsData = getValues(`passions.${passionIndex}.problems`);
         const problemsText = problemsData.map((p: {text: string}) => p.text).filter(Boolean);
         
@@ -324,6 +332,7 @@ const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
         try {
           const result = await suggestSolutionsForProblems({ problems: problemsText });
           setSolutions(result.solutions);
+          setValue(`passions.${passionIndex}.suggestedSolutions`, result.solutions);
           setIsDialogOpen(true);
           toast({
             title: toastContent.suggestionsSuccess.title,
@@ -438,6 +447,18 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                                         <FormLabel className="font-semibold text-md flex items-center gap-2">
                                             {c.possibilityLabel}
                                         </FormLabel>
+                                         <div className="flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
+                                                onClick={() => {
+                                                // setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                                // setHintOpen(true);
+                                                }}
+                                            >
+                                                <Lightbulb className="h-5 w-5" />
+                                            </button>
+                                        </div>
                                     </div>
                                     <FormControl>
                                         <Input {...field} className="text-base" placeholder={c.fieldPlaceholder} />
@@ -788,3 +809,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 
 
   
+
+    
