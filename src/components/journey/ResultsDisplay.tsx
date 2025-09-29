@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import Confetti from "react-confetti";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -143,6 +143,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
                     setCertificateId(userData.shortId);
                 } else {
                     // Fallback to full ID if shortId doesn't exist for some reason
+                    // This will be saved to the DB after results are calculated for the first time.
                     setCertificateId(userId.slice(0, 8).toUpperCase());
                 }
             }
@@ -200,6 +201,15 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         setRankedPassions(result);
         onResultsCalculated(result);
 
+        // Generate and save shortId if it doesn't exist
+        const userDocRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userDocRef);
+        if(userDoc.exists() && !userDoc.data().shortId) {
+            const newShortId = userId.slice(0, 8).toUpperCase();
+            await updateDoc(userDocRef, { shortId: newShortId });
+            setCertificateId(newShortId);
+        }
+
         // Trigger confetti
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 4000);
@@ -231,7 +241,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         getRanking();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passions, language, onResultsCalculated]);
+  }, [passions, language, onResultsCalculated, userId]);
 
   const generateSimpleReport = (reportPassionsData: PassionData[]) => {
     let report = `${c.reportTitle}\n\n`;
@@ -258,8 +268,11 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   
       if (passion.suggestedSolutions && passion.suggestedSolutions.length > 0) {
         report += `### Suggested Solutions\n`;
-        passion.suggestedSolutions.forEach(solution => {
-          report += `- ${solution}\n`;
+        passion.suggestedSolutions.forEach(attempt => {
+            report += `Attempt ${attempt.attempt}:\n`;
+            attempt.solutions.forEach(solution => {
+                report += `  - ${solution}\n`;
+            });
         });
         report += '\n';
       }
@@ -544,4 +557,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   );
 }
     
+    
+
     

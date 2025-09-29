@@ -18,7 +18,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
       ref={ref}
       className="fixed left-[-9999px] top-[-9999px] w-[1123px] h-[794px] bg-white font-body"
       style={{
-        backgroundImage: "url('https://i.suar.me/3AwJd/l')",
+        backgroundImage: "url('https://i.suar.me/2Wqr9/l')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
