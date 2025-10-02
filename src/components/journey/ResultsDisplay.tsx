@@ -3,9 +3,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { PassionData, FieldItem, UserData } from "@/lib/types";
-import { rankPassions, RankPassionsInput, RankPassionsOutput } from "@/ai/flows/rank-passions";
-import { generateDetailedReport, GenerateDetailedReportInput } from "@/ai/flows/generate-detailed-report";
-import { translateText } from "@/ai/flows/translate-text";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download, CheckCircle, FileText, Smartphone, Laptop, AlertTriangle } from "lucide-react";
@@ -24,6 +21,14 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Certificate } from "./Certificate";
 
+// Define simplified output type since the AI flow is removed
+export interface RankPassionsOutput {
+    rankedPassions: {
+        passion: string;
+        score: number;
+        reasoning: string;
+    }[];
+}
 
 interface ResultsDisplayProps {
   passions: PassionData[];
@@ -110,7 +115,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(initialResults);
   const [loading, setLoading] = useState(!initialResults);
   const [error, setError] = useState<string | null>(null);
-  const [isFallback, setIsFallback] = useState(false);
   
   const [isDownloadingCert, setIsDownloadingCert] = useState(false);
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
@@ -142,9 +146,9 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
                 if(userData.shortId) {
                     setCertificateId(userData.shortId);
                 } else {
-                    // Fallback to full ID if shortId doesn't exist for some reason
-                    // This will be saved to the DB after results are calculated for the first time.
-                    setCertificateId(userId.slice(0, 8).toUpperCase());
+                    const newShortId = userId.slice(0, 8).toUpperCase();
+                    setCertificateId(newShortId);
+                    await updateDoc(doc(db, "users", userId), { shortId: newShortId });
                 }
             }
         }
@@ -167,13 +171,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   useEffect(() => {
     const getRanking = async () => {
-      // Check if results are old format (missing "Next Steps" or "الخطوات القادمة")
-      const isOldFormat = initialResults &&
-          initialResults.rankedPassions.length > 0 &&
-          !initialResults.rankedPassions[0].reasoning.includes("Next Steps") &&
-          !initialResults.rankedPassions[0].reasoning.includes("الخطوات القادمة");
-
-      if (initialResults && !isOldFormat) {
+      if (initialResults) {
           setRankedPassions(initialResults);
           setLoading(false);
           setShowConfetti(true);
@@ -192,56 +190,29 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         possibilities: filterRatedItems(p.possibilities),
     }));
 
-      try {
-        const input: RankPassionsInput = { passions: validatedPassions, language };
-        const result = await rankPassions(input);
-        
-        result.rankedPassions.sort((a, b) => b.score - a.score);
-        
-        setRankedPassions(result);
-        onResultsCalculated(result);
+      // Fallback logic as the primary logic since AI is disabled
+      const passionsWithScores = validatedPassions.map(p => ({
+          passion: p.passion,
+          score: calculateScore(p),
+          reasoning: c.fallback.reasoning,
+      }));
 
-        // Generate and save shortId if it doesn't exist
-        const userDocRef = doc(db, "users", userId);
-        const userDoc = await getDoc(userDocRef);
-        if(userDoc.exists() && !userDoc.data().shortId) {
-            const newShortId = userId.slice(0, 8).toUpperCase();
-            await updateDoc(userDocRef, { shortId: newShortId });
-            setCertificateId(newShortId);
-        }
+      passionsWithScores.sort((a, b) => b.score - a.score);
 
-        // Trigger confetti
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 4000);
-
-      } catch (e) {
-        console.error("AI ranking failed, using fallback.", e);
-        setError(null); // Clear any previous errors
-        setIsFallback(true);
-
-        // Fallback logic
-        const passionsWithScores = validatedPassions.map(p => ({
-            passion: p.passion,
-            score: calculateScore(p),
-            reasoning: c.fallback.reasoning,
-        }));
-
-        passionsWithScores.sort((a, b) => b.score - a.score);
-
-        const fallbackResult: RankPassionsOutput = { rankedPassions: passionsWithScores };
-        setRankedPassions(fallbackResult);
-        onResultsCalculated(fallbackResult);
-
-      } finally {
-        setLoading(false);
-      }
+      const fallbackResult: RankPassionsOutput = { rankedPassions: passionsWithScores };
+      setRankedPassions(fallbackResult);
+      onResultsCalculated(fallbackResult);
+      
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 4000);
+      setLoading(false);
     };
 
     if(passions.length > 0){
         getRanking();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passions, language, onResultsCalculated, userId]);
+  }, [passions, language, onResultsCalculated]);
 
   const generateSimpleReport = (reportPassionsData: PassionData[]) => {
     let report = `${c.reportTitle}\n\n`;
@@ -294,14 +265,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             possibilities: filterRatedItems(p.possibilities),
           }));
 
-        let reportText = "";
-        if (isFallback) {
-            reportText = generateSimpleReport(filteredPassions);
-        } else {
-            const input: GenerateDetailedReportInput = { passions: filteredPassions, language };
-            const { report } = await generateDetailedReport(input);
-            reportText = report;
-        }
+        const reportText = generateSimpleReport(filteredPassions);
 
         const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
@@ -335,16 +299,8 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
         let passionForCert = topPassion || "your passion";
 
-        if (topPassion && !isFallback) {
-          try {
-            const { translatedText } = await translateText({ text: topPassion, targetLanguage: 'en' });
-            passionForCert = translatedText;
-          } catch (e) {
-             console.error("AI translation failed, using original passion name.", e);
-             passionForCert = topPassion;
-          }
-        }
-        
+        // Since AI translation is disabled, we'll just use the original passion name.
+        // A more robust solution might involve a simple mapping or asking the user.
         setPassionInEnglish(passionForCert);
 
         // Wait a tick for the state to update before rendering the canvas
@@ -402,45 +358,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   // A helper function to render the reasoning and next steps
   const renderReasoning = (reasoning: string) => {
-    const parts = reasoning.split('**الخطوات القادمة:**');
-    const mainReasoning = parts[0];
-    const nextSteps = parts[1];
-
-    if (language === 'en') {
-        const enParts = reasoning.split('**Next Steps:**');
-        const mainEnReasoning = enParts[0];
-        const nextEnSteps = enParts[1];
-        return (
-            <div>
-                <p className="text-muted-foreground whitespace-pre-wrap">{mainEnReasoning}</p>
-                {nextEnSteps && (
-                <div className="mt-4 p-4 bg-secondary/50 rounded-lg">
-                    <h5 className="font-bold mb-2 text-green-700 dark:text-green-400">Next Steps:</h5>
-                    <p className="text-muted-foreground whitespace-pre-wrap">{nextEnSteps}</p>
-                </div>
-                )}
-            </div>
-        );
-    }
-
-    return (
-        <div>
-            <p className="text-muted-foreground whitespace-pre-wrap">{mainReasoning}</p>
-            {nextSteps && (
-            <div className="mt-4 p-4 bg-secondary/50 rounded-lg">
-                <h5 className="font-bold mb-2 text-green-700 dark:text-green-400">الخطوات القادمة:</h5>
-                <p className="text-muted-foreground whitespace-pre-wrap">{nextSteps}</p>
-            </div>
-            )}
-        </div>
-    );
+      // Since AI is disabled, we always show the fallback reasoning.
+      return (
+        <p className="text-muted-foreground whitespace-pre-wrap">{c.fallback.reasoning}</p>
+      )
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={certificateId} />
 
-        {showConfetti && !isFallback && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
+        {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
+        
         {/* Certificate Download Dialog */}
         <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -508,8 +437,8 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         </AlertDialog>
 
         <div className="text-center space-y-4">
-            <h1 className="text-4xl font-headline font-bold text-primary">{isFallback ? c.fallback.title : c.title}</h1>
-            <p className="text-lg text-muted-foreground">{isFallback ? c.fallback.subtitle : c.subtitle}</p>
+            <h1 className="text-4xl font-headline font-bold text-primary">{c.fallback.title}</h1>
+            <p className="text-lg text-muted-foreground">{c.fallback.subtitle}</p>
             <div className="flex justify-center gap-4">
                 <Button onClick={() => setShowReportDialog(true)} variant="outline">
                     <FileText className={language === 'ar' ? "ml-2 h-4 w-4" : "mr-2 h-4 w-4"} />
@@ -556,7 +485,3 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     </div>
   );
 }
-    
-    
-
-    

@@ -10,8 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { suggestSolutionsForProblems } from '@/ai/flows/suggest-solutions-for-problems';
-import { explainHint } from '@/ai/flows/explain-hint';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Lightbulb, Sparkles, MoveLeft, MoveRight, PlusCircle, Trash2, Wand2, ArrowRight, CheckCircle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -36,80 +34,9 @@ import * as z from "zod";
 import { ConfirmationDialog } from './ConfirmationDialog';
 
 
+// AI Features are temporarily disabled.
 const AIHelperButton = ({ hints, passionName, stationName }: { hints: string[], passionName: string, stationName: string }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [explanation, setExplanation] = useState("");
-    const { language } = useLanguage();
-    const c = content[language].journey;
-    const toastContent = content[language].toasts;
-    const { toast } = useToast();
-  
-    const handleAIClick = async () => {
-      setIsOpen(true);
-      if (explanation) return;
-  
-      setIsLoading(true);
-      try {
-        const result = await explainHint({
-          passionName,
-          hints,
-          stationName,
-          language,
-        });
-        setExplanation(result.explanation);
-      } catch (error) {
-        toast({
-          title: toastContent.error.title,
-          description: toastContent.error.description,
-          variant: "destructive",
-        });
-        setIsOpen(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    return (
-      <>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="sm:max-w-[425px]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            <DialogHeader>
-              <DialogTitle className='flex items-center gap-2'><Wand2 className="h-5 w-5 text-accent"/>{c.aiHelper.title}</DialogTitle>
-              <DialogDescription>
-                {c.aiHelper.description}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <p>{c.aiHelper.loading}</p>
-                </div>
-              ) : (
-                <div className="space-y-4 text-sm whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
-                    <p>{explanation}</p>
-                </div>
-              )}
-            </div>
-             <DialogClose asChild>
-                <Button variant="outline">{c.aiHelper.closeButton}</Button>
-            </DialogClose>
-          </DialogContent>
-        </Dialog>
-        
-        <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={handleAIClick}
-            >
-            <Wand2 className="h-5 w-5 text-accent" />
-            <span>{c.aiHelper.buttonTitle}</span>
-        </Button>
-      </>
-    );
+    return null;
   };
 
 const StarRating = ({ field, stationId }: { field: any, stationId: string }) => {
@@ -294,114 +221,9 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   );
 };
 
+// AI feature disabled
 const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
-    const { getValues, setValue, watch } = useFormContext();
-    const [loading, setLoading] = useState(false);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const { toast } = useToast();
-    const { language } = useLanguage();
-    const c = content[language].journey;
-    const toastContent = content[language].toasts;
-    const MAX_ATTEMPTS = 2;
-    
-    const attempts = watch(`passions.${passionIndex}.solutionGenerationAttempts`) || 0;
-    const attemptsLeft = MAX_ATTEMPTS - attempts;
-    const existingSolutions = watch(`passions.${passionIndex}.suggestedSolutions`) || [];
-
-    const handleSuggestSolutions = async () => {
-        setIsDialogOpen(true);
-
-        if (attemptsLeft <= 0) {
-            return;
-        }
-
-        const problemsData = getValues(`passions.${passionIndex}.problems`);
-        const problemsText = problemsData.map((p: {text: string}) => p.text).filter(Boolean);
-        
-        if (problemsText.length === 0) {
-            toast({
-              title: toastContent.noProblems.title,
-              description: toastContent.noProblems.description,
-              variant: "destructive",
-            });
-            setIsDialogOpen(false);
-            return;
-        }
-
-        setLoading(true);
-        try {
-          const result = await suggestSolutionsForProblems({ problems: problemsText });
-          
-          const newSolutions = {
-            attempt: (attempts || 0) + 1,
-            solutions: result.solutions
-          };
-          const updatedSolutions = [...existingSolutions, newSolutions];
-
-          setValue(`passions.${passionIndex}.suggestedSolutions`, updatedSolutions);
-          setValue(`passions.${passionIndex}.solutionGenerationAttempts`, (attempts || 0) + 1);
-          
-          toast({
-            title: toastContent.suggestionsSuccess.title,
-            description: toastContent.suggestionsSuccess.description,
-          });
-        } catch (error) {
-            toast({
-              title: toastContent.error.title,
-              description: toastContent.error.description,
-              variant: "destructive",
-            });
-            setIsDialogOpen(false); // Close dialog on error
-        } finally {
-          setLoading(false);
-        }
-      };
-
-    return (
-        <div className="text-center">
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <Lightbulb className="text-accent"/>
-                            {c.solutionsDialog.title}
-                        </DialogTitle>
-                        <DialogDescription>{c.solutionsDialog.description}</DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 max-h-[60vh] overflow-y-auto">
-                        {existingSolutions.map((attempt: {attempt: number, solutions: string[]}, attemptIndex: number) => (
-                           <div key={attemptIndex} className="mb-4 p-3 bg-muted/50 rounded-lg">
-                               <h3 className="font-bold mb-2">{c.solutionsDialog.attempt} {attempt.attempt}</h3>
-                               <ol className="space-y-3 list-decimal pr-5 rtl:pl-5 rtl:pr-0">
-                                   {attempt.solutions.map((solution, index) => (
-                                       <li key={index} className="text-md pl-2">{solution}</li>
-                                   ))}
-                               </ol>
-                           </div>
-                        ))}
-                         {loading && (
-                            <div className="flex items-center justify-center gap-2">
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                <p>{c.aiHelper.loading}</p>
-                            </div>
-                        )}
-                    </div>
-                     <DialogClose asChild>
-                        <Button variant="outline">{c.solutionsDialog.closeButton}</Button>
-                    </DialogClose>
-                </DialogContent>
-            </Dialog>
-
-            <Button onClick={handleSuggestSolutions} disabled={loading || attemptsLeft <= 0} type="button" className="w-full mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                <Sparkles className="mr-2 h-4 w-4"/>
-                {c.suggestSolutionsButton}
-            </Button>
-            <p className="text-sm text-muted-foreground mt-2">
-                {attemptsLeft > 0 ? c.attempts.attemptsLeft(attemptsLeft) : c.attempts.noneLeftDescription}
-            </p>
-        </div>
-    )
+    return null;
 }
 
 
@@ -448,15 +270,7 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
         </Dialog>
         <div className="space-y-6">
             <SuggestSolutionsButton passionIndex={passionIndex} />
-            <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">{c.orLabel}</span>
-                </div>
-            </div>
-
+            
             {possibilityFields.map((item, index) => {
                 const problem = validProblems[index];
                 if (!problem) return null;
