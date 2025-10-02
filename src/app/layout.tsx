@@ -6,6 +6,9 @@ import { LanguageProvider } from "@/context/language-context";
 export const metadata: Metadata = {
   title: "Passion Path",
   description: "اكتشف شغفك وانطلق في رحلة الـ 6Ps",
+  icons: {
+    icon: 'https://i.suar.me/xpZXl/l',
+  },
 };
 
 export default function RootLayout({

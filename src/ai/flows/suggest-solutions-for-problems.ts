@@ -21,7 +21,7 @@ const SuggestSolutionsForProblemsInputSchema = z.object({
     .describe('A list of problems the user is facing with their passion.'),
 });
 export type SuggestSolutionsForProblemsInput = z.infer<
-  typeof SuggestSolutionsForproblemsInputSchema
+  typeof SuggestSolutionsForProblemsInputSchema
 >;
 
 const SuggestSolutionsForProblemsOutputSchema = z.object({
