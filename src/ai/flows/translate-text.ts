@@ -49,7 +49,7 @@ const translateTextFlow = ai.defineFlow(
     outputSchema: TranslateTextOutputSchema,
   },
   async (input) => {
-    const { output } = await translatePrompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
+    const { output } = await translatePrompt(input);
     return output!;
   }
 );

@@ -125,7 +125,7 @@ const generateDetailedReportFlow = ai.defineFlow(
       outputSchema: GenerateDetailedReportOutputSchema,
     },
     async (input) => {
-        const { output } = await reportPrompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
+        const { output } = await reportPrompt(input);
         return output!;
     }
 );

@@ -63,7 +63,7 @@ const suggestSolutionsForProblemsFlow = ai.defineFlow(
     outputSchema: SuggestSolutionsForProblemsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
+    const {output} = await prompt(input);
     return output!;
   }
 );
