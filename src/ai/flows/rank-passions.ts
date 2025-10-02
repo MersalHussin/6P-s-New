@@ -158,7 +158,7 @@ const rankPassionsFlow = ai.defineFlow(
     // and just pass them to the model for reasoning generation.
     // The model prompt has been updated to reflect this.
 
-    const { output } = await rankPassionsPrompt({ passions, language });
+    const { output } = await rankPassionsPrompt({ passions, language }, { model: 'googleai/gemini-1.5-flash-latest' });
     
     // The model now returns the full ranked list. We just need to ensure scores are correct.
     const finalRankedPassions = output!.rankedPassions.map(p => ({
@@ -172,6 +172,3 @@ const rankPassionsFlow = ai.defineFlow(
     return { rankedPassions: finalRankedPassions };
   }
 );
-
-    
-

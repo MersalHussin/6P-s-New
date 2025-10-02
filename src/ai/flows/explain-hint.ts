@@ -71,7 +71,7 @@ const explainHintFlow = ai.defineFlow(
     outputSchema: ExplainHintOutputSchema,
   },
   async (input) => {
-    const { output } = await explainPrompt(input);
+    const { output } = await explainPrompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
     return output!;
   }
 );
