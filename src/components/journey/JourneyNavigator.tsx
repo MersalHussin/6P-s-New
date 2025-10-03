@@ -511,9 +511,21 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     e.stopPropagation();
     setShowAiHelper(true);
     setAiHelpLoading(true);
-    // Dummy content since AI is disabled
-    setAiHelpContent(c.aiHelper.description); 
-    setAiHelpLoading(false);
+    setAiHelpContent("");
+    try {
+        // AI functionality is disabled, show fallback content
+        setAiHelpContent(c.aiHelper.description);
+    } catch (error) {
+        console.error(error);
+        setAiHelpContent(c.aiHelper.description); // Fallback content
+        toast({
+            title: t.error.title,
+            description: t.error.description,
+            variant: "destructive",
+        });
+    } finally {
+        setAiHelpLoading(false);
+    }
   }
 
 
@@ -535,10 +547,15 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <DialogHeader>
                     <DialogTitle>{c.aiHelper.title}</DialogTitle>
-                    <DialogDescription>{c.aiHelper.description}</DialogDescription>
                 </DialogHeader>
-                <div className="py-4 whitespace-pre-wrap">
-                    {aiHelpLoading ? <Loader2 className="animate-spin" /> : aiHelpContent}
+                <div className="py-4 whitespace-pre-wrap min-h-[100px]">
+                    {aiHelpLoading ? (
+                        <div className="flex items-center justify-center h-full">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    ) : (
+                        aiHelpContent
+                    )}
                 </div>
                 <DialogClose asChild>
                     <Button>{c.aiHelper.closeButton}</Button>
