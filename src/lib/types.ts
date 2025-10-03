@@ -1,8 +1,16 @@
 
 import type { Timestamp } from "firebase/firestore";
-import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 
-export type { RankPassionsOutput };
+// This type is manually recreated because the flow file was removed.
+// In a real scenario, you would import it from the flow file.
+export interface RankPassionsOutput {
+    rankedPassions: {
+        passion: string;
+        score: number;
+        reasoning: string;
+    }[];
+}
+
 
 export interface FieldItem {
   id: string;
