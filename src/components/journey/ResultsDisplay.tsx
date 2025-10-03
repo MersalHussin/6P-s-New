@@ -1,8 +1,9 @@
 
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { PassionData, FieldItem, UserData } from "@/lib/types";
+import type { PassionData, FieldItem, UserData, RankPassionsOutput } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Award, Download, CheckCircle, FileText, Smartphone, Laptop, AlertTriangle } from "lucide-react";
@@ -21,47 +22,6 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Certificate } from "./Certificate";
 
-// Define simplified output type since the AI flow is removed
-export interface RankPassionsOutput {
-    rankedPassions: {
-        passion: string;
-        score: number;
-        reasoning: string;
-    }[];
-}
-
-interface ResultsDisplayProps {
-  passions: PassionData[];
-  initialResults: RankPassionsOutput | null;
-  onResultsCalculated: (results: RankPassionsOutput) => void;
-  userId: string;
-}
-
-const filterRatedItems = (items: FieldItem[] | undefined): FieldItem[] => {
-    if (!Array.isArray(items)) {
-        return [];
-    }
-    return items.filter(item => item.text && item.weight > 0);
-};
-
-// Fallback score calculation function
-const calculateScore = (passion: { purpose: FieldItem[], power: FieldItem[], proof: FieldItem[], problems: FieldItem[], possibilities: FieldItem[] }): number => {
-    let score = 0;
-    const calculate = (items: FieldItem[], multiplier: 1 | -1) => {
-        return items.reduce((acc, item) => {
-            const weight = item.weight || 1;
-            return acc + (weight * multiplier);
-        }, 0);
-    };
-
-    score += calculate(passion.purpose, 1);
-    score += calculate(passion.power, 1);
-    score += calculate(passion.proof, 1);
-    score += calculate(passion.possibilities, 1);
-    score += calculate(passion.problems, -1);
-    
-    return score;
-}
 
 const downloadContent = {
     ar: {
@@ -110,8 +70,56 @@ const downloadContent = {
     }
 }
 
+const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): RankPassionsOutput => {
+    const c = content[language].results;
 
-export function ResultsDisplay({ passions, initialResults, onResultsCalculated, userId }: ResultsDisplayProps) {
+    const filterRatedItems = (items: FieldItem[] | undefined): FieldItem[] => {
+        if (!Array.isArray(items)) {
+            return [];
+        }
+        return items.filter(item => item.text && item.weight > 0);
+    };
+
+    const validatedPassions = passions.map(p => ({
+        passion: p.name,
+        purpose: filterRatedItems(p.purpose),
+        power: filterRatedItems(p.power),
+        proof: filterRatedItems(p.proof),
+        problems: filterRatedItems(p.problems),
+        possibilities: filterRatedItems(p.possibilities),
+    }));
+
+    const calculateScore = (passion: { purpose: FieldItem[], power: FieldItem[], proof: FieldItem[], problems: FieldItem[], possibilities: FieldItem[] }): number => {
+        let score = 0;
+        const calculate = (items: FieldItem[], multiplier: 1 | -1) => {
+            return items.reduce((acc, item) => {
+                const weight = item.weight || 1;
+                return acc + (weight * multiplier);
+            }, 0);
+        };
+
+        score += calculate(passion.purpose, 1);
+        score += calculate(passion.power, 1);
+        score += calculate(passion.proof, 1);
+        score += calculate(passion.possibilities, 1);
+        score += calculate(passion.problems, -1);
+        
+        return score;
+    }
+
+    const passionsWithScores = validatedPassions.map(p => ({
+        passion: p.passion,
+        score: calculateScore(p),
+        reasoning: c.fallback.reasoning,
+    }));
+
+    passionsWithScores.sort((a, b) => b.score - a.score);
+
+    return { rankedPassions: passionsWithScores };
+}
+
+
+export function ResultsDisplay({ passions, initialResults, onResultsCalculated, userId }: { passions: PassionData[], initialResults: RankPassionsOutput | null, onResultsCalculated: (results: RankPassionsOutput) => void, userId: string }) {
   const [rankedPassions, setRankedPassions] = useState<RankPassionsOutput | null>(initialResults);
   const [loading, setLoading] = useState(!initialResults);
   const [error, setError] = useState<string | null>(null);
@@ -181,31 +189,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
       
       setLoading(true);
       setError(null);
-      const validatedPassions = passions.map(p => ({
-        passion: p.name,
-        purpose: filterRatedItems(p.purpose),
-        power: filterRatedItems(p.power),
-        proof: filterRatedItems(p.proof),
-        problems: filterRatedItems(p.problems),
-        possibilities: filterRatedItems(p.possibilities),
-    }));
-
-      // Fallback logic as the primary logic since AI is disabled
-      const passionsWithScores = validatedPassions.map(p => ({
-          passion: p.passion,
-          score: calculateScore(p),
-          reasoning: c.fallback.reasoning,
-      }));
-
-      passionsWithScores.sort((a, b) => b.score - a.score);
-
-      const fallbackResult: RankPassionsOutput = { rankedPassions: passionsWithScores };
-      setRankedPassions(fallbackResult);
-      onResultsCalculated(fallbackResult);
-      
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 4000);
-      setLoading(false);
+      try {
+        const result = fallbackRankPassions(passions, language);
+        setRankedPassions(result);
+        onResultsCalculated(result);
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 8000);
+      } catch (e: any) {
+        setError(e.message || c.error);
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if(passions.length > 0){
@@ -239,11 +234,8 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   
       if (passion.suggestedSolutions && passion.suggestedSolutions.length > 0) {
         report += `### Suggested Solutions\n`;
-        passion.suggestedSolutions.forEach(attempt => {
-            report += `Attempt ${attempt.attempt}:\n`;
-            attempt.solutions.forEach(solution => {
-                report += `  - ${solution}\n`;
-            });
+        passion.suggestedSolutions.forEach(solution => {
+            report += `  - ${solution}\n`;
         });
         report += '\n';
       }
@@ -256,16 +248,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
     try {
-        const filteredPassions = passions.map(p => ({
-            ...p,
-            purpose: filterRatedItems(p.purpose),
-            power: filterRatedItems(p.power),
-            proof: filterRatedItems(p.proof),
-            problems: filterRatedItems(p.problems),
-            possibilities: filterRatedItems(p.possibilities),
-          }));
-
-        const reportText = generateSimpleReport(filteredPassions);
+        const reportText = generateSimpleReport(passions);
 
         const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
@@ -297,17 +280,18 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     setIsDownloadingCert(true);
     try {
         const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
-        let passionForCert = topPassion || "your passion";
+        let passionForCert = topPassion;
 
-        // Since AI translation is disabled, we'll just use the original passion name.
-        // A more robust solution might involve a simple mapping or asking the user.
+        // Simple translation for now as AI is disabled
+        if (language === 'ar') {
+            passionForCert = topPassion; 
+        }
         setPassionInEnglish(passionForCert);
 
-        // Wait a tick for the state to update before rendering the canvas
         await new Promise(resolve => setTimeout(resolve, 0));
 
         const canvas = await html2canvas(certificateRef.current, {
-            scale: 2, // Higher scale for better quality
+            scale: 2, 
             useCORS: true,
             backgroundColor: null,
         });
@@ -356,21 +340,12 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
 
   const topPassion = rankedPassions?.rankedPassions[0]?.passion || "";
 
-  // A helper function to render the reasoning and next steps
-  const renderReasoning = (reasoning: string) => {
-      // Since AI is disabled, we always show the fallback reasoning.
-      return (
-        <p className="text-muted-foreground whitespace-pre-wrap">{c.fallback.reasoning}</p>
-      )
-  };
-
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <Certificate ref={certificateRef} name={userName} passion={passionInEnglish || topPassion} userId={certificateId} />
 
         {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={400} />}
         
-        {/* Certificate Download Dialog */}
         <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <DialogHeader>
@@ -403,7 +378,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             </DialogContent>
         </Dialog>
 
-        {/* Report Download Alert Dialog */}
         <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
             <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <AlertDialogHeader className={cn(language === 'ar' ? "text-right" : "text-left")}>
@@ -477,7 +451,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
             </CardHeader>
             <CardContent>
               <h4 className="font-bold mb-2">{c.reasoning}:</h4>
-              {renderReasoning(passion.reasoning)}
+              <p className="text-muted-foreground whitespace-pre-wrap">{passion.reasoning}</p>
             </CardContent>
           </Card>
         ))}

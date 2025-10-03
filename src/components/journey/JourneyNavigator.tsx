@@ -34,11 +34,6 @@ import * as z from "zod";
 import { ConfirmationDialog } from './ConfirmationDialog';
 
 
-// AI Features are temporarily disabled.
-const AIHelperButton = ({ hints, passionName, stationName }: { hints: string[], passionName: string, stationName: string }) => {
-    return null;
-  };
-
 const StarRating = ({ field, stationId }: { field: any, stationId: string }) => {
     const [hover, setHover] = useState(0);
     const { language } = useLanguage();
@@ -153,13 +148,6 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                                 <Lightbulb className="h-5 w-5" />
                             </button>
                           </FormLabel>
-                          {index === 0 && (
-                            <AIHelperButton
-                                hints={stationContent.hints}
-                                passionName={passionName}
-                                stationName={stationContent.name}
-                            />
-                          )}
                       </div>
                     <FormControl>
                       <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
@@ -221,12 +209,6 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
   );
 };
 
-// AI feature disabled
-const SuggestSolutionsButton = ({ passionIndex }: { passionIndex: number }) => {
-    return null;
-}
-
-
 const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number; passionName: string }) => {
     const { control, watch, setValue } = useFormContext();
     const { language } = useLanguage();
@@ -269,7 +251,6 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
             </DialogContent>
         </Dialog>
         <div className="space-y-6">
-            <SuggestSolutionsButton passionIndex={passionIndex} />
             
             {possibilityFields.map((item, index) => {
                 const problem = validProblems[index];
@@ -389,10 +370,8 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     
     if (!stationData) return false;
 
-    // For the possibilities station, we check based on the number of problems
     if (currentFieldName === 'possibilities') {
         const problems = getValues(`passions.${currentPassionIndex}.problems`).filter((p: FieldItem) => p.text.trim() !== '');
-        // Validate that each possibility corresponding to a problem has text and weight
          const validationSchema = z.array(z.object({
             text: z.string().min(1, { message: "Text cannot be empty." }),
             weight: z.number().min(1, { message: "Weight must be selected." }),
@@ -499,7 +478,6 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const isLastStep = currentPassionIndex === totalPassions - 1 && currentPIndex === totalPStations - 1;
 
   const onSubmit = (data: { passions: PassionData[] }) => {
-    // This is called on the final step
     onComplete(data.passions);
   };
   

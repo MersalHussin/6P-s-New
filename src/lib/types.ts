@@ -1,24 +1,13 @@
 
 import type { Timestamp } from "firebase/firestore";
+import type { RankPassionsOutput } from "@/ai/flows/rank-passions";
 
-// Define a simplified RankPassionsOutput locally since the flow is removed
-export interface RankPassionsOutput {
-    rankedPassions: {
-        passion: string;
-        score: number;
-        reasoning: string;
-    }[];
-}
+export type { RankPassionsOutput };
 
 export interface FieldItem {
   id: string;
   text: string;
   weight: number; 
-}
-
-export interface SolutionAttempt {
-    attempt: number;
-    solutions: string[];
 }
 
 export interface PassionData {
@@ -29,7 +18,7 @@ export interface PassionData {
   proof: FieldItem[];
   problems: FieldItem[];
   possibilities: FieldItem[];
-  suggestedSolutions?: SolutionAttempt[];
+  suggestedSolutions?: string[];
   solutionGenerationAttempts?: number;
 }
 
