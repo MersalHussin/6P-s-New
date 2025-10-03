@@ -340,6 +340,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const [showNextPassionDialog, setShowNextPassionDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [confirmDialogData, setConfirmDialogData] = useState<FieldItem[]>([]);
+  const [showAiHelper, setShowAiHelper] = useState(false);
+  const [aiHelpContent, setAiHelpContent] = useState("");
+  const [aiHelpLoading, setAiHelpLoading] = useState(false);
 
   const totalPStations = P_STATIONS.length;
   const totalPassions = initialPassions.length;
@@ -485,6 +488,23 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const station = P_STATIONS[currentPIndex];
   const englishStationName = content.en.stations.find(s => s.id === station.id)?.name;
 
+  const handleAiHelp = async () => {
+    setShowAiHelper(true);
+    setAiHelpLoading(true);
+    setAiHelpContent("");
+    try {
+        // This is a placeholder for the actual AI call.
+        // In a real scenario, you'd call your AI flow here.
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const fakeAiResponse = `This is some AI-generated help content for the station: **${station.name}** and the passion: **${currentPassionName}**. It explains the importance of this step and gives you tips on how to best fill out the information.`;
+        setAiHelpContent(fakeAiResponse);
+    } catch(e) {
+        setAiHelpContent(t.error.description);
+    } finally {
+        setAiHelpLoading(false);
+    }
+  }
+
 
   return (
     <div className="w-full max-w-4xl mx-auto" ref={containerRef}>
@@ -500,6 +520,22 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
             data={confirmDialogData}
         />
         
+        <Dialog open={showAiHelper} onOpenChange={setShowAiHelper}>
+            <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <DialogHeader>
+                    <DialogTitle>{c.aiHelper.title}</DialogTitle>
+                    <DialogDescription>{c.aiHelper.description}</DialogDescription>
+                </DialogHeader>
+                <div className="py-4 whitespace-pre-wrap">
+                    {aiHelpLoading ? <Loader2 className="animate-spin" /> : aiHelpContent}
+                </div>
+                <DialogClose asChild>
+                    <Button>{c.aiHelper.closeButton}</Button>
+                </DialogClose>
+            </DialogContent>
+        </Dialog>
+
+
         <Dialog open={showNextPassionDialog} onOpenChange={setShowNextPassionDialog}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'} className="p-8">
                 <DialogHeader className="text-center">
@@ -570,21 +606,35 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                     <Card key={`${currentPassionIndex}-${currentPIndex}`} className="mt-4 overflow-hidden">
                     <CardHeader className="bg-muted/30">
                         <div className="flex flex-col gap-4">
-                            <div className='flex items-center gap-4'>
-                                <div className="bg-primary/10 text-primary p-3 rounded-full">
-                                    <CurrentStationIcon className="w-8 h-8" />
+                           <div className="flex items-start justify-between">
+                                <div className='flex items-center gap-4'>
+                                    <div className="bg-primary/10 text-primary p-3 rounded-full">
+                                        <CurrentStationIcon className="w-8 h-8" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="font-headline text-2xl flex items-baseline gap-2">
+                                            {language === 'ar' ? `محطة ${station.name}` : `Station: ${station.name}`}
+                                            {language === 'ar' && englishStationName && (
+                                                <span className="text-lg font-body text-muted-foreground">({englishStationName})</span>
+                                            )}
+                                        </CardTitle>
+                                        <CardDescription className="mt-2 text-base">
+                                            {station.description(currentPassionName)}
+                                        </CardDescription>
+                                    </div>
                                 </div>
-                                <div>
-                                    <CardTitle className="font-headline text-2xl flex items-baseline gap-2">
-                                        {language === 'ar' ? `محطة ${station.name}` : `Station: ${station.name}`}
-                                        {language === 'ar' && englishStationName && (
-                                            <span className="text-lg font-body text-muted-foreground">({englishStationName})</span>
-                                        )}
-                                    </CardTitle>
-                                    <CardDescription className="mt-2 text-base">
-                                        {station.description(currentPassionName)}
-                                    </CardDescription>
-                                </div>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button variant="outline" size="icon" onClick={handleAiHelp}>
+                                                <Wand2 className="h-5 w-5 text-accent"/>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{c.aiHelper.tooltip}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
                         </div>
 
