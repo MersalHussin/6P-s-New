@@ -488,7 +488,9 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const station = P_STATIONS[currentPIndex];
   const englishStationName = content.en.stations.find(s => s.id === station.id)?.name;
 
-  const handleAiHelp = async () => {
+  const handleAiHelp = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setShowAiHelper(true);
     setAiHelpLoading(true);
     setAiHelpContent("");
