@@ -361,6 +361,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const [showAiHelper, setShowAiHelper] = useState(false);
   const [aiHelpContent, setAiHelpContent] = useState("");
   const [aiHelpLoading, setAiHelpLoading] = useState(false);
+  const [aiHelpTitle, setAiHelpTitle] = useState("");
 
   const totalPStations = P_STATIONS.length;
   const totalPassions = initialPassions.length;
@@ -511,18 +512,14 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     e.stopPropagation();
     setShowAiHelper(true);
     setAiHelpLoading(true);
-    setAiHelpContent("");
     try {
-        // AI functionality is disabled, show fallback content
-        setAiHelpContent(c.aiHelper.description);
+        // Since AI is disabled, show a realistic message
+        setAiHelpTitle(c.aiHelper.exhausted.title);
+        setAiHelpContent(c.aiHelper.exhausted.description);
     } catch (error) {
         console.error(error);
-        setAiHelpContent(c.aiHelper.description); // Fallback content
-        toast({
-            title: t.error.title,
-            description: t.error.description,
-            variant: "destructive",
-        });
+        setAiHelpTitle(t.error.title);
+        setAiHelpContent(t.error.description);
     } finally {
         setAiHelpLoading(false);
     }
@@ -546,7 +543,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
         <Dialog open={showAiHelper} onOpenChange={setShowAiHelper}>
             <DialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <DialogHeader>
-                    <DialogTitle>{c.aiHelper.title}</DialogTitle>
+                    <DialogTitle>{aiHelpTitle || c.aiHelper.title}</DialogTitle>
                 </DialogHeader>
                 <div className="py-4 whitespace-pre-wrap min-h-[100px]">
                     {aiHelpLoading ? (
@@ -712,3 +709,5 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
     </div>
   );
 }
+
+    

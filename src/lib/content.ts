@@ -167,12 +167,16 @@ export const content: {
             removeButton: "إزالة العنصر",
             suggestSolutionsButton: "اقترح حلولاً للمشاكل",
             aiHelper: {
-                tooltip: "احصل على مساعدة من الذكاء الاصطناعي",
-                buttonTitle: "مساعدة من الذكاء الإصطناعي",
+                tooltip: "احصل على مساعدة",
+                buttonTitle: "مساعدة",
                 title: "مساعد الشغف",
                 description: "إليك شرح مفصل لمساعدتك على التفكير في هذه المحطة بشكل أعمق.",
                 loading: "أفكر في أفضل طريقة لمساعدتك...",
                 closeButton: "إغلاق",
+                exhausted: {
+                    title: "رصيد المساعدة غير متوفر",
+                    description: "لقد استهلكت رصيد المساعدة التجريبي حاليًا. لا يزال بإمكانك إكمال رحلتك بشكل طبيعي بالاعتماد على التلميحات المتاحة في كل حقل."
+                }
             },
             solutionsDialog: {
                 title: "حلول مقترحة",
@@ -409,12 +413,16 @@ export const content: {
             removeButton: "Remove Item",
             suggestSolutionsButton: "Suggest Solutions for Problems",
             aiHelper: {
-                tooltip: "Get help from AI",
-                buttonTitle: "AI Assistant",
+                tooltip: "Get Help",
+                buttonTitle: "Help",
                 title: "Passion Helper",
                 description: "Here is a detailed explanation to help you think about this station more deeply.",
                 loading: "Thinking of the best way to help you...",
                 closeButton: "Close",
+                exhausted: {
+                    title: "Help Credits Unavailable",
+                    description: "You have currently used up your trial help credits. You can still complete your journey normally by relying on the hints available in each field."
+                }
             },
             solutionsDialog: {
                 title: "Suggested Solutions",
@@ -522,5 +530,7 @@ export const content: {
 }
 
   
+
+    
 
     
