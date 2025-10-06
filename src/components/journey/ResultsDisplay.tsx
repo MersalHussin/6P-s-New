@@ -81,7 +81,7 @@ const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): R
     };
 
     const validatedPassions = passions.map(p => ({
-        passion: p.name,
+        name: p.name,
         purpose: filterRatedItems(p.purpose),
         power: filterRatedItems(p.power),
         proof: filterRatedItems(p.proof),
@@ -102,20 +102,30 @@ const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): R
         score += calculate(passion.power, 1);
         score += calculate(passion.proof, 1);
         score += calculate(passion.possibilities, 1);
-        score += calculate(passion.problems, -1);
+        // Problems have a negative impact
+        score -= calculate(passion.problems, 1);
         
         return score;
     }
 
     const passionsWithScores = validatedPassions.map(p => ({
-        passion: p.passion,
+        ...p,
         score: calculateScore(p),
-        reasoning: c.fallback.reasoning,
     }));
 
     passionsWithScores.sort((a, b) => b.score - a.score);
 
-    return { rankedPassions: passionsWithScores };
+    const totalScores = passionsWithScores.reduce((sum, p) => sum + p.score, 0);
+    const averageScore = totalScores / (passionsWithScores.length || 1);
+
+    const finalRankedPassions = passionsWithScores.map(p => ({
+        passion: p.name,
+        score: p.score,
+        reasoning: c.fallback.generateReasoning(p, averageScore),
+    }));
+
+
+    return { rankedPassions: finalRankedPassions };
 }
 
 
@@ -459,3 +469,4 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
     </div>
   );
 }
+

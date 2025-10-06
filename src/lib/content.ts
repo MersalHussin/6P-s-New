@@ -170,12 +170,13 @@ export const content: {
                 tooltip: "احصل على مساعدة",
                 buttonTitle: "مساعدة",
                 title: "مساعد الشغف",
-                description: "إليك شرح مفصل لمساعدتك على التفكير في هذه المحطة بشكل أعمق.",
-                loading: "أفكر في أفضل طريقة لمساعدتك...",
                 closeButton: "إغلاق",
-                exhausted: {
-                    title: "رصيد المساعدة غير متوفر",
-                    description: "لقد استهلكت رصيد المساعدة التجريبي حاليًا. لا يزال بإمكانك إكمال رحلتك بشكل طبيعي بالاعتماد على التلميحات المتاحة في كل حقل."
+                stationContent: {
+                    purpose: "هذه بداية رائعة! في محطة 'الهدف'، نحن نحاول فهم 'لماذا'. لماذا هذا الشغف يهمك؟ \n\n1. فكر في التأثير الذي تريد أن تحدثه. هل تريد مساعدة الآخرين، أم التعبير عن إبداعك، أم تحقيق الاستقلال المالي؟ \n2. ما هي القصة التي تريد أن ترويها من خلال هذا الشغف؟ \n3. لو لم يكن هناك أي عوائق، ماذا كنت ستفعل بهذا الشغف؟ \n\nلا تتردد في الحلم هنا. كلما كان هدفك أسمى، كان دافعك أقوى.",
+                    power: "ممتاز! الآن لنتحدث عن 'كيف'. كل شخص لديه مجموعة فريدة من المهارات والمواهب. في محطة 'القوة'، نريد تحديد أسلحتك السرية. \n\n1. ما هي الأشياء التي يقول الناس أنك جيد فيها وتتعلق بهذا الشغف؟ \n2. ما هي المهارات التي تستمتع باستخدامها حتى لو كانت صعبة؟ \n3. فكر في مهاراتك الشخصية (Soft skills) مثل التواصل أو حل المشكلات، كيف تخدم هذا الشغف؟ \n\nكن فخوراً بنقاط قوتك، فهي الأساس الذي ستبني عليه.",
+                    proof: "عمل رائع! الآن حان وقت 'ماذا'. في محطة 'الإثبات'، نحن نبحث عن دليل ملموس. الأفعال أبلغ من الكلمات. \n\n1. هل قمت بأي مشاريع شخصية، حتى لو كانت صغيرة، في هذا المجال؟ \n2. هل حضرت ورش عمل، أو أخذت دورات تدريبية تتعلق بهذا الشغف؟ \n3. هل هناك أي شخص يمكنك أن تعرض عليه عملك كدليل على اهتمامك؟ \n\nهذه المحطة تبني ثقتك بنفسك وتثبت أن شغفك ليس مجرد فكرة عابرة.",
+                    problems: "هذا طبيعي تمامًا! كل رحلة عظيمة لها تحدياتها. في محطة 'المشاكل'، سنتعامل مع الواقع. \n\n1. ما هي أكبر العقبات التي تشعر أنها تقف في طريقك؟ (وقت، مال، معرفة) \n2. ما هي المخاوف الداخلية التي تمنعك؟ (الخوف من الفشل، رأي الناس) \n3. إذا كان عليك أن تبدأ غدًا، ما هي أول مشكلة ستواجهك؟ \n\nالاعتراف بالمشاكل هو نصف الحل. كن صريحًا وشجاعًا هنا.",
+                    possibilities: "أحسنت! لقد حولنا المشاكل إلى فرص. في محطة 'الحلول الممكنة'، سنطلق العنان للإبداع. \n\n1. لكل مشكلة حددتها، فكر في خطوة واحدة صغيرة يمكنك اتخاذها للتغلب عليها. \n2. كيف يمكنك تحويل هذا الشغف إلى مشروع أو مصدر دخل؟ (عمل حر، منتج، خدمة) \n3. من هم الأشخاص أو الموارد التي يمكن أن تساعدك في تحقيق هذه الحلول؟ \n\nهذه هي محطة التخطيط العملي. حوّل أحلامك إلى خطوات قابلة للتنفيذ."
                 }
             },
             solutionsDialog: {
@@ -240,7 +241,18 @@ export const content: {
             fallback: {
                 title: "التحليل المبدئي لرحلتك",
                 subtitle: "لقد قمنا بحساب النقاط بناءً على إجاباتك. للحصول على تحليل معمق وخطوات عملية، قد تحتاج للانتظار قليلاً أو المحاولة لاحقاً.",
-                reasoning: "للحصول على تحليل معمق وخطة عمل مفصلة، يرجى تحديث الصفحة أو العودة في وقت لاحق. حاليًا، الترتيب يعتمد على حساب النقاط الذي قمت به.",
+                generateReasoning: (passion: any, avg: number) => {
+                    const positiveCount = (passion.purpose?.length || 0) + (passion.power?.length || 0) + (passion.proof?.length || 0) + (passion.possibilities?.length || 0);
+                    const negativeCount = passion.problems?.length || 0;
+            
+                    if (passion.score > avg * 1.2) {
+                        return `جاء هذا الشغف في مرتبة متقدمة بشكل ملحوظ. يبدو أن لديك أهدافًا واضحة (${passion.purpose?.length || 0})، ونقاط قوة داعمة (${passion.power?.length || 0})، وإثباتات قوية (${passion.proof?.length || 0}). الأهم من ذلك، أنك ترى حلولاً ممكنة (${passion.possibilities?.length || 0}) أكثر من المشاكل. هذا مؤشر قوي جدًا!`;
+                    } else if (passion.score < avg * 0.8) {
+                        return `هذا الشغف في مرتبة أقل حاليًا. قد يكون السبب هو وجود عدد كبير من المشاكل (${negativeCount}) مقارنة بالحلول الممكنة، أو ربما لم تكتشف بعد نقاط قوتك وأهدافك العميقة في هذا المجال. قد تحتاج إلى مزيد من الاستكشاف هنا.`;
+                    } else {
+                        return `هذا الشغف يقع في منطقة وسط. لديك بعض نقاط القوة والأهداف ولكن قد تواجه أيضًا بعض التحديات (${negativeCount}) التي تؤثر على نتيجتك. حاول التركيز على تحويل هذه التحديات إلى فرص ممكنة لتعزيز هذا الشغف.`;
+                    }
+                }
             },
         },
         footer: {
@@ -416,12 +428,13 @@ export const content: {
                 tooltip: "Get Help",
                 buttonTitle: "Help",
                 title: "Passion Helper",
-                description: "Here is a detailed explanation to help you think about this station more deeply.",
-                loading: "Thinking of the best way to help you...",
                 closeButton: "Close",
-                exhausted: {
-                    title: "Help Credits Unavailable",
-                    description: "You have currently used up your trial help credits. You can still complete your journey normally by relying on the hints available in each field."
+                stationContent: {
+                    purpose: "This is a great start! In the 'Purpose' station, we're trying to understand the 'why'. Why does this passion matter to you? \n\n1. Think about the impact you want to make. Do you want to help others, express your creativity, or achieve financial independence? \n2. What story do you want to tell through this passion? \n3. If there were no obstacles, what would you do with this passion? \n\nFeel free to dream big here. The loftier your goal, the stronger your motivation.",
+                    power: "Excellent! Now let's talk about the 'how'. Everyone has a unique set of skills and talents. In the 'Power' station, we want to identify your secret weapons. \n\n1. What do people say you're good at that relates to this passion? \n2. What skills do you enjoy using, even if they're challenging? \n3. Think about your soft skills, like communication or problem-solving. How do they serve this passion? \n\nBe proud of your strengths; they are the foundation you will build upon.",
+                    proof: "Great work! Now it's time for the 'what'. In the 'Proof' station, we're looking for tangible evidence. Actions speak louder than words. \n\n1. Have you done any personal projects, even small ones, in this area? \n2. Have you attended workshops or taken courses related to this passion? \n3. Is there anyone you can show your work to as proof of your interest? \n\nThis station builds your confidence and proves that your passion is not just a fleeting thought.",
+                    problems: "This is completely normal! Every great journey has its challenges. In the 'Problems' station, we'll get real. \n\n1. What are the biggest obstacles you feel are in your way? (Time, money, knowledge) \n2. What internal fears are holding you back? (Fear of failure, what people think) \n3. If you had to start tomorrow, what's the first problem you'd face? \n\nAcknowledging the problems is half the solution. Be honest and brave here.",
+                    possibilities: "Well done! We've turned problems into opportunities. In the 'Solutions' station, we'll unleash creativity. \n\n1. For each problem you identified, think of one small step you can take to overcome it. \n2. How can you turn this passion into a project or source of income? (Freelance work, a product, a service) \n3. Who are the people or resources that can help you achieve these solutions? \n\nThis is the practical planning station. Turn your dreams into actionable steps."
                 }
             },
             solutionsDialog: {
@@ -486,7 +499,18 @@ export const content: {
             fallback: {
                 title: "Your Preliminary Journey Results",
                 subtitle: "We have calculated the scores based on your answers. For a detailed analysis and actionable steps, you might need to wait a bit or try again later.",
-                reasoning: "For a more in-depth analysis and a detailed action plan, please refresh the page or come back later. Currently, the ranking is based on the point calculation you completed.",
+                generateReasoning: (passion: any, avg: number) => {
+                    const positiveCount = (passion.purpose?.length || 0) + (passion.power?.length || 0) + (passion.proof?.length || 0) + (passion.possibilities?.length || 0);
+                    const negativeCount = passion.problems?.length || 0;
+            
+                    if (passion.score > avg * 1.2) {
+                      return `This passion ranked significantly high. It seems you have clear goals (${passion.purpose?.length || 0}), supporting strengths (${passion.power?.length || 0}), and strong proofs (${passion.proof?.length || 0}). Most importantly, you see more possible solutions (${passion.possibilities?.length || 0}) than problems. This is a very strong indicator!`;
+                    } else if (passion.score < avg * 0.8) {
+                      return `This passion is currently ranked lower. This might be due to a high number of problems (${negativeCount}) compared to possible solutions, or perhaps you haven't yet discovered your deep strengths and goals in this area. You may need more exploration here.`;
+                    } else {
+                      return `This passion falls in a middle range. You have some strengths and goals but may also face some challenges (${negativeCount}) that affect your score. Try to focus on turning these challenges into opportunities to enhance this passion.`;
+                    }
+                }
             },
         },
         footer: {

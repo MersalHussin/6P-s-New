@@ -137,26 +137,26 @@ const DynamicFieldArray = ({ pIndex, passionIndex, passionName }: { pIndex: numb
                       <div className="flex items-center justify-between">
                           <FormLabel className="font-semibold text-md flex items-center gap-2">
                              {stationContent.singular} {index + 1}
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <button
-                                            type="button"
-                                            className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
-                                            onClick={() => {
-                                            setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
-                                            setHintOpen(true);
-                                            }}
-                                        >
-                                            <Lightbulb className="h-5 w-5" />
-                                        </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{c.aiHelper.tooltip}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
                           </FormLabel>
+                          <TooltipProvider>
+                              <Tooltip>
+                                  <TooltipTrigger asChild>
+                                      <button
+                                          type="button"
+                                          className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
+                                          onClick={() => {
+                                          setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                          setHintOpen(true);
+                                          }}
+                                      >
+                                          <Lightbulb className="h-5 w-5" />
+                                      </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                      <p>{c.aiHelper.tooltip}</p>
+                                  </TooltipContent>
+                              </Tooltip>
+                          </TooltipProvider>
                       </div>
                     <FormControl>
                       <Input {...field} className="text-base" placeholder={c.fieldPlaceholder}/>
@@ -284,26 +284,26 @@ const PossibilitiesForm = ({ passionIndex, passionName }: { passionIndex: number
                                     <div className="flex items-center justify-between">
                                         <FormLabel className="font-semibold text-md flex items-center gap-2">
                                             {c.possibilityLabel}
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <button
-                                                            type="button"
-                                                            className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
-                                                            onClick={() => {
-                                                                setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
-                                                                setHintOpen(true);
-                                                            }}
-                                                            >
-                                                            <Lightbulb className="h-5 w-5" />
-                                                        </button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>{c.aiHelper.tooltip}</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
                                         </FormLabel>
+                                         <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-help text-muted-foreground hover:text-accent h-7 w-7 flex items-center justify-center"
+                                                        onClick={() => {
+                                                            setCurrentHint(stationContent.hints[index % stationContent.hints.length]);
+                                                            setHintOpen(true);
+                                                        }}
+                                                        >
+                                                        <Lightbulb className="h-5 w-5" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{c.aiHelper.tooltip}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
                                     <FormControl>
                                         <Input {...field} className="text-base" placeholder={c.fieldPlaceholder} />
@@ -510,19 +510,13 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
   const handleAiHelp = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    const stationId = station.id as keyof typeof c.aiHelper.stationContent;
+    const helpText = c.aiHelper.stationContent[stationId];
+    
+    setAiHelpTitle(c.aiHelper.title);
+    setAiHelpContent(helpText);
     setShowAiHelper(true);
-    setAiHelpLoading(true);
-    try {
-        // Since AI is disabled, show a realistic message
-        setAiHelpTitle(c.aiHelper.exhausted.title);
-        setAiHelpContent(c.aiHelper.exhausted.description);
-    } catch (error) {
-        console.error(error);
-        setAiHelpTitle(t.error.title);
-        setAiHelpContent(t.error.description);
-    } finally {
-        setAiHelpLoading(false);
-    }
   }
 
 
@@ -651,7 +645,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                             <Button variant="outline" size="icon" onClick={handleAiHelp}>
+                                            <Button variant="outline" size="icon" onClick={handleAiHelp}>
                                                 <Wand2 className="h-5 w-5 text-accent"/>
                                             </Button>
                                         </TooltipTrigger>
