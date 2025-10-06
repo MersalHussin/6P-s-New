@@ -171,6 +171,8 @@ export const content: {
                 buttonTitle: "مساعدة",
                 title: "مساعد الشغف",
                 closeButton: "إغلاق",
+                noApiTitle: "المساعدة غير متاحة مؤقتاً",
+                noApiMessage: "لقد استنفدت رصيد الطلبات من الذكاء الاصطناعي لهذا اليوم. لا تقلق، يمكنك إكمال الرحلة وسيتم حساب نتائجك. حاول مرة أخرى غدًا!",
                 stationContent: {
                     purpose: "هذه بداية رائعة! في محطة 'الهدف'، نحن نحاول فهم 'لماذا'. لماذا هذا الشغف يهمك؟ \n\n1. فكر في التأثير الذي تريد أن تحدثه. هل تريد مساعدة الآخرين، أم التعبير عن إبداعك، أم تحقيق الاستقلال المالي؟ \n2. ما هي القصة التي تريد أن ترويها من خلال هذا الشغف؟ \n3. لو لم يكن هناك أي عوائق، ماذا كنت ستفعل بهذا الشغف؟ \n\nلا تتردد في الحلم هنا. كلما كان هدفك أسمى، كان دافعك أقوى.",
                     power: "ممتاز! الآن لنتحدث عن 'كيف'. كل شخص لديه مجموعة فريدة من المهارات والمواهب. في محطة 'القوة'، نريد تحديد أسلحتك السرية. \n\n1. ما هي الأشياء التي يقول الناس أنك جيد فيها وتتعلق بهذا الشغف؟ \n2. ما هي المهارات التي تستمتع باستخدامها حتى لو كانت صعبة؟ \n3. فكر في مهاراتك الشخصية (Soft skills) مثل التواصل أو حل المشكلات، كيف تخدم هذا الشغف؟ \n\nكن فخوراً بنقاط قوتك، فهي الأساس الذي ستبني عليه.",
@@ -241,16 +243,16 @@ export const content: {
             fallback: {
                 title: "التحليل المبدئي لرحلتك",
                 subtitle: "لقد قمنا بحساب النقاط بناءً على إجاباتك. للحصول على تحليل معمق وخطوات عملية، قد تحتاج للانتظار قليلاً أو المحاولة لاحقاً.",
-                generateReasoning: (passion: any, avg: number) => {
-                    const positiveCount = (passion.purpose?.length || 0) + (passion.power?.length || 0) + (passion.proof?.length || 0) + (passion.possibilities?.length || 0);
-                    const negativeCount = passion.problems?.length || 0;
-            
-                    if (passion.score > avg * 1.2) {
-                        return `جاء هذا الشغف في مرتبة متقدمة بشكل ملحوظ. يبدو أن لديك أهدافًا واضحة (${passion.purpose?.length || 0})، ونقاط قوة داعمة (${passion.power?.length || 0})، وإثباتات قوية (${passion.proof?.length || 0}). الأهم من ذلك، أنك ترى حلولاً ممكنة (${passion.possibilities?.length || 0}) أكثر من المشاكل. هذا مؤشر قوي جدًا!`;
-                    } else if (passion.score < avg * 0.8) {
-                        return `هذا الشغف في مرتبة أقل حاليًا. قد يكون السبب هو وجود عدد كبير من المشاكل (${negativeCount}) مقارنة بالحلول الممكنة، أو ربما لم تكتشف بعد نقاط قوتك وأهدافك العميقة في هذا المجال. قد تحتاج إلى مزيد من الاستكشاف هنا.`;
-                    } else {
-                        return `هذا الشغف يقع في منطقة وسط. لديك بعض نقاط القوة والأهداف ولكن قد تواجه أيضًا بعض التحديات (${negativeCount}) التي تؤثر على نتيجتك. حاول التركيز على تحويل هذه التحديات إلى فرص ممكنة لتعزيز هذا الشغف.`;
+                reasoningTemplates: {
+                    purpose: (item: string) => `لديك هدف واضح يتمثل في "${item}"، وهذا دافع قوي.`,
+                    power: (item: string) => `تمتلك نقطة قوة مميزة في "${item}"، وهذا يعزز من فرص نجاحك.`,
+                    proof: (item: string) => `خبرتك السابقة في "${item}" تشكل إثباتًا قويًا على جديتك.`,
+                    possibilities: `تفاؤلك بالحلول الممكنة أكبر من تأثير المشاكل، وهذا مؤشر إيجابي جدًا.`,
+                    problems: (item: string) => `على الرغم من وجود تحديات مثل "${item}"، إلا أنك لم تدعها توقفك.`,
+                    summary: {
+                        high: "بشكل عام، يظهر هذا الشغف كخيار واعد جدًا لك بناءً على إجاباتك المتوازنة والقوية.",
+                        medium: "هذا الشغف لديه إمكانيات جيدة، ولكن قد يحتاج إلى مزيد من التركيز على تحويل التحديات إلى فرص.",
+                        low: "قد يكون هذا الشغف أقل أولوية حاليًا، ربما لأنه يتطلب المزيد من الاستكشاف لتحديد أهدافك ونقاط قوتك فيه."
                     }
                 }
             },
@@ -429,6 +431,8 @@ export const content: {
                 buttonTitle: "Help",
                 title: "Passion Helper",
                 closeButton: "Close",
+                noApiTitle: "Help Temporarily Unavailable",
+                noApiMessage: "The request quota for the AI assistant has been exhausted for today. Don't worry, you can complete the journey and your results will be calculated. Please try again tomorrow!",
                 stationContent: {
                     purpose: "This is a great start! In the 'Purpose' station, we're trying to understand the 'why'. Why does this passion matter to you? \n\n1. Think about the impact you want to make. Do you want to help others, express your creativity, or achieve financial independence? \n2. What story do you want to tell through this passion? \n3. If there were no obstacles, what would you do with this passion? \n\nFeel free to dream big here. The loftier your goal, the stronger your motivation.",
                     power: "Excellent! Now let's talk about the 'how'. Everyone has a unique set of skills and talents. In the 'Power' station, we want to identify your secret weapons. \n\n1. What do people say you're good at that relates to this passion? \n2. What skills do you enjoy using, even if they're challenging? \n3. Think about your soft skills, like communication or problem-solving. How do they serve this passion? \n\nBe proud of your strengths; they are the foundation you will build upon.",
@@ -499,16 +503,16 @@ export const content: {
             fallback: {
                 title: "Your Preliminary Journey Results",
                 subtitle: "We have calculated the scores based on your answers. For a detailed analysis and actionable steps, you might need to wait a bit or try again later.",
-                generateReasoning: (passion: any, avg: number) => {
-                    const positiveCount = (passion.purpose?.length || 0) + (passion.power?.length || 0) + (passion.proof?.length || 0) + (passion.possibilities?.length || 0);
-                    const negativeCount = passion.problems?.length || 0;
-            
-                    if (passion.score > avg * 1.2) {
-                      return `This passion ranked significantly high. It seems you have clear goals (${passion.purpose?.length || 0}), supporting strengths (${passion.power?.length || 0}), and strong proofs (${passion.proof?.length || 0}). Most importantly, you see more possible solutions (${passion.possibilities?.length || 0}) than problems. This is a very strong indicator!`;
-                    } else if (passion.score < avg * 0.8) {
-                      return `This passion is currently ranked lower. This might be due to a high number of problems (${negativeCount}) compared to possible solutions, or perhaps you haven't yet discovered your deep strengths and goals in this area. You may need more exploration here.`;
-                    } else {
-                      return `This passion falls in a middle range. You have some strengths and goals but may also face some challenges (${negativeCount}) that affect your score. Try to focus on turning these challenges into opportunities to enhance this passion.`;
+                reasoningTemplates: {
+                    purpose: (item: string) => `You have a clear purpose represented by "${item}", which is a strong motivator.`,
+                    power: (item: string) => `You possess a distinct strength in "${item}", which enhances your chances of success.`,
+                    proof: (item: string) => `Your past experience in "${item}" serves as strong proof of your seriousness.`,
+                    possibilities: `Your optimism about possible solutions outweighs the impact of the problems, which is a very positive sign.`,
+                    problems: (item: string) => `Despite facing challenges like "${item}", you haven't let them stop you.`,
+                    summary: {
+                        high: "Overall, this passion appears to be a very promising option for you based on your balanced and strong answers.",
+                        medium: "This passion has good potential, but it may require more focus on turning challenges into opportunities.",
+                        low: "This passion might be a lower priority for now, perhaps because it requires more exploration to define your goals and strengths within it."
                     }
                 }
             },
@@ -556,5 +560,8 @@ export const content: {
   
 
     
+
+    
+
 
     

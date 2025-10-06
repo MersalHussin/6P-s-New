@@ -71,7 +71,7 @@ const downloadContent = {
 }
 
 const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): RankPassionsOutput => {
-    const c = content[language].results;
+    const c = content[language].results.fallback;
 
     const filterRatedItems = (items: FieldItem[] | undefined): FieldItem[] => {
         if (!Array.isArray(items)) {
@@ -102,7 +102,6 @@ const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): R
         score += calculate(passion.power, 1);
         score += calculate(passion.proof, 1);
         score += calculate(passion.possibilities, 1);
-        // Problems have a negative impact
         score -= calculate(passion.problems, 1);
         
         return score;
@@ -115,15 +114,58 @@ const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): R
 
     passionsWithScores.sort((a, b) => b.score - a.score);
 
-    const totalScores = passionsWithScores.reduce((sum, p) => sum + p.score, 0);
-    const averageScore = totalScores / (passionsWithScores.length || 1);
+    const getTopItems = (items: FieldItem[], count = 1) => items.sort((a, b) => b.weight - a.weight).slice(0, count).map(i => i.text);
 
-    const finalRankedPassions = passionsWithScores.map(p => ({
-        passion: p.name,
-        score: p.score,
-        reasoning: c.fallback.generateReasoning(p, averageScore),
-    }));
+    const finalRankedPassions = passionsWithScores.map(p => {
+        const reasoningParts = [];
+        
+        // Purpose analysis
+        const highPurpose = p.purpose.filter(i => i.weight >= 4);
+        if (highPurpose.length > 0) {
+            reasoningParts.push(c.reasoningTemplates.purpose(getTopItems(highPurpose)[0]));
+        }
 
+        // Power analysis
+        const highPower = p.power.filter(i => i.weight >= 4);
+        if (highPower.length > 0) {
+            reasoningParts.push(c.reasoningTemplates.power(getTopItems(highPower)[0]));
+        }
+
+        // Proof analysis
+        const highProof = p.proof.filter(i => i.weight >= 4);
+        if (highProof.length > 0) {
+            reasoningParts.push(c.reasoningTemplates.proof(getTopItems(highProof)[0]));
+        }
+
+        // Problems vs. Possibilities
+        const problemScore = p.problems.reduce((acc, item) => acc + item.weight, 0);
+        const possibilityScore = p.possibilities.reduce((acc, item) => acc + item.weight, 0);
+
+        if (possibilityScore > problemScore) {
+            reasoningParts.push(c.reasoningTemplates.possibilities);
+        } else {
+            const highProblem = p.problems.filter(i => i.weight >= 4);
+            if (highProblem.length > 0) {
+                reasoningParts.push(c.reasoningTemplates.problems(getTopItems(highProblem)[0]));
+            }
+        }
+        
+        // Final Summary
+        if (p.score > 10) {
+             reasoningParts.push(c.reasoningTemplates.summary.high);
+        } else if (p.score < 5) {
+             reasoningParts.push(c.reasoningTemplates.summary.low);
+        } else {
+             reasoningParts.push(c.reasoningTemplates.summary.medium);
+        }
+
+
+        return {
+            passion: p.name,
+            score: p.score,
+            reasoning: reasoningParts.join("\n- "),
+        };
+    });
 
     return { rankedPassions: finalRankedPassions };
 }
@@ -470,3 +512,6 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
   );
 }
 
+
+
+    
