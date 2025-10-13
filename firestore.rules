@@ -1,14 +1,14 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow public queries (list) and reads (get) on the users collection for certificate verification
     match /users/{userId} {
-      // Allow anyone to read the fields necessary for certificate verification.
-      allow get: if true; 
-      
-      // Allow authenticated users to read their own full document and update their own data.
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow list, get: if true;
+      // Allow authenticated users to write to their own document
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
-
+    
+    // Allow anyone to read the admin access code (for admin sign-in)
     match /config/admin {
         allow get: if true;
     }
