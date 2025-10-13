@@ -36,49 +36,40 @@ export default function AdminSignInPage() {
         return;
     }
 
-    try {
-      const configDocRef = doc(db, 'config', 'admin');
-      const configDoc = await getDoc(configDocRef);
+    const configDocRef = doc(db, 'config', 'admin');
+    const configDoc = await getDoc(configDocRef);
 
-      if (configDoc.exists()) {
-        const correctCode = configDoc.data().accessCode;
-        if (accessCode === correctCode) {
-            try {
-                sessionStorage.setItem(ADMIN_ACCESS_KEY, "true");
-                toast({
-                    title: 'Access Granted',
-                    description: "Redirecting to dashboard...",
-                });
-                router.push('/admin');
-            } catch (sessionError) {
-                toast({
-                    title: 'Login failed',
-                    description: "Could not set session. Please enable cookies/session storage.",
-                    variant: 'destructive',
-                });
-                setLoading(false);
-            }
-        } else {
-            toast({
-                title: 'Access Denied',
-                description: "The access code is incorrect.",
-                variant: 'destructive',
-            });
-            setLoading(false);
-        }
+    if (configDoc.exists()) {
+      const correctCode = configDoc.data().accessCode;
+      if (accessCode === correctCode) {
+          try {
+              sessionStorage.setItem(ADMIN_ACCESS_KEY, "true");
+              toast({
+                  title: 'Access Granted',
+                  description: "Redirecting to dashboard...",
+              });
+              router.push('/admin');
+          } catch (sessionError) {
+              toast({
+                  title: 'Login failed',
+                  description: "Could not set session. Please enable cookies/session storage.",
+                  variant: 'destructive',
+              });
+              setLoading(false);
+          }
       } else {
-         toast({
-            title: 'Configuration Error',
-            description: "Admin access code is not set up in the database.",
-            variant: 'destructive',
-        });
-        setLoading(false);
+          toast({
+              title: 'Access Denied',
+              description: "The access code is incorrect.",
+              variant: 'destructive',
+          });
+          setLoading(false);
       }
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
+    } else {
+       toast({
+          title: 'Configuration Error',
+          description: "Admin access code is not set up in the database.",
+          variant: 'destructive',
       });
       setLoading(false);
     }
@@ -121,3 +112,4 @@ export default function AdminSignInPage() {
   );
 }
 
+    

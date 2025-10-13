@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -123,7 +124,7 @@ export default function OnboardingPage() {
         return () => unsubscribe();
     }, [router]);
 
-    const handleOnboardingSubmit = async (values: z.infer<typeof onboardingSchema>) => {
+    const handleOnboardingSubmit = (values: z.infer<typeof onboardingSchema>) => {
         if (!user) return;
         form.clearErrors();
         setLoading(true);
@@ -147,14 +148,13 @@ export default function OnboardingPage() {
 
         const userDocRef = doc(db, "users", user.uid);
         
-        try {
-            await setDoc(userDocRef, userData, { merge: true });
-            toast({
+        setDoc(userDocRef, userData, { merge: true }).then(() => {
+             toast({
                 title: c.toastSuccessTitle,
                 description: c.toastSuccessDescription,
             });
             router.push('/journey');
-        } catch(serverError: any) {
+        }).catch(async (serverError: any) => {
             const permissionError = new FirestorePermissionError({
                 path: userDocRef.path,
                 operation: 'create',
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
             });
             errorEmitter.emit('permission-error', permissionError);
             setLoading(false);
-        }
+        });
     };
 
     if (loading && !user) {
@@ -317,3 +317,5 @@ export default function OnboardingPage() {
         </div>
     );
 }
+
+    
