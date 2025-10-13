@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -102,6 +101,7 @@ export default function JourneyPage() {
         lastUpdated: serverTimestamp()
     };
 
+    // NO await here. Chain the .catch() block.
     setDoc(userDocRef, dataToUpdate, { merge: true })
         .catch(async (serverError) => {
             const permissionError = new FirestorePermissionError({
@@ -177,5 +177,3 @@ export default function JourneyPage() {
     </div>
   );
 }
-
-    
