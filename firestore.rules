@@ -1,13 +1,13 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // This rule allows anyone to read and write to the "users" collection.
-    // This is necessary for the initial user creation (addDoc) and for the admin dashboard to read all user data.
-    // In a production app with real user authentication, you would want to restrict this further.
-    // For example, users should only be able to write to their own document.
-    match /users/{document=**} {
-      allow read, write: if true;
+    // Allow users to read and write only their own data in the 'users' collection
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Allow anyone to read the admin access code (for admin sign-in)
+    match /config/admin {
+        allow get: if true;
     }
   }
 }
