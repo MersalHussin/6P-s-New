@@ -29,6 +29,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Globe, LogOut, User as UserIcon, Loader2, MoveLeft, RefreshCw, Home, ShieldQuestion, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { UserProfileDialog } from "@/components/journey/UserProfileDialog";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const content = {
   ar: {
@@ -151,19 +153,28 @@ export function AppHeader() {
     router.push('/');
   };
 
-  const handleRestartJourney = async () => {
+  const handleRestartJourney = () => {
     if (!user) return;
-    try {
-        const userDocRef = doc(db, "users", user.uid);
-        await updateDoc(userDocRef, {
-            journeyData: [],
-            resultsData: null,
-            currentStation: 'passions'
+    
+    const userDocRef = doc(db, "users", user.uid);
+    const dataToUpdate = {
+        journeyData: [],
+        resultsData: null,
+        currentStation: 'passions'
+    };
+
+    updateDoc(userDocRef, dataToUpdate)
+        .then(() => {
+            window.location.href = '/journey';
+        })
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: userDocRef.path,
+                operation: 'update',
+                requestResourceData: dataToUpdate,
+            });
+            errorEmitter.emit('permission-error', permissionError);
         });
-        window.location.href = '/journey';
-    } catch (error) {
-        console.error("Error restarting journey: ", error);
-    }
   }
 
   const handleStartJourney = () => {

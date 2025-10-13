@@ -14,6 +14,8 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { AppHeader } from "@/components/layout/Header";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const loadingContent = {
     ar: {
@@ -91,17 +93,24 @@ export default function JourneyPage() {
     }
   };
 
-  const updateFirestore = async (data: Partial<UserData>) => {
+  const updateFirestore = (data: Partial<UserData>) => {
     if (!user) return;
-    try {
-        const userDocRef = doc(db, "users", user.uid);
-        await setDoc(userDocRef, {
-            ...data,
-            lastUpdated: serverTimestamp()
-        }, { merge: true });
-    } catch (error) {
-        console.error("Error updating document: ", error);
-    }
+    
+    const userDocRef = doc(db, "users", user.uid);
+    const dataToUpdate = {
+        ...data,
+        lastUpdated: serverTimestamp()
+    };
+
+    setDoc(userDocRef, dataToUpdate, { merge: true })
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: userDocRef.path,
+                operation: 'update',
+                requestResourceData: dataToUpdate,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
   };
 
   const handlePassionsSubmit = (passions: { name: string }[]) => {
@@ -168,3 +177,5 @@ export default function JourneyPage() {
     </div>
   );
 }
+
+    

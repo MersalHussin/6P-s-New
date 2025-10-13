@@ -1,7 +1,9 @@
+
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { LanguageProvider } from "@/context/language-context";
+import { FirebaseErrorListener } from "@/components/FirebaseErrorListener";
 
 export const metadata: Metadata = {
   title: "Passion Path",
@@ -28,6 +30,7 @@ export default function RootLayout({
           />
         </head>
         <body className="font-body antialiased">
+          <FirebaseErrorListener />
           {children}
           <Toaster />
         </body>
@@ -35,3 +38,5 @@ export default function RootLayout({
     </LanguageProvider>
   );
 }
+
+    

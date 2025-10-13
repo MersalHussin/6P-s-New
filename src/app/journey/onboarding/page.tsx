@@ -20,6 +20,8 @@ import { Loader2, User as UserIcon } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { countries } from '@/lib/countries';
 import { cn } from '@/lib/utils';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const content = {
     ar: {
@@ -130,33 +132,36 @@ export default function OnboardingPage() {
             ? values.otherEducationStatus 
             : values.educationStatus;
 
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                id: user.uid,
-                email: user.email,
-                name: values.name,
-                whatsapp: `${values.countryCode}${values.phone}`,
-                educationStatus: finalEducationStatus,
-                school: values.school,
-                job: values.job,
-                createdAt: serverTimestamp(),
-                lastUpdated: serverTimestamp(),
-                currentStation: 'passions'
-            }, { merge: true });
+        const userData = {
+            id: user.uid,
+            email: user.email,
+            name: values.name,
+            whatsapp: `${values.countryCode}${values.phone}`,
+            educationStatus: finalEducationStatus,
+            school: values.school,
+            job: values.job,
+            createdAt: serverTimestamp(),
+            lastUpdated: serverTimestamp(),
+            currentStation: 'passions'
+        };
 
+        const userDocRef = doc(db, "users", user.uid);
+        
+        setDoc(userDocRef, userData, { merge: true }).then(() => {
             toast({
                 title: c.toastSuccessTitle,
                 description: c.toastSuccessDescription,
             });
             router.push('/journey');
-        } catch (error: any) {
-            toast({
-                title: c.toastErrorTitle,
-                description: error.message,
-                variant: 'destructive',
+        }).catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: userDocRef.path,
+                operation: 'create',
+                requestResourceData: userData,
             });
+            errorEmitter.emit('permission-error', permissionError);
             setLoading(false);
-        }
+        });
     };
 
     if (loading && !user) {
@@ -311,7 +316,5 @@ export default function OnboardingPage() {
         </div>
     );
 }
-
-    
 
     
