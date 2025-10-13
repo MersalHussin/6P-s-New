@@ -253,6 +253,12 @@ export const content: {
                         high: "بشكل عام، يظهر هذا الشغف كخيار واعد جدًا لك بناءً على إجاباتك المتوازنة والقوية.",
                         medium: "هذا الشغف لديه إمكانيات جيدة، ولكن قد يحتاج إلى مزيد من التركيز على تحويل التحديات إلى فرص.",
                         low: "قد يكون هذا الشغف أقل أولوية حاليًا، ربما لأنه يتطلب المزيد من الاستكشاف لتحديد أهدافك ونقاط قوتك فيه."
+                    },
+                    finalAdvice: {
+                        rank1: "نصيحة: هذا هو شغفك الأقوى! إنه يمثل أفضل فرصة لك للنجاح والتأثير. ركز طاقتك هنا، وابدأ في تحويله إلى واقع ملموس.",
+                        rank2: "نصيحة: هذا شغف واعد جدًا. فكر في كيفية دمجه مع شغفك الأول، أو اعتبره خطة بديلة قوية يمكنك تطويرها بالتوازي.",
+                        rank3: "نصيحة: هذا يمكن أن يكون هواية رائعة أو مجالًا جانبيًا تستمتع به. لا تضعه كأولوية قصوى الآن، لكن لا تهمله تمامًا.",
+                        default: "نصيحة: في الوقت الحالي، قد يكون من الأفضل ترك هذا الشغف جانبًا والتركيز على الخيارات ذات الأولوية الأعلى لضمان عدم تشتيت جهودك.",
                     }
                 }
             },
@@ -513,6 +519,12 @@ export const content: {
                         high: "Overall, this passion appears to be a very promising option for you based on your balanced and strong answers.",
                         medium: "This passion has good potential, but it may require more focus on turning challenges into opportunities.",
                         low: "This passion might be a lower priority for now, perhaps because it requires more exploration to define your goals and strengths within it."
+                    },
+                    finalAdvice: {
+                        rank1: "Advice: This is your strongest passion! It represents your best opportunity for success and impact. Focus your energy here, and start turning it into a tangible reality.",
+                        rank2: "Advice: This is a very promising passion. Think about how you might integrate it with your top passion, or consider it a strong alternative to develop in parallel.",
+                        rank3: "Advice: This could be a great hobby or a side-interest you enjoy. Don't make it a top priority right now, but don't neglect it entirely.",
+                        default: "Advice: For now, it might be best to set this passion aside and focus on higher-priority options to ensure your efforts are not diluted.",
                     }
                 }
             },

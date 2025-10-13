@@ -116,7 +116,7 @@ const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): R
 
     const getTopItems = (items: FieldItem[], count = 1) => items.sort((a, b) => b.weight - a.weight).slice(0, count).map(i => i.text);
 
-    const finalRankedPassions = passionsWithScores.map(p => {
+    const finalRankedPassions = passionsWithScores.map((p, index) => {
         const reasoningParts = [];
         
         // Purpose analysis
@@ -158,6 +158,19 @@ const fallbackRankPassions = (passions: PassionData[], language: 'ar' | 'en'): R
         } else {
              reasoningParts.push(c.reasoningTemplates.summary.medium);
         }
+        
+        // Add final advice based on rank
+        let finalAdvice = "";
+        if (index === 0) {
+            finalAdvice = c.reasoningTemplates.finalAdvice.rank1;
+        } else if (index === 1) {
+            finalAdvice = c.reasoningTemplates.finalAdvice.rank2;
+        } else if (index === 2) {
+            finalAdvice = c.reasoningTemplates.finalAdvice.rank3;
+        } else {
+            finalAdvice = c.reasoningTemplates.finalAdvice.default;
+        }
+        reasoningParts.push(`\n${finalAdvice}`);
 
 
         return {
