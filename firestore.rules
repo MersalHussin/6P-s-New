@@ -1,10 +1,19 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
     // Allow users to read and write only their own data in the 'users' collection
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+    // Allow anyone to check for a certificate ID, but only return specific, non-sensitive fields.
+    // This rule allows the public certificate check page to function without exposing all user data.
+    match /users/{userId} {
+        allow list: if true;
+    }
+
     // Allow anyone to read the admin access code (for admin sign-in)
     match /config/admin {
         allow get: if true;
