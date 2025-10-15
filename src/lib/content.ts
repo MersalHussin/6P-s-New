@@ -70,7 +70,7 @@ export const content: {
         },
         stations: [
             { 
-                id: 'passion-selection', name: 'تحديد الشغف', singular: 'الشغف', englishName: 'Passion Selection', icon: Flame,
+                id: 'passion-selection', name: 'تحديد الشغف', singular: 'الشغف', englishName: 'Passion', icon: Flame,
                 description: () => 'أول خطوة هي تحديد الاهتمامات اللي بتحبها. هتختار من 3 لـ 6 مجالات عشان نبدأ رحلة استكشافهم مع بعض.',
                 hints: []
             },
@@ -111,7 +111,7 @@ export const content: {
                 ] 
             },
             { 
-                id: 'possibilities', name: 'الحلول الممكنة', singular: 'الحل الممكن', englishName: 'Solutions', icon: Lightbulb,
+                id: 'possibilities', name: 'الخطوات الممكنة', singular: 'الخطوة الممكنة', englishName: 'Possible Steps', icon: Lightbulb,
                 description: (passionName) => `لكل مشكلة حل! بناءً على التحديات التي حددتها لشغفك في "${passionName}"، فكر في خطوات عملية ومبتكرة لتجاوزها.`,
                 hints: [ 
                     'حول كل مشكلة إلى فرصة. كيف يمكنك تحويل هذا التحدي إلى خطوة للأمام؟',
@@ -134,14 +134,14 @@ export const content: {
             fieldLabel: "العنصر",
             fieldPlaceholder: "اكتب هنا...",
             problemLabel: "المشكلة",
-            possibilityLabel: "الحل المقترح أو الخطوة التالية",
+            possibilityLabel: "الخطوة المقترحة أو التالية",
             orLabel: "أو",
             weightLabels: {
                 purpose: "ما مدى أهمية هذا الهدف بالنسبة لك؟",
                 power: "ما مدى قوة هذه المهارة لديك؟",
                 proof: "ما مدى قوة هذا الإثبات؟",
                 problems: "ما مدى تأثير هذه المشكلة؟",
-                possibilities: "ما مدى حماسك وقناعتك بهذا الحل؟",
+                possibilities: "ما مدى حماسك وقناعتك بهذه الخطوة؟",
                 default: "تقييمك"
             },
             ratings: {
@@ -179,7 +179,7 @@ export const content: {
                     power: "ممتاز! الآن لنتحدث عن 'كيف'. كل شخص لديه مجموعة فريدة من المهارات والمواهب. في محطة 'القوة'، نريد تحديد أسلحتك السرية. \n\n1. ما هي الأشياء التي يقول الناس أنك جيد فيها وتتعلق بهذا الشغف؟ \n2. ما هي المهارات التي تستمتع باستخدامها حتى لو كانت صعبة؟ \n3. فكر في مهاراتك الشخصية (Soft skills) مثل التواصل أو حل المشكلات، كيف تخدم هذا الشغف؟ \n\nكن فخوراً بنقاط قوتك، فهي الأساس الذي ستبني عليه.",
                     proof: "عمل رائع! الآن حان وقت 'ماذا'. في محطة 'الإثبات'، نحن نبحث عن دليل ملموس. الأفعال أبلغ من الكلمات. \n\n1. هل قمت بأي مشاريع شخصية، حتى لو كانت صغيرة، في هذا المجال؟ \n2. هل حضرت ورش عمل، أو أخذت دورات تدريبية تتعلق بهذا الشغف؟ \n3. هل هناك أي شخص يمكنك أن تعرض عليه عملك كدليل على اهتمامك؟ \n\nهذه المحطة تبني ثقتك بنفسك وتثبت أن شغفك ليس مجرد فكرة عابرة.",
                     problems: "هذا طبيعي تمامًا! كل رحلة عظيمة لها تحدياتها. في محطة 'المشاكل'، سنتعامل مع الواقع. \n\n1. ما هي أكبر العقبات التي تشعر أنها تقف في طريقك؟ (وقت، مال، معرفة) \n2. ما هي المخاوف الداخلية التي تمنعك؟ (الخوف من الفشل، رأي الناس) \n3. إذا كان عليك أن تبدأ غدًا، ما هي أول مشكلة ستواجهك؟ \n\nالاعتراف بالمشاكل هو نصف الحل. كن صريحًا وشجاعًا هنا.",
-                    possibilities: "أحسنت! لقد حولنا المشاكل إلى فرص. في محطة 'الحلول الممكنة'، سنطلق العنان للإبداع. \n\n1. لكل مشكلة حددتها، فكر في خطوة واحدة صغيرة يمكنك اتخاذها للتغلب عليها. \n2. كيف يمكنك تحويل هذا الشغف إلى مشروع أو مصدر دخل؟ (عمل حر، منتج، خدمة) \n3. من هم الأشخاص أو الموارد التي يمكن أن تساعدك في تحقيق هذه الحلول؟ \n\nهذه هي محطة التخطيط العملي. حوّل أحلامك إلى خطوات قابلة للتنفيذ."
+                    possibilities: "أحسنت! لقد حولنا المشاكل إلى فرص. في محطة 'الخطوات الممكنة'، سنطلق العنان للإبداع. \n\n1. لكل مشكلة حددتها، فكر في خطوة واحدة صغيرة يمكنك اتخاذها للتغلب عليها. \n2. كيف يمكنك تحويل هذا الشغف إلى مشروع أو مصدر دخل؟ (عمل حر، منتج، خدمة) \n3. من هم الأشخاص أو الموارد التي يمكن أن تساعدك في تحقيق هذه الخطوات؟ \n\nهذه هي محطة التخطيط العملي. حوّل أحلامك إلى خطوات قابلة للتنفيذ."
                 }
             },
             solutionsDialog: {
@@ -259,7 +259,7 @@ export const content: {
                         rank1: "نصيحة: هذا هو شغفك الأقوى! إنه يمثل أفضل فرصة لك للنجاح والتأثير. ركز طاقتك هنا، وابدأ في تحويله إلى واقع ملموس.",
                         rank2: "نصيحة: هذا شغف واعد جدًا. فكر في كيفية دمجه مع شغفك الأول، أو اعتبره خطة بديلة قوية يمكنك تطويرها بالتوازي.",
                         rank3: "نصيحة: هذا يمكن أن يكون هواية رائعة أو مجالًا جانبيًا تستمتع به. لا تضعه كأولوية قصوى الآن، لكن لا تهمله تمامًا.",
-                        default: "نصي-حة: في الوقت الحالي، قد يكون من الأفضل ترك هذا الشغف جانبًا والتركيز على الخيارات ذات الأولوية الأعلى لضمان عدم تشتيت جهودك.",
+                        default: "نصيحة: في الوقت الحالي، قد يكون من الأفضل ترك هذا الشغف جانبًا والتركيز على الخيارات ذات الأولوية الأعلى لضمان عدم تشتيت جهودك.",
                     }
                 }
             },
@@ -377,7 +377,7 @@ export const content: {
                 ] 
             },
             { 
-                id: 'possibilities', name: 'Solutions', singular: 'Solution', icon: Lightbulb,
+                id: 'possibilities', name: 'Possible Steps', singular: 'Possible Step', icon: Lightbulb,
                 description: (passionName) => `For every problem, there's a solution! Based on the challenges you've identified for your passion in "${passionName}", think of practical and innovative steps to overcome them.`,
                 hints: [
                     'Turn every problem into an opportunity. How can you turn this challenge into a step forward?',
@@ -400,14 +400,14 @@ export const content: {
             fieldLabel: "Item",
             fieldPlaceholder: "Type here...",
             problemLabel: "The Problem",
-            possibilityLabel: "The Proposed Solution or Next Step",
+            possibilityLabel: "The Proposed Step or Next Action",
             orLabel: "OR",
             weightLabels: {
                 purpose: "How important is this goal to you?",
                 power: "How strong is this skill of yours?",
                 proof: "How strong is this proof?",
                 problems: "How impactful is this problem?",
-                possibilities: "How excited and confident are you about this solution?",
+                possibilities: "How excited and confident are you about this step?",
                 default: "Your Rating"
             },
             ratings: {
@@ -445,7 +445,7 @@ export const content: {
                     power: "Excellent! Now let's talk about the 'how'. Everyone has a unique set of skills and talents. In the 'Power' station, we want to identify your secret weapons. \n\n1. What do people say you're good at that relates to this passion? \n2. What skills do you enjoy using, even if they're challenging? \n3. Think about your soft skills, like communication or problem-solving. How do they serve this passion? \n\nBe proud of your strengths; they are the foundation you will build upon.",
                     proof: "Great work! Now it's time for the 'what'. In the 'Proof' station, we're looking for tangible evidence. Actions speak louder than words. \n\n1. Have you done any personal projects, even small ones, in this area? \n2. Have you attended workshops or taken courses related to this passion? \n3. Is there anyone you can show your work to as proof of your interest? \n\nThis station builds your confidence and proves that your passion is not just a fleeting thought.",
                     problems: "This is completely normal! Every great journey has its challenges. In the 'Problems' station, we'll get real. \n\n1. What are the biggest obstacles you feel are in your way? (Time, money, knowledge) \n2. What internal fears are holding you back? (Fear of failure, what people think) \n3. If you had to start tomorrow, what's the first problem you'd face? \n\nAcknowledging the problems is half the solution. Be honest and brave here.",
-                    possibilities: "Well done! We've turned problems into opportunities. In the 'Solutions' station, we'll unleash creativity. \n\n1. For each problem you identified, think of one small step you can take to overcome it. \n2. How can you turn this passion into a project or source of income? (Freelance work, a product, a service) \n3. Who are the people or resources that can help you achieve these solutions? \n\nThis is the practical planning station. Turn your dreams into actionable steps."
+                    possibilities: "Well done! We've turned problems into opportunities. In the 'Possible Steps' station, we'll unleash creativity. \n\n1. For each problem you identified, think of one small step you can take to overcome it. \n2. How can you turn this passion into a project or source of income? (Freelance work, a product, a service) \n3. Who are the people or resources that can help you achieve these steps? \n\nThis is the practical planning station. Turn your dreams into actionable steps."
                 }
             },
             solutionsDialog: {
@@ -578,4 +578,5 @@ export const content: {
 
 
     
+
 

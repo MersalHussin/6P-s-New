@@ -403,7 +403,7 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
          if (!result.success) {
             toast({
                 title: t.validationError.title,
-                description: language === 'ar' ? 'الرجاء كتابة حل وتقييم لكل مشكلة.' : 'Please write and rate a solution for each problem.',
+                description: language === 'ar' ? 'الرجاء كتابة خطوة وتقييم لكل مشكلة.' : 'Please write and rate a step for each problem.',
                 variant: "destructive",
             });
             return false;
@@ -705,3 +705,4 @@ export function JourneyNavigator({ initialPassions, onComplete, onDataChange }: 
 }
 
     
+
