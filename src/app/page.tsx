@@ -119,10 +119,10 @@ export default function Home() {
                                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mb-4">
                                         <Icon className="h-6 w-6 text-primary"/>
                                     </div>
-                                    <CardTitle className="font-headline text-2xl">
-                                        {station.name}
+                                    <CardTitle className="font-headline text-2xl flex flex-col items-center">
+                                        <span>{station.name}</span>
                                         {language === 'ar' && station.englishName && (
-                                            <span className="text-lg text-muted-foreground ml-2">({station.englishName})</span>
+                                            <span className="text-lg text-muted-foreground font-normal">({station.englishName})</span>
                                         )}
                                     </CardTitle>
                                 </CardHeader>
@@ -155,4 +155,5 @@ export default function Home() {
 }
 
     
+
 
