@@ -6,6 +6,7 @@ interface StationInfo {
     id: string;
     name: string;
     singular: string;
+    englishName?: string;
     icon: LucideIcon;
     description: (passionName: string) => string;
     hints: string[];
@@ -69,12 +70,12 @@ export const content: {
         },
         stations: [
             { 
-                id: 'passion-selection', name: 'تحديد الشغف', singular: 'الشغف', icon: Flame,
+                id: 'passion-selection', name: 'تحديد الشغف', singular: 'الشغف', englishName: 'Passion Selection', icon: Flame,
                 description: () => 'أول خطوة هي تحديد الاهتمامات اللي بتحبها. هتختار من 3 لـ 6 مجالات عشان نبدأ رحلة استكشافهم مع بعض.',
                 hints: []
             },
             { 
-                id: 'purpose', name: 'الهدف', singular: 'الهدف', icon: Goal,
+                id: 'purpose', name: 'الهدف', singular: 'الهدف', englishName: 'Purpose', icon: Goal,
                 description: (passionName) => `ما هي الأهداف والدوافع العميقة التي تحرك شغفك بمجال "${passionName}"؟ وما هي القيمة التي يضيفها هذا الشغف لحياتك؟`,
                 hints: [
                     'فكر في الصورة الكبيرة: لماذا هذا الشغف مهم بالنسبة لك؟ ما الذي تأمل في تحقيقه من خلاله على المدى الطويل؟',
@@ -83,7 +84,7 @@ export const content: {
                 ] 
             },
             { 
-                id: 'power', name: 'القوة', singular: 'نقطة القوة', icon: Zap,
+                id: 'power', name: 'القوة', singular: 'نقطة القوة', englishName: 'Power', icon: Zap,
                 description: (passionName) => `ما هي نقاط قوتك ومهاراتك الحالية التي تدعم شغفك في "${passionName}"، وكيف يمكنك استغلالها لصالحك؟`,
                 hints: [
                     'فكر في مهاراتك الطبيعية والمكتسبة. ما الذي تجيده ويميزك في هذا المجال؟',
@@ -92,7 +93,7 @@ export const content: {
                 ] 
             },
             { 
-                id: 'proof', name: 'الإثبات', singular: 'الإثبات', icon: FileCheck,
+                id: 'proof', name: 'الإثبات', singular: 'الإثبات', englishName: 'Proof', icon: FileCheck,
                 description: (passionName) => `ما هي الأدلة والتجارب العملية التي تثبت اهتمامك الحقيقي بشغفك في "${passionName}"؟`,
                 hints: [
                     'ابحث في ماضيك عن أي دليل ملموس يثبت أنك بالفعل مهتم بهذا الشغف. كلما كان الدليل أقوى، زادت مصداقية شغفك.',
@@ -101,7 +102,7 @@ export const content: {
                 ] 
             },
             { 
-                id: 'problems', name: 'المشاكل', singular: 'المشكلة', icon: AlertTriangle,
+                id: 'problems', name: 'المشاكل', singular: 'المشكلة', englishName: 'Problems', icon: AlertTriangle,
                 description: (passionName) => `ما هي العقبات والتحديات الواقعية التي قد تواجهك وأنت تسعى وراء شغفك في "${passionName}"؟`,
                 hints: [
                     'كن واقعيًا وصريحًا مع نفسك. ما هي أكبر العقبات التي تمنعك من المضي قدمًا في هذا الشغف؟',
@@ -110,7 +111,7 @@ export const content: {
                 ] 
             },
             { 
-                id: 'possibilities', name: 'الحلول الممكنة', singular: 'الحل الممكن', icon: Lightbulb,
+                id: 'possibilities', name: 'الحلول الممكنة', singular: 'الحل الممكن', englishName: 'Solutions', icon: Lightbulb,
                 description: (passionName) => `لكل مشكلة حل! بناءً على التحديات التي حددتها لشغفك في "${passionName}"، فكر في خطوات عملية ومبتكرة لتجاوزها.`,
                 hints: [ 
                     'حول كل مشكلة إلى فرصة. كيف يمكنك تحويل هذا التحدي إلى خطوة للأمام؟',
@@ -258,7 +259,7 @@ export const content: {
                         rank1: "نصيحة: هذا هو شغفك الأقوى! إنه يمثل أفضل فرصة لك للنجاح والتأثير. ركز طاقتك هنا، وابدأ في تحويله إلى واقع ملموس.",
                         rank2: "نصيحة: هذا شغف واعد جدًا. فكر في كيفية دمجه مع شغفك الأول، أو اعتبره خطة بديلة قوية يمكنك تطويرها بالتوازي.",
                         rank3: "نصيحة: هذا يمكن أن يكون هواية رائعة أو مجالًا جانبيًا تستمتع به. لا تضعه كأولوية قصوى الآن، لكن لا تهمله تمامًا.",
-                        default: "نصيحة: في الوقت الحالي، قد يكون من الأفضل ترك هذا الشغف جانبًا والتركيز على الخيارات ذات الأولوية الأعلى لضمان عدم تشتيت جهودك.",
+                        default: "نصي-حة: في الوقت الحالي، قد يكون من الأفضل ترك هذا الشغف جانبًا والتركيز على الخيارات ذات الأولوية الأعلى لضمان عدم تشتيت جهودك.",
                     }
                 }
             },
@@ -577,3 +578,4 @@ export const content: {
 
 
     
+
