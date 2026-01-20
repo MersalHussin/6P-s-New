@@ -13,7 +13,7 @@ import {z} from 'genkit/zod';
 
 export const ExplainHintInputSchema = z.object({
   stationName: z.string().describe('The name of the station the user is currently on.'),
-  passionName: z.string().describe('The name of the passion the user is currently exploring.'),
+  passionName: z.string().describe('The name of the preferred field the user is currently exploring.'),
   stationDescription: z.string().describe('The description of the current station.'),
   language: z.enum(['en', 'ar']).describe('The language for the response.'),
 });
@@ -36,7 +36,7 @@ const explainHintFlow = ai.defineFlow(
   async (input) => {
     const prompt = `
         You are a helpful and encouraging career and passion coach.
-        The user is on a journey to discover their passion. They are at the "${input.stationName}" station for their passion "${input.passionName}".
+        The user is on a journey to discover their preferences. They are at the "${input.stationName}" station for their preferred field "${input.passionName}".
         The goal of this station is: "${input.stationDescription}".
         The user has asked for help. Your task is to provide a detailed, encouraging, and thought-provoking explanation in ${input.language === 'ar' ? 'Arabic' : 'English'}.
         

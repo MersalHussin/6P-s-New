@@ -68,7 +68,7 @@ export default function UserSignUpPage() {
 
         <Link href="/" passHref className="mb-8">
              <div className="relative h-12 w-48">
-                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+                <Image src="https://i.suar.me/1AxXY/l" alt="Preferences Path Logo" fill style={{ objectFit: 'contain' }}/>
             </div>
         </Link>
       <Card className="w-full max-w-sm mx-4">

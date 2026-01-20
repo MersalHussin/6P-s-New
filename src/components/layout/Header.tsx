@@ -92,7 +92,7 @@ const LogoLink = ({ isJourneyPage, c }: { isJourneyPage: boolean, c: any }) => {
              <AlertDialog>
                 <AlertDialogTrigger asChild>
                     <div className="relative h-10 w-40 cursor-pointer">
-                        <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+                        <Image src="https://i.suar.me/1AxXY/l" alt="Preferences Path Logo" fill style={{ objectFit: 'contain' }}/>
                     </div>
                 </AlertDialogTrigger>
                 <AlertDialogContent dir={c.logoClickWarning.title === "العودة إلى الصفحة الرئيسية" ? "rtl" : "ltr"}>
@@ -112,7 +112,7 @@ const LogoLink = ({ isJourneyPage, c }: { isJourneyPage: boolean, c: any }) => {
     return (
         <Link href="/" passHref>
             <div className="relative h-10 w-40 cursor-pointer">
-                <Image src="https://i.suar.me/1AxXY/l" alt="Passion Path Logo" fill style={{ objectFit: 'contain' }}/>
+                <Image src="https://i.suar.me/1AxXY/l" alt="Preferences Path Logo" fill style={{ objectFit: 'contain' }}/>
             </div>
         </Link>
     );

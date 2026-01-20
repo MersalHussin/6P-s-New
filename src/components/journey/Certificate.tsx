@@ -46,7 +46,7 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
         {/* Encouraging Message */}
         <div className="absolute top-1/2 w-full text-center px-[220px]" style={{ transform: 'translateY(40%)' }}>
            <p className="text-[#002B7F] text-[22px] leading-snug">
-            Congratulations on successfully completing the 6Ps Journey. Your passion has been identified as: {passion}. We are proud of your effort and wish you success in turning your passion into impact.
+            Congratulations on successfully completing the 6Ps Journey. Your preferred field has been identified as: {passion}. We are proud of your effort and wish you success in turning your passion into impact.
            </p>
         </div>
 
@@ -60,5 +60,3 @@ export const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(({
 });
 
 Certificate.displayName = 'Certificate';
-
-    

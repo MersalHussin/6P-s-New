@@ -64,13 +64,13 @@ export function AdminDashboard() {
         CurrentStation: user.currentStation,
         ...passionsData?.reduce((acc, p, i) => ({
           ...acc,
-          [`Passion ${i+1} Name`]: p.passionName,
-          [`Passion ${i+1} Purpose`]: p.purpose,
-          [`Passion ${i+1} Power`]: p.power,
-          [`Passion ${i+1} Proof`]: p.proof,
-          [`Passion ${i+1} Problems`]: p.problems,
-          [`Passion ${i+1} Possibilities`]: p.possibilities,
-          [`Passion ${i+1} Solutions`]: p.suggestedSolutions,
+          [`Preferred ${i+1} Name`]: p.passionName,
+          [`Preferred ${i+1} Purpose`]: p.purpose,
+          [`Preferred ${i+1} Power`]: p.power,
+          [`Preferred ${i+1} Proof`]: p.proof,
+          [`Preferred ${i+1} Problems`]: p.problems,
+          [`Preferred ${i+1} Possibilities`]: p.possibilities,
+          [`Preferred ${i+1} Solutions`]: p.suggestedSolutions,
         }), {})
       };
     });
@@ -78,12 +78,12 @@ export function AdminDashboard() {
     const worksheet = XLSX.utils.json_to_sheet(flattenedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
-    XLSX.writeFile(workbook, "PassionPath_Users.xlsx");
+    XLSX.writeFile(workbook, "Preferences_Path_Users.xlsx");
   };
 
   const stationLabels: Record<string, string> = {
     'user-data': 'User Data Entry',
-    'passions': 'Passion Entry',
+    'passions': 'Preferred Entry',
     'journey': 'Journey In Progress',
     'results': 'Results Calculated'
   };
@@ -178,5 +178,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
-    

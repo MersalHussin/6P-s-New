@@ -5,8 +5,8 @@ import { LanguageProvider } from "@/context/language-context";
 import { FirebaseErrorListener } from "@/components/FirebaseErrorListener";
 
 export const metadata: Metadata = {
-  title: "Passion Path",
-  description: "اكتشف شغفك وانطلق في رحلة الـ 6Ps",
+  title: "Preferences Path",
+  description: "اكتشف مفضلاتك وانطلق في رحلة الـ 6Ps",
   icons: {
     icon: 'https://i.suar.me/xpZXl/l',
   },

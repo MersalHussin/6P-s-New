@@ -27,7 +27,7 @@ const downloadContent = {
     ar: {
         certificateDialog: {
             title: "تنزيل شهادة الإنجاز",
-            description: "أدخل اسمك ليتم وضعه على شهادة إتمام رحلة اكتشاف الشغف. استخدم اسمك باللغة الإنجليزية للحصول على أفضل نتيجة.",
+            description: "أدخل اسمك ليتم وضعه على شهادة إتمام رحلة اكتشاف المفضلات. استخدم اسمك باللغة الإنجليزية للحصول على أفضل نتيجة.",
             nameLabel: "الاسم",
             namePlaceholder: "اسمك الكامل",
             downloadButton: "تنزيل الشهادة (PDF)",
@@ -49,7 +49,7 @@ const downloadContent = {
     en: {
         certificateDialog: {
             title: "Download Certificate of Completion",
-            description: "Enter your name to be placed on your passion discovery journey certificate. Use your English name for best results.",
+            description: "Enter your name to be placed on your preference discovery journey certificate. Use your English name for best results.",
             nameLabel: "Name",
             namePlaceholder: "Your Full Name",
             downloadButton: "Download Certificate (PDF)",
@@ -318,7 +318,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'Passion_Path_Report.txt';
+        link.download = 'Preferences_Path_Report.txt';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -369,7 +369,7 @@ export function ResultsDisplay({ passions, initialResults, onResultsCalculated, 
         });
 
         pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save('Passion_Path_Certificate.pdf');
+        pdf.save('Preferences_Path_Certificate.pdf');
 
     } catch (e) {
         console.error(e);
