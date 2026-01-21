@@ -1,5 +1,3 @@
-
-
 import { Goal, Zap, FileCheck, AlertTriangle, Lightbulb, Flame, type LucideIcon } from "lucide-react";
 
 interface StationInfo {
@@ -43,7 +41,7 @@ export const content: {
         cta: "ابدأ رحلتك الآن",
         verifyCertificate: "التحقق من الشهادة",
         hero: {
-            title: "اكتشف مفضلاتك، ارسم مستقبلك",
+            title: "اكتشف نفسك، ارسم مستقبلك",
             subtitle: "انضم لآلاف الشباب في رحلة فريدة من 6 خطوات للعثور على المجال المفضل الحقيقي الذي سيقود مسيرتك المهنية والعملية."
         },
         howItWorks: {
@@ -312,7 +310,7 @@ export const content: {
         cta: "Start Your Journey Now",
         verifyCertificate: "Verify Certificate",
         hero: {
-            title: "Discover Your Preferences, Design Your Future",
+            title: "Discover Yourself, Design Your Future",
             subtitle: "Join thousands of youths on a unique 6-step journey to find the true preferred field that will drive your professional and practical career."
         },
         howItWorks: {
@@ -575,17 +573,3 @@ export const content: {
         }
     }
 }
-
-  
-
-    
-
-    
-
-
-    
-
-
-
-
-
