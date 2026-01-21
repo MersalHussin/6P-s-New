@@ -265,9 +265,12 @@ export const content: {
             },
         },
         footer: {
-            title: "تم تطوير هذا التطبيق من خلال ",
-            subtitle: "مرسال",
-            link: "https://mersal.top/"
+            developed_by_pre: "تم تطوير هذا التطبيق من خلال ",
+            developed_by_name: "مرسال",
+            developed_by_link: "https://mersal.top/",
+            copyright_pre: "جميع الحقوق محفوظة لـ د. ",
+            copyright_name: "محمد حربي",
+            copyright_link: "https://mohamedharby.com/"
         },
         auth: {
             backToHome: "الرئيسية",
@@ -531,9 +534,12 @@ export const content: {
             },
         },
         footer: {
-            title: "This app was developed by the Qudurat Youth team.",
-            subtitle: "Methodology Discoverer: Dr. Mohamed Harby",
-            link: "https://www.linkedin.com/in/mohamedharby2020/"
+            developed_by_pre: "This app was developed by ",
+            developed_by_name: "Mersal",
+            developed_by_link: "https://mersal.top/",
+            copyright_pre: "All rights reserved for Dr. ",
+            copyright_name: "Mohamed Harby",
+            copyright_link: "https://mohamedharby.com/"
         },
         auth: {
             backToHome: "Home",
@@ -578,6 +584,7 @@ export const content: {
 
 
     
+
 
 
 
