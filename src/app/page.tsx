@@ -139,15 +139,26 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-primary text-primary-foreground py-8">
-          <div className="container mx-auto text-center space-y-2">
-              <p className="font-bold text-lg">{c.footer.title}</p>
-              {c.footer.subtitle && c.footer.link ? (
-                <a href={c.footer.link} target="_blank" rel="noopener noreferrer" className="text-sm opacity-80 hover:opacity-100 hover:underline transition-opacity">
-                    {c.footer.subtitle}
-                </a>
-              ) : c.footer.subtitle && (
-                <p className="text-sm opacity-80 mt-2">{c.footer.subtitle}</p>
-              )}
+          <div className="container mx-auto text-center">
+            {language === 'ar' ? (
+                <p className="font-bold text-lg">
+                    {c.footer.title}
+                    <a href={c.footer.link} target="_blank" rel="noopener noreferrer" className="hover:underline transition-opacity">
+                        {c.footer.subtitle}
+                    </a>
+                </p>
+            ) : (
+                <div className="space-y-2">
+                    <p className="font-bold text-lg">{c.footer.title}</p>
+                    {c.footer.subtitle && c.footer.link ? (
+                        <a href={c.footer.link} target="_blank" rel="noopener noreferrer" className="text-sm opacity-80 hover:opacity-100 hover:underline transition-opacity">
+                            {c.footer.subtitle}
+                        </a>
+                    ) : c.footer.subtitle && (
+                        <p className="text-sm opacity-80 mt-2">{c.footer.subtitle}</p>
+                    )}
+                </div>
+            )}
           </div>
       </footer>
     </div>
@@ -155,5 +166,6 @@ export default function Home() {
 }
 
     
+
 
 

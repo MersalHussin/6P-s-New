@@ -265,9 +265,9 @@ export const content: {
             },
         },
         footer: {
-            title: "تم تطوير هذا التطبيق من خلال فريق قدرات شباب",
-            subtitle: "مُكتشف المنهجية: د. محمد حربي",
-            link: "https://www.linkedin.com/in/mohamedharby2020/"
+            title: "تم تطوير هذا التطبيق من خلال ",
+            subtitle: "مرسال",
+            link: "https://mersal.top/"
         },
         auth: {
             backToHome: "الرئيسية",
@@ -336,7 +336,7 @@ export const content: {
         },
         stations: [
             { 
-                id: 'passion-selection', name: 'Preferred Selection', singular: 'Preferred', englishName: 'Preferred', icon: Flame,
+                id: 'passion-selection', name: 'Preferred Selection', singular: 'Preferred', icon: Flame,
                 description: () => 'The first step is to identify the interests you love. You will choose from 3 to 6 areas to begin our journey of exploring them together.',
                 hints: []
             },
@@ -578,6 +578,7 @@ export const content: {
 
 
     
+
 
 
 
